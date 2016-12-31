@@ -1,7 +1,9 @@
 package cc.isotopestudio.cscraft;
 
+import cc.isotopestudio.cscraft.command.CommandCs;
 import cc.isotopestudio.cscraft.command.CommandCscraft;
 import cc.isotopestudio.cscraft.listener.PlayerListener;
+import cc.isotopestudio.cscraft.task.UpdateConfig;
 import cc.isotopestudio.cscraft.util.PluginFile;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -15,18 +17,25 @@ public class CScraft extends JavaPlugin {
     public static CScraft plugin;
 
     public static PluginFile config;
-    public static PluginFile warpData;
+    public static PluginFile roomData;
+    public static PluginFile classData;
+    public static PluginFile playerData;
 
     @Override
     public void onEnable() {
         plugin = this;
         config = new PluginFile(this, "config.yml", "config.yml");
         config.setEditable(false);
-        warpData = new PluginFile(this, "warps.yml");
+        roomData = new PluginFile(this, "room.yml");
+        classData = new PluginFile(this, "class.yml");
+        playerData = new PluginFile(this, "player.yml");
 
-        this.getCommand("w").setExecutor(new CommandCscraft());
+        this.getCommand("cscraft").setExecutor(new CommandCscraft());
+        this.getCommand("cs").setExecutor(new CommandCs());
 
         plugin.getServer().getPluginManager().registerEvents(new PlayerListener(), this);
+
+        new UpdateConfig().run();
 
         getLogger().info(pluginName + "成功加载!");
         getLogger().info(pluginName + "由ISOTOPE Studio制作!");

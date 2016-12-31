@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Set;
 
 
-public class WarpGUI extends GUI {
+public class RoomGUI extends GUI {
 
     public static Set<String> keys;
 
@@ -23,7 +23,7 @@ public class WarpGUI extends GUI {
     private Map<Integer, String> slotIDMap;
     private List<String> favorites;
 
-    public WarpGUI(Player player, int page) {
+    public RoomGUI(Player player, int page) {
         super(S.toBoldGold("地标列表") + "[" + player.getName() + "]", 4 * 9, player);
         this.page = page;
     }

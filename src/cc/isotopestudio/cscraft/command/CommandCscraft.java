@@ -20,17 +20,15 @@ public class CommandCscraft implements CommandExecutor {
                 return true;
             }
             Player player = (Player) sender;
-            if (!player.hasPermission("luckycat.admin")) {
+            if (!player.hasPermission("cscraft.admin")) {
                 player.sendMessage(S.toPrefixRed("你没有权限"));
                 return true;
             }
             if (args.length < 1) {
                 player.sendMessage(S.toPrefixGreen("帮助菜单"));
-                player.sendMessage(S.toYellow("/" + label + " setlot - 设置手中的物品为抽奖卷"));
-                player.sendMessage(S.toYellow("/" + label + " add <幸运值> - 添加手中的物品为奖品"));
-                player.sendMessage(S.toYellow("/" + label + " remove <ID> - 删除一个奖品(列表中的ID)"));
-                player.sendMessage(S.toYellow("/" + label + " removeall - 删除所有奖品和玩家"));
-                player.sendMessage(S.toYellow("/" + label + " removerecords - 删除所有玩家的中奖纪录"));
+                player.sendMessage(S.toYellow("/" + label + " create <名字> <team|infect|protect> - 创建<团队|感染|守卫>"));
+                player.sendMessage(S.toYellow("/" + label + " addclass <名字> <职业名字> - 添加手中的物品为奖品"));
+                
                 player.sendMessage(S.toYellow("/" + label + " list - 查看奖品列表"));
                 return true;
             }

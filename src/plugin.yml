@@ -5,3 +5,10 @@ author: Mars
 description: CScraft
 website: http://isotopestudio.cc
 version: 1.0.0
+commands:
+  cscraft:
+    description: CScraft
+    usage: /<command>
+  cs:
+    description: CScraft
+    usage: /<command>
