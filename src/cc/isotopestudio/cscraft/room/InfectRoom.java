@@ -4,8 +4,21 @@ package cc.isotopestudio.cscraft.room;
  * Copyright ISOTOPE Studio
  */
 
+import cc.isotopestudio.cscraft.util.S;
+
 public class InfectRoom extends Room {
+
     public InfectRoom(String name) {
         super(name);
+    }
+
+    @Override
+    public boolean isReady() {
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        return S.toBoldDarkGreen("¸ÐÈ¾Ä£Ê½");
     }
 }

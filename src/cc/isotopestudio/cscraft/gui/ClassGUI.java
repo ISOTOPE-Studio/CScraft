@@ -7,7 +7,7 @@ package cc.isotopestudio.cscraft.gui;
 import org.bukkit.entity.Player;
 
 public class ClassGUI extends GUI {
-    ClassGUI(String name, int size, Player player) {
-        super(name, size, player);
+    ClassGUI(String name, Player player) {
+        super(name, 9, player);
     }
 }

@@ -3,6 +3,7 @@ package cc.isotopestudio.cscraft;
 import cc.isotopestudio.cscraft.command.CommandCs;
 import cc.isotopestudio.cscraft.command.CommandCscraft;
 import cc.isotopestudio.cscraft.listener.PlayerListener;
+import cc.isotopestudio.cscraft.task.CheckPlayerLocation;
 import cc.isotopestudio.cscraft.task.UpdateConfig;
 import cc.isotopestudio.cscraft.util.PluginFile;
 import org.bukkit.ChatColor;
@@ -36,14 +37,23 @@ public class CScraft extends JavaPlugin {
         plugin.getServer().getPluginManager().registerEvents(new PlayerListener(), this);
 
         new UpdateConfig().run();
+        new CheckPlayerLocation().runTaskTimer(this, 20, 20);
 
         getLogger().info(pluginName + "成功加载!");
         getLogger().info(pluginName + "由ISOTOPE Studio制作!");
         getLogger().info("http://isotopestudio.cc");
     }
 
+    public void onReload() {
+        playerData.reload();
+        roomData.reload();
+        config.reload();
+        new UpdateConfig().run();
+    }
+
     @Override
     public void onDisable() {
+        //End all games
         getLogger().info(pluginName + "成功卸载!");
     }
 

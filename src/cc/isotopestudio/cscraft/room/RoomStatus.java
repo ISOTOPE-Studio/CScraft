@@ -9,6 +9,7 @@ import cc.isotopestudio.cscraft.util.S;
 public enum RoomStatus {
     WAITING(S.toGreen("等待中")),
     PROGRESS(S.toYellow("游戏中"));
+
     private final String name;
 
     RoomStatus(String name) {

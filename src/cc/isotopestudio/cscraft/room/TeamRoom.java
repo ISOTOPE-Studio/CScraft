@@ -4,9 +4,21 @@ package cc.isotopestudio.cscraft.room;
  * Copyright ISOTOPE Studio
  */
 
+import cc.isotopestudio.cscraft.util.S;
+
 public class TeamRoom extends Room {
 
     public TeamRoom(String name) {
         super(name);
+    }
+
+    @Override
+    public boolean isReady() {
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        return S.toBoldGold("团队模式");
     }
 }

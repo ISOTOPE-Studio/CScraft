@@ -4,8 +4,28 @@ package cc.isotopestudio.cscraft.room;
  * Copyright ISOTOPE Studio
  */
 
+import cc.isotopestudio.cscraft.util.S;
+
 public class ProtectRoom extends Room {
+
     public ProtectRoom(String name) {
         super(name);
+    }
+
+    @Override
+    void loadFromConfig() {
+        super.loadFromConfig();
+
+    }
+
+
+    @Override
+    public boolean isReady() {
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        return S.toBoldPurple("йьнюдёй╫");
     }
 }

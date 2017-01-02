@@ -7,8 +7,9 @@ package cc.isotopestudio.cscraft.data;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+
+import static cc.isotopestudio.cscraft.CScraft.plugin;
 
 public class CSClass {
 
@@ -28,5 +29,18 @@ public class CSClass {
 
     public void equip(Player player) {
 
+    }
+
+    public static Set<CSClass> parseSet(Collection<String> stringSet) {
+        Set<CSClass> result = new HashSet<>();
+        if (stringSet != null)
+            for (String classString : stringSet) {
+                if (!classes.containsKey(classString)) {
+                    plugin.getLogger().warning("职业 " + classString + " 不存在");
+                    continue;
+                }
+                result.add(classes.get(classString));
+            }
+        return result;
     }
 }

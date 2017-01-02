@@ -10,6 +10,10 @@ public class UpdateConfig extends BukkitRunnable {
 
     @Override
     public void run() {
+        // Update config
 
+        // Update class
+
+        // Update room
     }
 }

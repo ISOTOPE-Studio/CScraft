@@ -4,6 +4,7 @@ package cc.isotopestudio.cscraft.command;
  * Copyright ISOTOPE Studio
  */
 
+import cc.isotopestudio.cscraft.gui.RoomGUI;
 import cc.isotopestudio.cscraft.util.S;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -24,6 +25,7 @@ public class CommandCs implements CommandExecutor {
                 player.sendMessage(S.toPrefixRed("你没有权限"));
                 return true;
             }
+            new RoomGUI(player).open(player);
             return true;
         }
         return false;
