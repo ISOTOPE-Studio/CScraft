@@ -4,17 +4,18 @@ package cc.isotopestudio.cscraft.command;
  * Copyright ISOTOPE Studio
  */
 
+import cc.isotopestudio.cscraft.data.CSClass;
 import cc.isotopestudio.cscraft.util.S;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class CommandCscraft implements CommandExecutor {
+public class CommandCsroom implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (cmd.getName().equalsIgnoreCase("cscraft")) {
+        if (cmd.getName().equalsIgnoreCase("csroom")) {
             if (!(sender instanceof Player)) {
                 sender.sendMessage(S.toPrefixRed("玩家执行的命令"));
                 return true;
@@ -28,8 +29,24 @@ public class CommandCscraft implements CommandExecutor {
                 player.sendMessage(S.toPrefixGreen("帮助菜单"));
                 player.sendMessage(S.toYellow("/" + label + " create <名字> <team|infect|protect> - 创建<团队|感染|守卫>"));
                 player.sendMessage(S.toYellow("/" + label + " addclass <名字> <职业名字> - 添加手中的物品为奖品"));
-                
+
                 player.sendMessage(S.toYellow("/" + label + " list - 查看奖品列表"));
+                return true;
+            }
+            if (args[0].equalsIgnoreCase("addclass")) {
+                if (args.length < 2) {
+                    player.sendMessage(S.toYellow("/" + label + " add <幸运值> - 添加手中的物品为奖品"));
+                    return true;
+                }
+                if (CSClass.classes.containsKey(args[1])) {
+                    final CSClass csclass = CSClass.classes.get(args[1]);
+                    csclass.setClass(player);
+
+                } else {
+                    final CSClass csclass = new CSClass(args[1]);
+                    csclass.setClass(player);
+                }
+
                 return true;
             }
             if (args[0].equalsIgnoreCase("add")) {

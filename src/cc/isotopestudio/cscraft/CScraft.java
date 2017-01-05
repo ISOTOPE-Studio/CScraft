@@ -1,7 +1,8 @@
 package cc.isotopestudio.cscraft;
 
 import cc.isotopestudio.cscraft.command.CommandCs;
-import cc.isotopestudio.cscraft.command.CommandCscraft;
+import cc.isotopestudio.cscraft.command.CommandCsclass;
+import cc.isotopestudio.cscraft.command.CommandCsroom;
 import cc.isotopestudio.cscraft.listener.PlayerListener;
 import cc.isotopestudio.cscraft.task.CheckPlayerLocation;
 import cc.isotopestudio.cscraft.task.UpdateConfig;
@@ -31,7 +32,8 @@ public class CScraft extends JavaPlugin {
         classData = new PluginFile(this, "class.yml");
         playerData = new PluginFile(this, "player.yml");
 
-        this.getCommand("cscraft").setExecutor(new CommandCscraft());
+        this.getCommand("cscroom").setExecutor(new CommandCsroom());
+        this.getCommand("csclass").setExecutor(new CommandCsclass());
         this.getCommand("cs").setExecutor(new CommandCs());
 
         plugin.getServer().getPluginManager().registerEvents(new PlayerListener(), this);

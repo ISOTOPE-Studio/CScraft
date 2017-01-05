@@ -26,17 +26,4 @@ public class Util {
         return new Location(world, x, y, z);
     }
 
-    public static void sendAllPlayers(Room room, String msg) {
-        for (Player player : room.getPlayersNames()) {
-            player.sendMessage(msg);
-        }
-    }
-
-    @SuppressWarnings("deprecation")
-    public static void sendAllPlayersTitle(Room room, String title, String subtitle) {
-        for (Player player : room.getPlayersNames()) {
-            player.sendTitle(title, subtitle);
-        }
-    }
-
 }

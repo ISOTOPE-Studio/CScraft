@@ -4,7 +4,10 @@ package cc.isotopestudio.cscraft.task;
  * Copyright ISOTOPE Studio
  */
 
+import cc.isotopestudio.cscraft.data.CSClass;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import static cc.isotopestudio.cscraft.CScraft.classData;
 
 public class UpdateConfig extends BukkitRunnable {
 
@@ -13,6 +16,9 @@ public class UpdateConfig extends BukkitRunnable {
         // Update config
 
         // Update class
+        for (String className : classData.getKeys(false)) {
+            CSClass.classes.put(className, new CSClass(className));
+        }
 
         // Update room
     }

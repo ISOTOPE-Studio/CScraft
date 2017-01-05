@@ -1,13 +1,15 @@
 # CScraft
 
-## 添加职业
-``/csclass add <职业名称>``
+## 职业
+``/csclass set <职业名称>``
 
 背包里的装备当 这个职业的装备
 
 ``/csclass delete <职业名称>``
 
 ``/csclass list``
+
+``/csclass setinvisible <true|false>``
 
 ### 权限
 ``csclass.<职业名字>``
@@ -38,6 +40,9 @@
 ``/cscraft teamA <名字>``
 
 ``/cscraft teamB <名字>``
+
+### 添加药水
+``/cscraft effect <漂浮物品ID> <获得药水> <药水等级> <时间> <冷却>``
 
 ### 设置奖励
 ``/cscraft reward <名字> <命令>``

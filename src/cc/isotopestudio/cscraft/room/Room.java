@@ -18,7 +18,7 @@ public abstract class Room {
 
     public static Map<String, Room> rooms = new HashMap<>();
 
-    ConfigurationSection config;
+    private ConfigurationSection config;
 
     // Settings
     private final String name;

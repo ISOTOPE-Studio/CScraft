@@ -49,7 +49,7 @@ public class RoomGUI extends GUI {
             meta.setDisplayName(S.toBoldRed(room.getName()));
             List<String> lore = new ArrayList<>();
             lore.add(room.toString());
-            lore.add(room.getPlayers().size()+"Íæ¼Ò")
+            lore.add(room.getPlayers().size()+"Íæ¼Ò");
             meta.setLore(lore);
             item.setItemMeta(meta);
             setOption(pos,item);

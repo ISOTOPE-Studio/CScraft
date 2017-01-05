@@ -9,6 +9,9 @@ commands:
   cscraft:
     description: CScraft
     usage: /<command>
+  csroom:
+    description: CScraft
+    usage: /<command>
   cs:
     description: CScraft
     usage: /<command>
