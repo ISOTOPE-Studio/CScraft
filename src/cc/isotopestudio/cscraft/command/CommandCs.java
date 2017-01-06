@@ -17,12 +17,12 @@ public class CommandCs implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (cmd.getName().equalsIgnoreCase("cs")) {
             if (!(sender instanceof Player)) {
-                sender.sendMessage(S.toPrefixRed("ç©å®¶æ‰§è¡Œçš„å‘½ä»¤"));
+                sender.sendMessage(S.toPrefixRed("Íæ¼ÒÖ´ĞĞµÄÃüÁî"));
                 return true;
             }
             Player player = (Player) sender;
             if (!player.hasPermission("cscraft.player")) {
-                player.sendMessage(S.toPrefixRed("ä½ æ²¡æœ‰æƒé™"));
+                player.sendMessage(S.toPrefixRed("ÄãÃ»ÓĞÈ¨ÏŞ"));
                 return true;
             }
             new RoomGUI(player).open(player);

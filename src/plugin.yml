@@ -6,7 +6,7 @@ description: CScraft
 website: http://isotopestudio.cc
 version: 1.0.0
 commands:
-  cscraft:
+  csclass:
     description: CScraft
     usage: /<command>
   csroom:

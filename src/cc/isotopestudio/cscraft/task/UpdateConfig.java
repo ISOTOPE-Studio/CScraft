@@ -17,7 +17,7 @@ public class UpdateConfig extends BukkitRunnable {
 
         // Update class
         for (String className : classData.getKeys(false)) {
-            CSClass.classes.put(className, new CSClass(className));
+            new CSClass(className);
         }
 
         // Update room

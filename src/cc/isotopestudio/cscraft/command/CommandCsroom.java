@@ -17,25 +17,25 @@ public class CommandCsroom implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (cmd.getName().equalsIgnoreCase("csroom")) {
             if (!(sender instanceof Player)) {
-                sender.sendMessage(S.toPrefixRed("ç©å®¶æ‰§è¡Œçš„å‘½ä»¤"));
+                sender.sendMessage(S.toPrefixRed("Íæ¼ÒÖ´ĞĞµÄÃüÁî"));
                 return true;
             }
             Player player = (Player) sender;
             if (!player.hasPermission("cscraft.admin")) {
-                player.sendMessage(S.toPrefixRed("ä½ æ²¡æœ‰æƒé™"));
+                player.sendMessage(S.toPrefixRed("ÄãÃ»ÓĞÈ¨ÏŞ"));
                 return true;
             }
             if (args.length < 1) {
-                player.sendMessage(S.toPrefixGreen("å¸®åŠ©èœå•"));
-                player.sendMessage(S.toYellow("/" + label + " create <åå­—> <team|infect|protect> - åˆ›å»º<å›¢é˜Ÿ|æ„ŸæŸ“|å®ˆå«>"));
-                player.sendMessage(S.toYellow("/" + label + " addclass <åå­—> <èŒä¸šåå­—> - æ·»åŠ æ‰‹ä¸­çš„ç‰©å“ä¸ºå¥–å“"));
+                player.sendMessage(S.toPrefixGreen("°ïÖú²Ëµ¥"));
+                player.sendMessage(S.toYellow("/" + label + " create <Ãû×Ö> <team|infect|protect> - ´´½¨<ÍÅ¶Ó|¸ĞÈ¾|ÊØÎÀ>"));
+                player.sendMessage(S.toYellow("/" + label + " addclass <Ãû×Ö> <Ö°ÒµÃû×Ö> - Ìí¼ÓÊÖÖĞµÄÎïÆ·Îª½±Æ·"));
 
-                player.sendMessage(S.toYellow("/" + label + " list - æŸ¥çœ‹å¥–å“åˆ—è¡¨"));
+                player.sendMessage(S.toYellow("/" + label + " list - ²é¿´½±Æ·ÁĞ±í"));
                 return true;
             }
             if (args[0].equalsIgnoreCase("addclass")) {
                 if (args.length < 2) {
-                    player.sendMessage(S.toYellow("/" + label + " add <å¹¸è¿å€¼> - æ·»åŠ æ‰‹ä¸­çš„ç‰©å“ä¸ºå¥–å“"));
+                    player.sendMessage(S.toYellow("/" + label + " add <ĞÒÔËÖµ> - Ìí¼ÓÊÖÖĞµÄÎïÆ·Îª½±Æ·"));
                     return true;
                 }
                 if (CSClass.classes.containsKey(args[1])) {
@@ -51,7 +51,7 @@ public class CommandCsroom implements CommandExecutor {
             }
             if (args[0].equalsIgnoreCase("add")) {
                 if (args.length < 2) {
-                    player.sendMessage(S.toYellow("/" + label + " add <å¹¸è¿å€¼> - æ·»åŠ æ‰‹ä¸­çš„ç‰©å“ä¸ºå¥–å“"));
+                    player.sendMessage(S.toYellow("/" + label + " add <ĞÒÔËÖµ> - Ìí¼ÓÊÖÖĞµÄÎïÆ·Îª½±Æ·"));
                     return true;
                 }
 
@@ -59,24 +59,24 @@ public class CommandCsroom implements CommandExecutor {
             }
             if (args[0].equalsIgnoreCase("remove")) {
                 if (args.length < 2) {
-                    player.sendMessage(S.toYellow("/" + label + " remove <ID> - åˆ é™¤ä¸€ä¸ªå¥–å“(åˆ—è¡¨ä¸­çš„ID)"));
+                    player.sendMessage(S.toYellow("/" + label + " remove <ID> - É¾³ıÒ»¸ö½±Æ·(ÁĞ±íÖĞµÄID)"));
                     return true;
                 }
                 int id;
                 try {
                     id = Integer.parseInt(args[1]);
                 } catch (Exception e) {
-                    player.sendMessage(S.toPrefixRed("æ•°å­—ä¸å¯¹"));
+                    player.sendMessage(S.toPrefixRed("Êı×Ö²»¶Ô"));
                     return true;
                 }
-                player.sendMessage(S.toPrefixGreen("æˆåŠŸåˆ é™¤"));
+                player.sendMessage(S.toPrefixGreen("³É¹¦É¾³ı"));
                 return true;
             }
             if (args[0].equalsIgnoreCase("list")) {
 
                 return true;
             }
-            player.sendMessage(S.toPrefixRed("æœªçŸ¥å‘½ä»¤, è¾“å…¥ /" + label + " æŸ¥çœ‹å¸®åŠ©"));
+            player.sendMessage(S.toPrefixRed("Î´ÖªÃüÁî, ÊäÈë /" + label + " ²é¿´°ïÖú"));
             return true;
         }
         return false;

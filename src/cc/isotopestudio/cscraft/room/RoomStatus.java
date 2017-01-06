@@ -7,8 +7,8 @@ package cc.isotopestudio.cscraft.room;
 import cc.isotopestudio.cscraft.util.S;
 
 public enum RoomStatus {
-    WAITING(S.toGreen("ç­‰å¾…ä¸­")),
-    PROGRESS(S.toYellow("æ¸¸æˆä¸­"));
+    WAITING(S.toGreen("µÈ´ıÖĞ")),
+    PROGRESS(S.toYellow("ÓÎÏ·ÖĞ"));
 
     private final String name;
 

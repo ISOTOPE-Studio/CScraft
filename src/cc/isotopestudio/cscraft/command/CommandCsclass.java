@@ -17,66 +17,97 @@ public class CommandCsclass implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (cmd.getName().equalsIgnoreCase("csclass")) {
             if (!(sender instanceof Player)) {
-                sender.sendMessage(S.toPrefixRed("ç©å®¶æ‰§è¡Œçš„å‘½ä»¤"));
+                sender.sendMessage(S.toPrefixRed("Íæ¼ÒÖ´ĞĞµÄÃüÁî"));
                 return true;
             }
             Player player = (Player) sender;
             if (!player.hasPermission("cscraft.admin")) {
-                player.sendMessage(S.toPrefixRed("ä½ æ²¡æœ‰æƒé™"));
+                player.sendMessage(S.toPrefixRed("ÄãÃ»ÓĞÈ¨ÏŞ"));
                 return true;
             }
             if (args.length < 1) {
-                player.sendMessage(S.toPrefixGreen("å¸®åŠ©èœå•"));
-                player.sendMessage(S.toYellow("/" + label + " create <åå­—> <team|infect|protect> - åˆ›å»º<å›¢é˜Ÿ|æ„ŸæŸ“|å®ˆå«>"));
-                player.sendMessage(S.toYellow("/" + label + " addclass <åå­—> <èŒä¸šåå­—> - æ·»åŠ æ‰‹ä¸­çš„ç‰©å“ä¸ºå¥–å“"));
-
-                player.sendMessage(S.toYellow("/" + label + " list - æŸ¥çœ‹å¥–å“åˆ—è¡¨"));
+                player.sendMessage(S.toPrefixGreen("°ïÖú²Ëµ¥"));
+                player.sendMessage(S.toYellow("/" + label + " set <Ãû×Ö> - ±³°üÀïµÄ×°±¸µ±´ËÖ°ÒµµÄ×°±¸"));
+                player.sendMessage(S.toYellow("/" + label + " setinvisible <Ãû×Ö> <true|false> - ÒşÉí"));
+                player.sendMessage(S.toYellow("/" + label + " delete <Ãû×Ö> - É¾³ıÖ°Òµ"));
+                player.sendMessage(S.toYellow("/" + label + " list - ²é¿´Ö°ÒµÁĞ±í"));
                 return true;
             }
-            if (args[0].equalsIgnoreCase("addclass")) {
+            if (args[0].equalsIgnoreCase("set")) {
                 if (args.length < 2) {
-                    player.sendMessage(S.toYellow("/" + label + " add <å¹¸è¿å€¼> - æ·»åŠ æ‰‹ä¸­çš„ç‰©å“ä¸ºå¥–å“"));
+                    player.sendMessage(S.toPrefixYellow("/" + label + " set <Ãû×Ö> - ±³°üÀïµÄ×°±¸µ±´ËÖ°ÒµµÄ×°±¸"));
                     return true;
                 }
-                if (CSClass.classes.containsKey(args[1])) {
-                    final CSClass csclass = CSClass.classes.get(args[1]);
+                CSClass csclass = CSClass.getClassByName(args[1]);
+                if (csclass != null) {
                     csclass.setClass(player);
-
                 } else {
-                    final CSClass csclass = new CSClass(args[1]);
+                    csclass = new CSClass(args[1]);
                     csclass.setClass(player);
                 }
-
+                player.sendMessage(S.toPrefixGreen("³É¹¦ÉèÖÃ"));
                 return true;
             }
-            if (args[0].equalsIgnoreCase("add")) {
+            if (args[0].equalsIgnoreCase("setinvisible")) {
                 if (args.length < 2) {
-                    player.sendMessage(S.toYellow("/" + label + " add <å¹¸è¿å€¼> - æ·»åŠ æ‰‹ä¸­çš„ç‰©å“ä¸ºå¥–å“"));
+                    player.sendMessage(S.toYellow("/" + label + " setinvisible <Ãû×Ö> <true|false> - ÒşÉí"));
                     return true;
                 }
-
+                CSClass csclass = CSClass.getClassByName(args[1]);
+                if (csclass != null) {
+                    switch (args[2]) {
+                        case "true":
+                            csclass.setInvisible(true);
+                            break;
+                        case "false":
+                            csclass.setInvisible(false);
+                            break;
+                        default:
+                            player.sendMessage(S.toPrefixRed("²ÎÊı´íÎó"));
+                            return true;
+                    }
+                    player.sendMessage(S.toPrefixGreen("³É¹¦ÉèÖÃ"));
+                } else {
+                    player.sendMessage(S.toPrefixRed("Ö°Òµ²»´æÔÚ"));
+                }
                 return true;
             }
-            if (args[0].equalsIgnoreCase("remove")) {
+            if (args[0].equalsIgnoreCase("delete")) {
                 if (args.length < 2) {
-                    player.sendMessage(S.toYellow("/" + label + " remove <ID> - åˆ é™¤ä¸€ä¸ªå¥–å“(åˆ—è¡¨ä¸­çš„ID)"));
+                    player.sendMessage(S.toYellow("/" + label + " delete <Ãû×Ö> - É¾³ıÖ°Òµ"));
                     return true;
                 }
-                int id;
-                try {
-                    id = Integer.parseInt(args[1]);
-                } catch (Exception e) {
-                    player.sendMessage(S.toPrefixRed("æ•°å­—ä¸å¯¹"));
-                    return true;
+                CSClass csclass = CSClass.getClassByName(args[1]);
+                if (csclass != null) {
+                    csclass.remove();
+                    player.sendMessage(S.toPrefixGreen("³É¹¦É¾³ı"));
+                } else {
+                    player.sendMessage(S.toPrefixRed("Ö°Òµ²»´æÔÚ"));
                 }
-                player.sendMessage(S.toPrefixGreen("æˆåŠŸåˆ é™¤"));
                 return true;
             }
             if (args[0].equalsIgnoreCase("list")) {
-
+                player.sendMessage(S.toPrefixYellow("Ö°ÒµÁĞ±í"));
+                for (CSClass csclass : CSClass.classes.values()) {
+                    player.sendMessage(S.toBoldDarkGreen("   - " + csclass.getName()));
+                }
                 return true;
             }
-            player.sendMessage(S.toPrefixRed("æœªçŸ¥å‘½ä»¤, è¾“å…¥ /" + label + " æŸ¥çœ‹å¸®åŠ©"));
+            if (args[0].equalsIgnoreCase("equip")) {
+                if (args.length < 2) {
+                    player.sendMessage(S.toYellow("/" + label + " equip <Ãû×Ö> - É¾³ıÖ°Òµ"));
+                    return true;
+                }
+                CSClass csclass = CSClass.getClassByName(args[1]);
+                if (csclass != null) {
+                    csclass.equip(player);
+                    player.sendMessage(S.toPrefixGreen("³É¹¦"));
+                } else {
+                    player.sendMessage(S.toPrefixRed("Ö°Òµ²»´æÔÚ"));
+                }
+                return true;
+            }
+            player.sendMessage(S.toPrefixRed("Î´ÖªÃüÁî, ÊäÈë /" + label + " ²é¿´°ïÖú"));
             return true;
         }
         return false;

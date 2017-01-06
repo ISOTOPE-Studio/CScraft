@@ -32,8 +32,8 @@ public class CScraft extends JavaPlugin {
         classData = new PluginFile(this, "class.yml");
         playerData = new PluginFile(this, "player.yml");
 
-        this.getCommand("cscroom").setExecutor(new CommandCsroom());
         this.getCommand("csclass").setExecutor(new CommandCsclass());
+        this.getCommand("csroom").setExecutor(new CommandCsroom());
         this.getCommand("cs").setExecutor(new CommandCs());
 
         plugin.getServer().getPluginManager().registerEvents(new PlayerListener(), this);
@@ -41,8 +41,8 @@ public class CScraft extends JavaPlugin {
         new UpdateConfig().run();
         new CheckPlayerLocation().runTaskTimer(this, 20, 20);
 
-        getLogger().info(pluginName + "鎴愬姛鍔犺浇!");
-        getLogger().info(pluginName + "鐢盜SOTOPE Studio鍒朵綔!");
+        getLogger().info(pluginName + "成功加载!");
+        getLogger().info(pluginName + "由ISOTOPE Studio制作!");
         getLogger().info("http://isotopestudio.cc");
     }
 
@@ -56,7 +56,7 @@ public class CScraft extends JavaPlugin {
     @Override
     public void onDisable() {
         //End all games
-        getLogger().info(pluginName + "鎴愬姛鍗歌浇!");
+        getLogger().info(pluginName + "成功卸载!");
     }
 
 }

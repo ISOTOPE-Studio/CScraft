@@ -52,6 +52,10 @@ public class CSClass {
         }
     }
 
+    public String getName() {
+        return name;
+    }
+
     public void setClass(Player player) {
         config.set("inventory", null);
         PlayerInventory inv = player.getInventory();
@@ -83,7 +87,17 @@ public class CSClass {
     }
 
     public void equip(Player player) {
-
+        player.getInventory().clear();
+        if (equipment[0] != null)
+            player.getInventory().setHelmet(equipment[0]);
+        if (equipment[1] != null)
+            player.getInventory().setChestplate(equipment[1]);
+        if (equipment[2] != null)
+            player.getInventory().setLeggings(equipment[2]);
+        if (equipment[3] != null)
+            player.getInventory().setBoots(equipment[3]);
+        for (int i : inventory.keySet())
+            player.getInventory().setItem(i, inventory.get(i));
     }
 
     public boolean isInvisible() {
@@ -92,6 +106,20 @@ public class CSClass {
 
     public void setInvisible(boolean invisible) {
         this.invisible = invisible;
+        config.set("invisible", invisible);
+        classData.save();
+    }
+
+    public void remove() {
+        classes.remove(name);
+        classData.set(name, null);
+        classData.save();
+    }
+
+    public static CSClass getClassByName(String name) {
+        if (classes.containsKey(name))
+            return classes.get(name);
+        return null;
     }
 
     public static Set<CSClass> parseSet(Collection<String> stringSet) {
@@ -99,7 +127,7 @@ public class CSClass {
         if (stringSet != null)
             for (String classString : stringSet) {
                 if (!classes.containsKey(classString)) {
-                    plugin.getLogger().warning("ËÅå‰∏ö " + classString + " ‰∏çÂ≠òÂú®");
+                    plugin.getLogger().warning("÷∞“µ " + classString + " ≤ª¥Ê‘⁄");
                     continue;
                 }
                 result.add(classes.get(classString));
