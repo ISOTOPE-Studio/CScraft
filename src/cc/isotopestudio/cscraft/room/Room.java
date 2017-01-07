@@ -5,20 +5,22 @@ package cc.isotopestudio.cscraft.room;
  */
 
 import cc.isotopestudio.cscraft.data.CSClass;
+import cc.isotopestudio.cscraft.util.PluginFile;
 import cc.isotopestudio.cscraft.util.Util;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import java.util.*;
 
-import static cc.isotopestudio.cscraft.CScraft.roomData;
+import static cc.isotopestudio.cscraft.CScraft.*;
 
 public abstract class Room {
 
     public static Map<String, Room> rooms = new HashMap<>();
 
-    private ConfigurationSection config;
+    private final PluginFile config;
+    private final PluginFile msgData;
 
     // Settings
     private final String name;
@@ -39,15 +41,13 @@ public abstract class Room {
 
     public Room(String name) {
         this.name = name;
-        config = roomData.getConfigurationSection(name);
-        if (config == null) {
-            roomData.set(name + ".created", new Date().getTime());
-            roomData.save();
-            config = roomData.getConfigurationSection(name);
-        } else {
-            loadFromConfig();
-        }
+        config = new PluginFile(plugin, "rooms/" + ChatColor.stripColor(getClass().getSimpleName()) + "." + name + "/config.yml");
+        roomFiles.add(config);
+        msgData = new PluginFile(plugin, "rooms/" + ChatColor.stripColor(getClass().getSimpleName()) + "." + name + "/msg.yml", "msg.yml");
+        msgFiles.add(msgData);
+        msgData.setEditable(false);
         rooms.put(name, this);
+        loadFromConfig();
     }
 
     void loadFromConfig() {
@@ -71,7 +71,7 @@ public abstract class Room {
     public void setPos1(Location pos1) {
         this.pos1 = pos1;
         config.set("pos1", Util.locationToString(pos1));
-        roomData.save();
+        config.save();
     }
 
     public Location getPos2() {
@@ -81,7 +81,7 @@ public abstract class Room {
     public void setPos2(Location pos2) {
         this.pos2 = pos2;
         config.set("pos2", Util.locationToString(pos2));
-        roomData.save();
+        config.save();
     }
 
     public Location getLobby() {
@@ -91,7 +91,7 @@ public abstract class Room {
     public void setLobby(Location lobby) {
         this.lobby = lobby;
         config.set("lobby", Util.locationToString(lobby));
-        roomData.save();
+        config.save();
     }
 
     public int getMinPlayer() {
@@ -101,7 +101,7 @@ public abstract class Room {
     public void setMinPlayer(int minPlayer) {
         this.minPlayer = minPlayer;
         config.set("min", minPlayer);
-        roomData.save();
+        config.save();
     }
 
     public int getMaxPlayer() {
@@ -111,7 +111,7 @@ public abstract class Room {
     public void setMaxPlayer(int maxPlayer) {
         this.maxPlayer = maxPlayer;
         config.set("max", maxPlayer);
-        roomData.save();
+        config.save();
     }
 
     /**
@@ -123,7 +123,7 @@ public abstract class Room {
 
     public void saveTeamAclass() {
         config.set("teamAclass", new ArrayList<>(teamAclass));
-        roomData.save();
+        config.save();
     }
 
     /**
@@ -135,7 +135,14 @@ public abstract class Room {
 
     public void saveTeamBclass() {
         config.set("teamBclass", new ArrayList<>(teamBclass));
-        roomData.save();
+        config.save();
+    }
+
+    public void remove() {
+        config.getFile().getParentFile().delete();
+        roomFiles.remove(config);
+        msgFiles.remove(msgData);
+        rooms.remove(name);
     }
 
     public abstract boolean isReady();
@@ -150,7 +157,7 @@ public abstract class Room {
     public void setStatus(RoomStatus status) {
         this.status = status;
         config.set("status", status.name());
-        roomData.save();
+        config.save();
     }
 
     /**

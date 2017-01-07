@@ -113,4 +113,8 @@ public class PluginFile extends YamlConfiguration {
         super.load(new FileInputStream(file));
     }
 
+
+    public File getFile() {
+        return file;
+    }
 }

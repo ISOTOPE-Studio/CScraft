@@ -10,6 +10,9 @@ import cc.isotopestudio.cscraft.util.PluginFile;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class CScraft extends JavaPlugin {
 
     private static final String pluginName = "CScraft";
@@ -19,19 +22,16 @@ public class CScraft extends JavaPlugin {
     public static CScraft plugin;
 
     public static PluginFile config;
-    public static PluginFile roomData;
     public static PluginFile classData;
     public static PluginFile playerData;
-    public static PluginFile msgData;
+    public static final Set<PluginFile> roomFiles = new HashSet<>();
+    public static final Set<PluginFile> msgFiles = new HashSet<>();
 
     @Override
     public void onEnable() {
         plugin = this;
-        msgData = new PluginFile(this, "msg.yml", "msg.yml");
-        msgData.setEditable(false);
         config = new PluginFile(this, "config.yml", "config.yml");
         config.setEditable(false);
-        roomData = new PluginFile(this, "room.yml");
         classData = new PluginFile(this, "class.yml");
         playerData = new PluginFile(this, "player.yml");
 
@@ -51,7 +51,6 @@ public class CScraft extends JavaPlugin {
 
     public void onReload() {
         playerData.reload();
-        roomData.reload();
         config.reload();
         new UpdateConfig().run();
     }
