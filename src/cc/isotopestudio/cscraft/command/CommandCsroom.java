@@ -33,6 +33,14 @@ public class CommandCsroom implements CommandExecutor {
                 player.sendMessage(S.toYellow("/" + label + " list - 查看奖品列表"));
                 return true;
             }
+            if (args[0].equalsIgnoreCase("create")) {
+                if (args.length < 2) {
+                    player.sendMessage(S.toYellow("/" + label + " add <幸运值> - 添加手中的物品为奖品"));
+                    return true;
+                }
+
+                return true;
+            }
             if (args[0].equalsIgnoreCase("addclass")) {
                 if (args.length < 2) {
                     player.sendMessage(S.toYellow("/" + label + " add <幸运值> - 添加手中的物品为奖品"));
@@ -45,14 +53,6 @@ public class CommandCsroom implements CommandExecutor {
                 } else {
                     final CSClass csclass = new CSClass(args[1]);
                     csclass.setClass(player);
-                }
-
-                return true;
-            }
-            if (args[0].equalsIgnoreCase("add")) {
-                if (args.length < 2) {
-                    player.sendMessage(S.toYellow("/" + label + " add <幸运值> - 添加手中的物品为奖品"));
-                    return true;
                 }
 
                 return true;

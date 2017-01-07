@@ -22,10 +22,13 @@ public class CScraft extends JavaPlugin {
     public static PluginFile roomData;
     public static PluginFile classData;
     public static PluginFile playerData;
+    public static PluginFile msgData;
 
     @Override
     public void onEnable() {
         plugin = this;
+        msgData = new PluginFile(this, "msg.yml", "msg.yml");
+        msgData.setEditable(false);
         config = new PluginFile(this, "config.yml", "config.yml");
         config.setEditable(false);
         roomData = new PluginFile(this, "room.yml");
