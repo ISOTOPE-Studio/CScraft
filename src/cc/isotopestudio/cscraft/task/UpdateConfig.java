@@ -4,7 +4,7 @@ package cc.isotopestudio.cscraft.task;
  * Copyright ISOTOPE Studio
  */
 
-import cc.isotopestudio.cscraft.data.CSClass;
+import cc.isotopestudio.cscraft.element.CSClass;
 import cc.isotopestudio.cscraft.room.InfectRoom;
 import cc.isotopestudio.cscraft.room.ProtectRoom;
 import cc.isotopestudio.cscraft.room.TeamRoom;
@@ -46,7 +46,7 @@ public class UpdateConfig extends BukkitRunnable {
                             new TeamRoom(roomFileString[1]);
                             break;
                         default:
-                            plugin.getLogger().warning("´íÎó: parsing room data folder");
+                            plugin.getLogger().warning("ï¿½ï¿½ï¿½ï¿½: parsing room data folder");
                             break;
                     }
                 }

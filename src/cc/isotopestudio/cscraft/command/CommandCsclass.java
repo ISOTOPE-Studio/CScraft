@@ -4,7 +4,8 @@ package cc.isotopestudio.cscraft.command;
  * Copyright ISOTOPE Studio
  */
 
-import cc.isotopestudio.cscraft.data.CSClass;
+import cc.isotopestudio.cscraft.element.CSClass;
+import cc.isotopestudio.cscraft.room.Room;
 import cc.isotopestudio.cscraft.util.S;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -30,6 +31,7 @@ public class CommandCsclass implements CommandExecutor {
                 player.sendMessage(S.toYellow("/" + label + " set <名字> - 背包里的装备当此职业的装备"));
                 player.sendMessage(S.toYellow("/" + label + " setinvisible <名字> <true|false> - 隐身"));
                 player.sendMessage(S.toYellow("/" + label + " delete <名字> - 删除职业"));
+                player.sendMessage(S.toRed("    会删除所有房间内的此职业"));
                 player.sendMessage(S.toYellow("/" + label + " list - 查看职业列表"));
                 return true;
             }
@@ -79,6 +81,12 @@ public class CommandCsclass implements CommandExecutor {
                 }
                 CSClass csclass = CSClass.getClassByName(args[1]);
                 if (csclass != null) {
+                    for (Room room : Room.rooms.values()) {
+                        room.getTeamAclass().remove(csclass);
+                        room.saveTeamAclass();
+                        room.getTeamBclass().remove(csclass);
+                        room.saveTeamBclass();
+                    }
                     csclass.remove();
                     player.sendMessage(S.toPrefixGreen("成功删除"));
                 } else {

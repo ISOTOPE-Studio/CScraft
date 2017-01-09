@@ -4,13 +4,17 @@ package cc.isotopestudio.cscraft.room;
  * Copyright ISOTOPE Studio
  */
 
-import cc.isotopestudio.cscraft.data.CSClass;
+import cc.isotopestudio.cscraft.element.CSClass;
+import cc.isotopestudio.cscraft.element.EffectPlace;
 import cc.isotopestudio.cscraft.util.PluginFile;
 import cc.isotopestudio.cscraft.util.Util;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
 
+import java.io.File;
 import java.util.*;
 
 import static cc.isotopestudio.cscraft.CScraft.*;
@@ -27,16 +31,19 @@ public abstract class Room {
     // pos must smaller than pos2
     private Location pos1;
     private Location pos2;
+    private Location teamA;
+    private Location teamB;
     private Location lobby;
     private int minPlayer;
     private int maxPlayer;
-    private Set<CSClass> teamAclass;
-    private Set<CSClass> teamBclass;
+    private Set<CSClass> teamAclass = new HashSet<>();
+    private Set<CSClass> teamBclass = new HashSet<>();
+    private Set<EffectPlace> effects = new HashSet<>();
 
     // In-game
     private RoomStatus status;
-    private Set<Player> teamAplayer;
-    private Set<Player> teamBplayer;
+    private Set<Player> teamAplayer = new HashSet<>();
+    private Set<Player> teamBplayer = new HashSet<>();
 
 
     public Room(String name) {
@@ -53,9 +60,18 @@ public abstract class Room {
     void loadFromConfig() {
         pos1 = Util.stringToLocation(config.getString("pos1"));
         pos2 = Util.stringToLocation(config.getString("pos2"));
+        teamA = Util.stringToLocation(config.getString("teamA"));
+        teamB = Util.stringToLocation(config.getString("teamB"));
         lobby = Util.stringToLocation(config.getString("lobby"));
         minPlayer = config.getInt("min");
         maxPlayer = config.getInt("max");
+        teamAclass.clear();
+        teamAclass.addAll(CSClass.parseSet(config.getStringList("teamAclass")));
+        teamBclass.clear();
+        teamBclass.addAll(CSClass.parseSet(config.getStringList("teamBclass")));
+        for (String s : config.getStringList("effectPlace")) {
+            effects.add(EffectPlace.deserialize(s));
+        }
     }
 
     // Settings
@@ -81,6 +97,26 @@ public abstract class Room {
     public void setPos2(Location pos2) {
         this.pos2 = pos2;
         config.set("pos2", Util.locationToString(pos2));
+        config.save();
+    }
+
+    public Location getTeamALocation() {
+        return teamA;
+    }
+
+    public void setTeamALocation(Location teamA) {
+        this.teamA = teamA;
+        config.set("teamA", Util.locationToString(teamA));
+        config.save();
+    }
+
+    public Location getTeamBLocation() {
+        return teamB;
+    }
+
+    public void setTeamBLocation(Location teamB) {
+        this.teamB = teamB;
+        config.set("teamB", Util.locationToString(teamA));
         config.save();
     }
 
@@ -122,7 +158,11 @@ public abstract class Room {
     }
 
     public void saveTeamAclass() {
-        config.set("teamAclass", new ArrayList<>(teamAclass));
+        List<String> list = new ArrayList<>();
+        for (CSClass csclass : teamAclass) {
+            list.add(csclass.getName());
+        }
+        config.set("teamAclass", list);
         config.save();
     }
 
@@ -134,11 +174,31 @@ public abstract class Room {
     }
 
     public void saveTeamBclass() {
-        config.set("teamBclass", new ArrayList<>(teamBclass));
+        List<String> list = new ArrayList<>();
+        for (CSClass csclass : teamBclass) {
+            list.add(csclass.getName());
+        }
+        config.set("teamBclass", list);
         config.save();
     }
 
+    public void addEffectPlace(Location location, Material material, PotionEffect effect, int cd) {
+        effects.add(new EffectPlace(location, material, effect, cd));
+        List<String> list = new ArrayList<>();
+        for (EffectPlace effectPlace : effects) {
+            list.add(effectPlace.serialize());
+        }
+        config.set("effectPlace", list);
+        config.save();
+    }
+
+    public Set<EffectPlace> getEffectPlaces() {
+        return effects;
+    }
+
     public void remove() {
+        config.getFile().delete();
+        msgData.getFile().delete();
         config.getFile().getParentFile().delete();
         roomFiles.remove(config);
         msgFiles.remove(msgData);

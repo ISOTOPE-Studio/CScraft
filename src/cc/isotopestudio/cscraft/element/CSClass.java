@@ -1,4 +1,4 @@
-package cc.isotopestudio.cscraft.data;
+package cc.isotopestudio.cscraft.element;
 /*
  * Created by Mars Tan on 12/31/2016.
  * Copyright ISOTOPE Studio
@@ -83,7 +83,6 @@ public class CSClass {
             }
         }
         classData.save();
-
     }
 
     public void equip(Player player) {
