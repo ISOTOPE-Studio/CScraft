@@ -14,7 +14,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 
-import java.io.File;
 import java.util.*;
 
 import static cc.isotopestudio.cscraft.CScraft.*;
@@ -24,7 +23,7 @@ public abstract class Room {
     public static Map<String, Room> rooms = new HashMap<>();
 
     private final PluginFile config;
-    private final PluginFile msgData;
+    PluginFile msgData;
 
     // Settings
     private final String name;
@@ -41,7 +40,7 @@ public abstract class Room {
     private Set<EffectPlace> effects = new HashSet<>();
 
     // In-game
-    private RoomStatus status;
+    private RoomStatus status = RoomStatus.WAITING;
     private Set<Player> teamAplayer = new HashSet<>();
     private Set<Player> teamBplayer = new HashSet<>();
 
@@ -50,9 +49,7 @@ public abstract class Room {
         this.name = name;
         config = new PluginFile(plugin, "rooms/" + ChatColor.stripColor(getClass().getSimpleName()) + "." + name + "/config.yml");
         roomFiles.add(config);
-        msgData = new PluginFile(plugin, "rooms/" + ChatColor.stripColor(getClass().getSimpleName()) + "." + name + "/msg.yml", "msg.yml");
-        msgFiles.add(msgData);
-        msgData.setEditable(false);
+
         rooms.put(name, this);
         loadFromConfig();
     }
@@ -63,8 +60,8 @@ public abstract class Room {
         teamA = Util.stringToLocation(config.getString("teamA"));
         teamB = Util.stringToLocation(config.getString("teamB"));
         lobby = Util.stringToLocation(config.getString("lobby"));
-        minPlayer = config.getInt("min");
-        maxPlayer = config.getInt("max");
+        minPlayer = config.getInt("min", 2);
+        maxPlayer = config.getInt("max", 4);
         teamAclass.clear();
         teamAclass.addAll(CSClass.parseSet(config.getStringList("teamAclass")));
         teamBclass.clear();
@@ -78,6 +75,18 @@ public abstract class Room {
 
     public String getName() {
         return name;
+    }
+
+    public String getMsg(String path) {
+        return ChatColor.translateAlternateColorCodes('&', msgData.getString(path));
+    }
+
+    public List<String> getMsgList(String path) {
+        List<String> list = new ArrayList<>();
+        for (String line : msgData.getStringList(path)) {
+            list.add(ChatColor.translateAlternateColorCodes('&', line));
+        }
+        return list;
     }
 
     public Location getPos1() {

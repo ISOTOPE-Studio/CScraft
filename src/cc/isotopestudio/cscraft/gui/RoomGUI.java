@@ -46,13 +46,18 @@ public class RoomGUI extends GUI {
                     break;
             }
             ItemMeta meta = item.getItemMeta();
-            meta.setDisplayName(S.toBoldRed(room.getName()));
+            String title = room.getMsg("GUI.title");
+            if (title != null)
+                meta.setDisplayName(title);
+            else
+                meta.setDisplayName(S.toBoldRed(room.getName()));
             List<String> lore = new ArrayList<>();
             lore.add(room.toString());
-            lore.add(room.getPlayers().size()+"Íæ¼Ò");
+            lore.add(room.getPlayers().size() + "Íæ¼Ò");
+            lore.addAll(room.getMsgList("GUI.lore"));
             meta.setLore(lore);
             item.setItemMeta(meta);
-            setOption(pos,item);
+            setOption(pos, item);
             pos++;
         }
     }

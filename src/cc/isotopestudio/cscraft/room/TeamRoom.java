@@ -4,12 +4,20 @@ package cc.isotopestudio.cscraft.room;
  * Copyright ISOTOPE Studio
  */
 
+import cc.isotopestudio.cscraft.util.PluginFile;
 import cc.isotopestudio.cscraft.util.S;
+import org.bukkit.ChatColor;
+
+import static cc.isotopestudio.cscraft.CScraft.msgFiles;
+import static cc.isotopestudio.cscraft.CScraft.plugin;
 
 public class TeamRoom extends Room {
 
     public TeamRoom(String name) {
         super(name);
+        msgData = new PluginFile(plugin, "rooms/" + ChatColor.stripColor(getClass().getSimpleName()) + "." + name + "/msg.yml", "msg_team.yml");
+        msgFiles.add(msgData);
+        msgData.setEditable(false);
     }
 
     @Override

@@ -15,3 +15,6 @@ commands:
   cs:
     description: CScraft
     usage: /<command>
+  csreload:
+    description: CScraft
+    usage: /<command>

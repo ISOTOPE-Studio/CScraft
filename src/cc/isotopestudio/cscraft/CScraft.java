@@ -2,6 +2,7 @@ package cc.isotopestudio.cscraft;
 
 import cc.isotopestudio.cscraft.command.CommandCs;
 import cc.isotopestudio.cscraft.command.CommandCsclass;
+import cc.isotopestudio.cscraft.command.CommandCsreload;
 import cc.isotopestudio.cscraft.command.CommandCsroom;
 import cc.isotopestudio.cscraft.listener.PlayerListener;
 import cc.isotopestudio.cscraft.task.CheckPlayerLocation;
@@ -38,6 +39,7 @@ public class CScraft extends JavaPlugin {
         this.getCommand("csclass").setExecutor(new CommandCsclass());
         this.getCommand("csroom").setExecutor(new CommandCsroom());
         this.getCommand("cs").setExecutor(new CommandCs());
+        this.getCommand("csreload").setExecutor(new CommandCsreload());
 
         plugin.getServer().getPluginManager().registerEvents(new PlayerListener(), this);
 
