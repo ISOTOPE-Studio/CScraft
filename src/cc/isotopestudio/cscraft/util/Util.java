@@ -8,8 +8,15 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class Util {
     public static String locationToString(Location loc) {
@@ -53,5 +60,62 @@ public class Util {
         material = Material.getMaterial(id);
         if (material != null) return material;
         return null;
+    }
+
+    public static Map<Integer, ItemStack> saveInventory(Player player, ConfigurationSection config, String path) {
+        Map<Integer, ItemStack> inventory = new HashMap<>();
+        config.set(path, null);
+        PlayerInventory inv = player.getInventory();
+        ItemStack[] equipment = new ItemStack[4];
+        equipment[0] = inv.getHelmet();
+        equipment[1] = inv.getChestplate();
+        equipment[2] = inv.getLeggings();
+        equipment[3] = inv.getBoots();
+        if (equipment[0] != null)
+            config.set(path + ".equipment.helmet", equipment[0]);
+        if (equipment[1] != null)
+            config.set(path + ".equipment.chestplate", equipment[1]);
+        if (equipment[2] != null)
+            config.set(path + ".equipment.leggings", equipment[2]);
+        if (equipment[3] != null)
+            config.set(path + ".equipment.boots", equipment[3]);
+        ItemStack[] contents = inv.getContents();
+        for (int i = 0; i < contents.length; i++) {
+            if (contents[i] != null) {
+                ItemStack item = contents[i];
+                if (item.getType() != Material.AIR) {
+                    item = item.clone();
+                    inventory.put(i, item);
+                    config.set(path + ".item." + i, item);
+                }
+            }
+        }
+        return inventory;
+    }
+
+    public static void loadInventory(ConfigurationSection config, Player player) {
+        ItemStack[] equipment = new ItemStack[4];
+        equipment[0] = config.getItemStack("equipment.helmet");
+        equipment[1] = config.getItemStack("equipment.chestplate");
+        equipment[2] = config.getItemStack("equipment.leggings");
+        equipment[3] = config.getItemStack("equipment.boots");
+        Map<Integer, ItemStack> inventory = new HashMap<>();
+        ConfigurationSection itemSection = config.getConfigurationSection("item");
+        if (itemSection != null) {
+            for (String key : itemSection.getKeys(false)) {
+                inventory.put(Integer.parseInt(key), itemSection.getItemStack(key));
+            }
+        }
+        player.getInventory().clear();
+        if (equipment[0] != null)
+            player.getInventory().setHelmet(equipment[0]);
+        if (equipment[1] != null)
+            player.getInventory().setChestplate(equipment[1]);
+        if (equipment[2] != null)
+            player.getInventory().setLeggings(equipment[2]);
+        if (equipment[3] != null)
+            player.getInventory().setBoots(equipment[3]);
+        for (int i : inventory.keySet())
+            player.getInventory().setItem(i, inventory.get(i));
     }
 }

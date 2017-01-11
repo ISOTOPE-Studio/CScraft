@@ -14,10 +14,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 
 public class RoomGUI extends GUI {
@@ -25,7 +22,7 @@ public class RoomGUI extends GUI {
     public static Set<String> keys;
 
     private List<String> warps;
-    private Map<Integer, String> slotIDMap;
+    private Map<Integer, String> slotIDMap = new HashMap<>();
     private List<String> favorites;
 
     public RoomGUI(Player player) {
@@ -34,6 +31,7 @@ public class RoomGUI extends GUI {
         int pos = 0;
         for (Room room : Room.rooms.values()) {
             if (pos >= size) break;
+            slotIDMap.put(pos, room.getName());
             ItemStack item = new ItemStack(Material.WOOL);
             switch (room.getStatus()) {
                 case WAITING:
@@ -42,7 +40,7 @@ public class RoomGUI extends GUI {
                     break;
                 case PROGRESS:
                     // change
-                    item.setDurability((short) 5);
+                    item.setDurability((short) 14);
                     break;
             }
             ItemMeta meta = item.getItemMeta();
@@ -53,7 +51,7 @@ public class RoomGUI extends GUI {
                 meta.setDisplayName(S.toBoldRed(room.getName()));
             List<String> lore = new ArrayList<>();
             lore.add(room.toString());
-            lore.add(room.getPlayers().size() + "玩家");
+            lore.add(S.toGreen("玩家: " + room.getPlayers().size() + " / " + room.getMaxPlayer()));
             lore.addAll(room.getMsgList("GUI.lore"));
             meta.setLore(lore);
             item.setItemMeta(meta);
@@ -72,7 +70,17 @@ public class RoomGUI extends GUI {
             }
 
             if (optionIcons[slot] != null) {
-
+                Room room = Room.rooms.get(slotIDMap.get(slot));
+                if (room == null) {
+                    player.sendMessage(S.toPrefixRed("房间不存在"));
+                } else {
+                    if (room.getPlayers().size() >= room.getMaxPlayer()) {
+                        player.sendMessage(S.toPrefixRed("玩家数量已达最大值"));
+                    } else {
+                        room.join(player);
+                        player.sendMessage(S.toPrefixGreen("传送到大厅"));
+                    }
+                }
                 player.closeInventory();
             }
         }

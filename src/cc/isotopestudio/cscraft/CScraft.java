@@ -4,8 +4,10 @@ import cc.isotopestudio.cscraft.command.CommandCs;
 import cc.isotopestudio.cscraft.command.CommandCsclass;
 import cc.isotopestudio.cscraft.command.CommandCsreload;
 import cc.isotopestudio.cscraft.command.CommandCsroom;
+import cc.isotopestudio.cscraft.element.GameItems;
 import cc.isotopestudio.cscraft.listener.PlayerListener;
 import cc.isotopestudio.cscraft.task.CheckPlayerLocation;
+import cc.isotopestudio.cscraft.task.RoomLobbyUpdateTask;
 import cc.isotopestudio.cscraft.task.UpdateConfig;
 import cc.isotopestudio.cscraft.util.PluginFile;
 import org.bukkit.ChatColor;
@@ -45,6 +47,9 @@ public class CScraft extends JavaPlugin {
 
         new UpdateConfig().run();
         new CheckPlayerLocation().runTaskTimer(this, 20, 20);
+        new RoomLobbyUpdateTask().runTaskTimer(this, 10, 20);
+
+        GameItems.update();
 
         getLogger().info(pluginName + "成功加载!");
         getLogger().info(pluginName + "由ISOTOPE Studio制作!");

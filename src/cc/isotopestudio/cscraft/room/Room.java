@@ -6,7 +6,10 @@ package cc.isotopestudio.cscraft.room;
 
 import cc.isotopestudio.cscraft.element.CSClass;
 import cc.isotopestudio.cscraft.element.EffectPlace;
+import cc.isotopestudio.cscraft.element.GameItems;
+import cc.isotopestudio.cscraft.listener.PlayerInfo;
 import cc.isotopestudio.cscraft.util.PluginFile;
+import cc.isotopestudio.cscraft.util.S;
 import cc.isotopestudio.cscraft.util.Util;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -41,8 +44,10 @@ public abstract class Room {
 
     // In-game
     private RoomStatus status = RoomStatus.WAITING;
+    private long scheduleStart = -1;
     private Set<Player> teamAplayer = new HashSet<>();
     private Set<Player> teamBplayer = new HashSet<>();
+    private Set<Player> players = new HashSet<>();
 
 
     public Room(String name) {
@@ -216,6 +221,13 @@ public abstract class Room {
 
     public abstract boolean isReady();
 
+    public long getScheduleStart() {
+        return scheduleStart;
+    }
+
+    public void setScheduleStart(long scheduleStart) {
+        this.scheduleStart = scheduleStart;
+    }
 
     // In-game
 
@@ -229,6 +241,36 @@ public abstract class Room {
         config.save();
     }
 
+    public void join(Player player) {
+        playerData.set(player.getName(), null);
+        playerData.set(player.getName() + ".created", new Date().getTime());
+        playerData.set(player.getName() + ".room", name);
+        Util.saveInventory(player, playerData.getConfigurationSection(player.getName()), "inventory");
+        playerData.set(player.getName() + ".location", Util.locationToString(player.getLocation()));
+        playerData.save();
+        player.getInventory().clear();
+        player.teleport(lobby);
+        player.getInventory().setItem(8, GameItems.getExitItem());
+        players.add(player);
+        PlayerInfo.playerRoomMap.put(player, this);
+        sendAllPlayersMsg(S.toPrefixAqua(player.getDisplayName()) + S.toAqua(" 加入房间"));
+    }
+
+    public void exit(Player player) {
+        final Location location = Util.stringToLocation(playerData.getString(player.getName() + ".location"));
+        if (location == null) {
+            player.sendMessage(S.toPrefixRed("你的数据损坏!"));
+            return;
+        }
+        player.teleport(location);
+        Util.loadInventory(playerData.getConfigurationSection(player.getName() + ".inventory"), player);
+        playerData.set(player.getName(), null);
+        players.remove(player);
+        PlayerInfo.playerRoomMap.remove(player);
+        playerData.save();
+        sendAllPlayersMsg(S.toPrefixAqua(player.getDisplayName()) + S.toAqua(" 退出房间"));
+    }
+
     /**
      * @return type name with chatcolor
      */
@@ -236,9 +278,15 @@ public abstract class Room {
     public abstract String toString();
 
     public Set<Player> getPlayers() {
-        Set<Player> player = new HashSet<>(teamAplayer);
-        player.addAll(teamBplayer);
-        return player;
+        return players;
     }
 
+    public void sendAllPlayersMsg(String msg) {
+        for (Player player : players)
+            player.sendMessage(msg);
+    }
+
+    public void start() {
+        status = RoomStatus.PROGRESS;
+    }
 }

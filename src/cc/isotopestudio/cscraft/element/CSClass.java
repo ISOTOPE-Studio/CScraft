@@ -4,11 +4,10 @@ package cc.isotopestudio.cscraft.element;
  * Copyright ISOTOPE Studio
  */
 
-import org.bukkit.Material;
+import cc.isotopestudio.cscraft.util.Util;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 
 import java.util.*;
 
@@ -57,31 +56,7 @@ public class CSClass {
     }
 
     public void setClass(Player player) {
-        config.set("inventory", null);
-        PlayerInventory inv = player.getInventory();
-        equipment[0] = inv.getHelmet();
-        equipment[1] = inv.getChestplate();
-        equipment[2] = inv.getLeggings();
-        equipment[3] = inv.getBoots();
-        if (equipment[0] != null)
-            config.set("inventory.equipment.helmet", equipment[0]);
-        if (equipment[1] != null)
-            config.set("inventory.equipment.chestplate", equipment[1]);
-        if (equipment[2] != null)
-            config.set("inventory.equipment.leggings", equipment[2]);
-        if (equipment[3] != null)
-            config.set("inventory.equipment.boots", equipment[3]);
-        ItemStack[] contents = inv.getContents();
-        for (int i = 0; i < contents.length; i++) {
-            if (contents[i] != null) {
-                ItemStack item = contents[i];
-                if (item.getType() != Material.AIR) {
-                    item = item.clone();
-                    inventory.put(i, item);
-                    config.set("inventory.item." + i, item);
-                }
-            }
-        }
+        inventory.putAll(Util.saveInventory(player, config, "inventory"));
         classData.save();
     }
 

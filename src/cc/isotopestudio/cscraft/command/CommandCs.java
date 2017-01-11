@@ -5,6 +5,7 @@ package cc.isotopestudio.cscraft.command;
  */
 
 import cc.isotopestudio.cscraft.gui.RoomGUI;
+import cc.isotopestudio.cscraft.listener.PlayerInfo;
 import cc.isotopestudio.cscraft.util.S;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -25,7 +26,10 @@ public class CommandCs implements CommandExecutor {
                 player.sendMessage(S.toPrefixRed("你没有权限"));
                 return true;
             }
-            new RoomGUI(player).open(player);
+            if (PlayerInfo.getRoom(player) == null)
+                new RoomGUI(player).open(player);
+            else
+                player.sendMessage(S.toPrefixRed("你在游戏房间里"));
             return true;
         }
         return false;

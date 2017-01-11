@@ -5,10 +5,7 @@ package cc.isotopestudio.cscraft.command;
  */
 
 import cc.isotopestudio.cscraft.element.CSClass;
-import cc.isotopestudio.cscraft.room.InfectRoom;
-import cc.isotopestudio.cscraft.room.ProtectRoom;
-import cc.isotopestudio.cscraft.room.Room;
-import cc.isotopestudio.cscraft.room.TeamRoom;
+import cc.isotopestudio.cscraft.room.*;
 import cc.isotopestudio.cscraft.util.S;
 import cc.isotopestudio.cscraft.util.Util;
 import org.bukkit.Material;
@@ -307,7 +304,7 @@ public class CommandCsroom implements CommandExecutor {
                     player.sendMessage(S.toYellow("/" + label + " info <名字> - 查看信息"));
                     return true;
                 }
-                player.sendMessage(S.toPrefixAqua(" INFO - ")+room.toString() + " " + room.getName());
+                player.sendMessage(S.toPrefixAqua(" INFO - ") + room.toString() + " " + room.getName());
                 player.sendMessage(S.toBoldDarkAqua("    大厅: ") +
                         (room.getLobby() != null ? S.toGreen("已设置") : S.toRed("未设置")));
                 player.sendMessage(S.toBoldDarkAqua("    POS1: ") +
@@ -339,8 +336,12 @@ public class CommandCsroom implements CommandExecutor {
                     player.sendMessage(S.toYellow("/" + label + " remove <名字> - 删除一个房间"));
                     return true;
                 }
-                room.remove();
-                player.sendMessage(S.toPrefixGreen("成功删除"));
+                if (room.getStatus() == RoomStatus.WAITING) {
+                    room.remove();
+                    player.sendMessage(S.toPrefixGreen("成功删除"));
+                } else {
+                    player.sendMessage(S.toPrefixRed("此房间游戏中"));
+                }
                 return true;
             }
             player.sendMessage(S.toPrefixRed("未知命令, 输入 /" + label + " 查看帮助"));
