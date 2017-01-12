@@ -4,8 +4,10 @@ package cc.isotopestudio.cscraft.task;
  * Copyright ISOTOPE Studio
  */
 
+import cc.isotopestudio.cscraft.room.ProtectRoom;
 import cc.isotopestudio.cscraft.room.Room;
 import cc.isotopestudio.cscraft.room.RoomStatus;
+import cc.isotopestudio.cscraft.room.TeamRoom;
 import cc.isotopestudio.cscraft.util.S;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -15,8 +17,8 @@ public class RoomLobbyUpdateTask extends BukkitRunnable {
     private int waitCount = 0;
 
     private static final int waitInterval = 7;
-    private static final int startWaitInterval = 30;
-    private static final int[] startWaitAnnounce = {60, 30, 15, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
+    private static final int startWaitInterval = 15;
+    private static final int[] startWaitAnnounce = {15, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
 
     @Override
     public void run() {
@@ -26,7 +28,11 @@ public class RoomLobbyUpdateTask extends BukkitRunnable {
             if (room.getStatus() != RoomStatus.WAITING) continue;
 
             if (room.getPlayers().size() >= room.getMinPlayer()) {
-                if (room.getScheduleStart() < 0) {
+                if ((room instanceof TeamRoom || room instanceof ProtectRoom)
+                        && room.getPlayers().size() % 2 != 0) {
+                    room.sendAllPlayersMsg(S.toPrefixYellow("玩家数量必须是偶数"));
+                    room.setScheduleStart(-1);
+                } else if (room.getScheduleStart() < 0) {
                     room.setScheduleStart(new Date().getTime() + startWaitInterval * 1000);
                     room.sendAllPlayersMsg(S.toPrefixYellow("还有 " + startWaitInterval + " 秒开始游戏"));
                 } else {

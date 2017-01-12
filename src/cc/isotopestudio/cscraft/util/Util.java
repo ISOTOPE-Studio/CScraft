@@ -94,6 +94,8 @@ public class Util {
     }
 
     public static void loadInventory(ConfigurationSection config, Player player) {
+        player.getInventory().clear();
+        if (config == null) return;
         ItemStack[] equipment = new ItemStack[4];
         equipment[0] = config.getItemStack("equipment.helmet");
         equipment[1] = config.getItemStack("equipment.chestplate");
@@ -106,7 +108,6 @@ public class Util {
                 inventory.put(Integer.parseInt(key), itemSection.getItemStack(key));
             }
         }
-        player.getInventory().clear();
         if (equipment[0] != null)
             player.getInventory().setHelmet(equipment[0]);
         if (equipment[1] != null)

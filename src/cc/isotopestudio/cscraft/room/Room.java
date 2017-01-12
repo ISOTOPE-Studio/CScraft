@@ -38,16 +38,17 @@ public abstract class Room {
     private Location lobby;
     private int minPlayer;
     private int maxPlayer;
-    private Set<CSClass> teamAclass = new HashSet<>();
-    private Set<CSClass> teamBclass = new HashSet<>();
-    private Set<EffectPlace> effects = new HashSet<>();
+    Set<CSClass> teamAclass = new HashSet<>();
+    Set<CSClass> teamBclass = new HashSet<>();
+    Set<EffectPlace> effects = new HashSet<>();
 
     // In-game
     private RoomStatus status = RoomStatus.WAITING;
     private long scheduleStart = -1;
-    private Set<Player> teamAplayer = new HashSet<>();
-    private Set<Player> teamBplayer = new HashSet<>();
-    private Set<Player> players = new HashSet<>();
+    Set<Player> teamAplayer = new HashSet<>();
+    Set<Player> teamBplayer = new HashSet<>();
+    Set<Player> players = new HashSet<>();
+    Map<Player, CSClass> playerClassMap = new HashMap<>();
 
 
     public Room(String name) {
@@ -253,6 +254,7 @@ public abstract class Room {
         playerData.save();
         player.getInventory().clear();
         player.teleport(lobby);
+        player.getInventory().setItem(0, GameItems.getClassItem());
         player.getInventory().setItem(8, GameItems.getExitItem());
         players.add(player);
         PlayerInfo.playerRoomMap.put(player, this);
@@ -281,6 +283,14 @@ public abstract class Room {
 
     public Set<Player> getPlayers() {
         return players;
+    }
+
+    public Set<Player> getTeamAplayer() {
+        return teamAplayer;
+    }
+
+    public Set<Player> getTeamBplayer() {
+        return teamBplayer;
     }
 
     public void sendAllPlayersMsg(String msg) {

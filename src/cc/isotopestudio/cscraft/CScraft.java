@@ -33,6 +33,7 @@ public class CScraft extends JavaPlugin {
     public static PluginFile config;
     public static PluginFile classData;
     public static PluginFile playerData;
+    public static PluginFile classMsgData;
     public static final Set<PluginFile> roomFiles = new HashSet<>();
     public static final Set<PluginFile> msgFiles = new HashSet<>();
 
@@ -43,6 +44,8 @@ public class CScraft extends JavaPlugin {
         config.setEditable(false);
         classData = new PluginFile(this, "class.yml");
         playerData = new PluginFile(this, "player.yml");
+        classMsgData = new PluginFile(this, "classMsg.yml", "classMsg.yml");
+        classMsgData.setEditable(false);
 
         this.getCommand("csclass").setExecutor(new CommandCsclass());
         this.getCommand("csroom").setExecutor(new CommandCsroom());
@@ -78,6 +81,8 @@ public class CScraft extends JavaPlugin {
     public void onReload() {
         playerData.reload();
         config.reload();
+        classData.reload();
+        classMsgData.reload();
         new UpdateConfig().run();
     }
 

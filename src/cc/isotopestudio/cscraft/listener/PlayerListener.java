@@ -4,7 +4,9 @@ package cc.isotopestudio.cscraft.listener;
  * Copyright ISOTOPE Studio
  */
 
+import cc.isotopestudio.cscraft.CScraft;
 import cc.isotopestudio.cscraft.element.GameItems;
+import cc.isotopestudio.cscraft.gui.ClassGUI;
 import cc.isotopestudio.cscraft.room.Room;
 import cc.isotopestudio.cscraft.room.RoomStatus;
 import cc.isotopestudio.cscraft.util.S;
@@ -15,6 +17,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -88,17 +91,42 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
         final Player player = event.getPlayer();
-        if (!playerRoomMap.containsKey(player)) {
-            return;
-        }
+        if (event.getItem() == null) return;
+        if (!playerRoomMap.containsKey(player)) return;
         Room room = playerRoomMap.get(player);
         if (room.getStatus() == RoomStatus.WAITING) {
+            event.setCancelled(true);
             if (GameItems.getExitItem().equals(event.getItem())) {
                 room.exit(player);
                 player.sendMessage(S.toPrefixGreen("退出房间"));
+            } else if (GameItems.getTeam1Item().equals(event.getItem())) {
+                if (room.getTeamAplayer().contains(player)) {
+                    player.sendMessage(S.toPrefixRed("你已经在蓝队了"));
+                } else {
+                    room.getTeamBplayer().remove(player);
+                    room.getTeamAplayer().add(player);
+                    room.sendAllPlayersMsg(CScraft.prefix + player.getDisplayName() + S.toGreen(" 加入") + S.toBoldDarkAqua("蓝队"));
+                }
+            } else if (GameItems.getTeam2Item().equals(event.getItem())) {
+                if (room.getTeamBplayer().contains(player)) {
+                    player.sendMessage(S.toPrefixRed("你已经在红队了"));
+                } else {
+                    room.getTeamAplayer().remove(player);
+                    room.getTeamBplayer().add(player);
+                    room.sendAllPlayersMsg(CScraft.prefix + player.getDisplayName() + S.toGreen(" 加入") + S.toBoldRed("红队"));
+                }
+            } else if (GameItems.getClassItem().equals(event.getItem())) {
+                new ClassGUI(room, player).open(player);
             }
         } else {
         }
+    }
+
+    @EventHandler
+    public void onDrop(PlayerDropItemEvent event) {
+        final Player player = event.getPlayer();
+        if (!playerRoomMap.containsKey(player)) return;
+        event.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

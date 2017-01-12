@@ -5,14 +5,14 @@ package cc.isotopestudio.cscraft.element;
  */
 
 import cc.isotopestudio.cscraft.util.Util;
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
-import static cc.isotopestudio.cscraft.CScraft.classData;
-import static cc.isotopestudio.cscraft.CScraft.plugin;
+import static cc.isotopestudio.cscraft.CScraft.*;
 
 public class CSClass {
 
@@ -88,6 +88,18 @@ public class CSClass {
         classes.remove(name);
         classData.set(name, null);
         classData.save();
+    }
+
+    public String getMsg(String path) {
+        return ChatColor.translateAlternateColorCodes('&', classMsgData.getString(name + "." + path));
+    }
+
+    public List<String> getMsgList(String path) {
+        List<String> list = new ArrayList<>();
+        for (String line : classMsgData.getStringList(name + "." + path)) {
+            list.add(ChatColor.translateAlternateColorCodes('&', line));
+        }
+        return list;
     }
 
     public static CSClass getClassByName(String name) {

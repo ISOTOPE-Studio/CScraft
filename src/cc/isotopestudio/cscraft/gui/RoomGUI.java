@@ -14,16 +14,15 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 public class RoomGUI extends GUI {
 
-    public static Set<String> keys;
-
-    private List<String> warps;
     private Map<Integer, String> slotIDMap = new HashMap<>();
-    private List<String> favorites;
 
     public RoomGUI(Player player) {
         super(S.toBoldGold("º”»Î”Œœ∑") + "[" + player.getName() + "]", 4 * 9, player);
