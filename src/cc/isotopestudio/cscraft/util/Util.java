@@ -15,11 +15,11 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Util {
     public static String locationToString(Location loc) {
+        if (loc == null) return "";
         return loc.getWorld().getName() + " " + loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ();
     }
 
@@ -117,5 +117,13 @@ public class Util {
             player.getInventory().setBoots(equipment[3]);
         for (int i : inventory.keySet())
             player.getInventory().setItem(i, inventory.get(i));
+    }
+
+    public static Set<String> playerToStringSet(Collection<Player> players) {
+        Set<String> set = new HashSet<>();
+        for (Player player : players) {
+            set.add(player.getName());
+        }
+        return set;
     }
 }

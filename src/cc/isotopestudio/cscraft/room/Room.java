@@ -25,7 +25,7 @@ public abstract class Room {
 
     public static Map<String, Room> rooms = new HashMap<>();
 
-    private final PluginFile config;
+    final PluginFile config;
     PluginFile msgData;
 
     // Settings
@@ -130,7 +130,7 @@ public abstract class Room {
 
     public void setTeamBLocation(Location teamB) {
         this.teamB = teamB;
-        config.set("teamB", Util.locationToString(teamA));
+        config.set("teamB", Util.locationToString(teamB));
         config.save();
     }
 
@@ -219,7 +219,10 @@ public abstract class Room {
         rooms.remove(name);
     }
 
-    public abstract boolean isReady();
+    public boolean isReady() {
+        return lobby != null && pos1 != null && pos2 != null && teamA != null && teamB != null
+                && teamAclass.size() > 0 && teamBclass.size() > 0;
+    }
 
     public long getScheduleStart() {
         return scheduleStart;
@@ -257,18 +260,17 @@ public abstract class Room {
     }
 
     public void exit(Player player) {
-        final Location location = Util.stringToLocation(playerData.getString(player.getName() + ".location"));
-        if (location == null) {
-            player.sendMessage(S.toPrefixRed("你的数据损坏!"));
-            return;
-        }
-        player.teleport(location);
-        Util.loadInventory(playerData.getConfigurationSection(player.getName() + ".inventory"), player);
-        playerData.set(player.getName(), null);
+        PlayerInfo.teleportOut(player);
+        leave(player);
+    }
+
+
+    public void leave(Player player) {
+        playerData.set(player.getName() + ".room", null);
         players.remove(player);
         PlayerInfo.playerRoomMap.remove(player);
-        playerData.save();
         sendAllPlayersMsg(S.toPrefixAqua(player.getDisplayName()) + S.toAqua(" 退出房间"));
+        playerData.save();
     }
 
     /**
@@ -289,4 +291,28 @@ public abstract class Room {
     public void start() {
         status = RoomStatus.PROGRESS;
     }
+
+    public String infoString() {
+        final StringBuffer sb = new StringBuffer("Room{");
+        sb.append("\nname='").append(name).append('\'');
+        sb.append("\npos1=").append(Util.locationToString(pos1));
+        sb.append("\npos2=").append(Util.locationToString(pos2));
+        sb.append("\nteamA=").append(Util.locationToString(teamA));
+        sb.append("\nteamB=").append(Util.locationToString(teamB));
+        sb.append("\nlobby=").append(Util.locationToString(lobby));
+        sb.append("\nminPlayer=").append(minPlayer);
+        sb.append("\nmaxPlayer=").append(maxPlayer);
+        sb.append("\nteamAclass=").append(teamAclass);
+        sb.append("\nteamBclass=").append(teamBclass);
+        sb.append("\neffects=").append(effects);
+        sb.append("\nstatus=").append(status);
+        sb.append("\nscheduleStart=").append(scheduleStart);
+        sb.append("\nteamAplayer=").append(Util.playerToStringSet(teamAplayer));
+        sb.append("\nteamBplayer=").append(Util.playerToStringSet(teamBplayer));
+        sb.append("\nplayers=").append(Util.playerToStringSet(players));
+        sb.append('}');
+        return sb.toString();
+    }
+
+
 }

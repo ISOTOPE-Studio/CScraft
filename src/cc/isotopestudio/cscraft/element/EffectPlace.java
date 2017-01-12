@@ -51,4 +51,15 @@ public class EffectPlace {
         int cd = Integer.parseInt(s[3]);
         return new EffectPlace(loc, material, effect, cd);
     }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("EffectPlace{");
+        sb.append("location=").append(Util.locationToString(location));
+        sb.append(", material=").append(material);
+        sb.append(", effect=").append(effect);
+        sb.append(", cd=").append(cd);
+        sb.append('}');
+        return sb.toString();
+    }
 }

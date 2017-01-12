@@ -13,16 +13,30 @@ import static cc.isotopestudio.cscraft.CScraft.plugin;
 
 public class TeamRoom extends Room {
 
+    private int goal;
+
     public TeamRoom(String name) {
         super(name);
         msgData = new PluginFile(plugin, "rooms/" + ChatColor.stripColor(getClass().getSimpleName()) + "." + name + "/msg.yml", "msg_team.yml");
         msgFiles.add(msgData);
         msgData.setEditable(false);
+
+        goal = config.getInt("goal", 20);
+    }
+
+    public int getGoal() {
+        return goal;
+    }
+
+    public void setGoal(int goal) {
+        this.goal = goal;
+        config.set("goal", goal);
+        config.save();
     }
 
     @Override
     public boolean isReady() {
-        return false;
+        return super.isReady();
     }
 
     @Override

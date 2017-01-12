@@ -4,14 +4,20 @@ import cc.isotopestudio.cscraft.command.CommandCs;
 import cc.isotopestudio.cscraft.command.CommandCsclass;
 import cc.isotopestudio.cscraft.command.CommandCsreload;
 import cc.isotopestudio.cscraft.command.CommandCsroom;
+import cc.isotopestudio.cscraft.debugGUI.LogGUI;
+import cc.isotopestudio.cscraft.debugGUI.SettingsGUI;
 import cc.isotopestudio.cscraft.element.GameItems;
+import cc.isotopestudio.cscraft.listener.PlayerInfo;
 import cc.isotopestudio.cscraft.listener.PlayerListener;
+import cc.isotopestudio.cscraft.room.Room;
 import cc.isotopestudio.cscraft.task.CheckPlayerLocation;
 import cc.isotopestudio.cscraft.task.RoomLobbyUpdateTask;
 import cc.isotopestudio.cscraft.task.UpdateConfig;
 import cc.isotopestudio.cscraft.util.PluginFile;
+import cc.isotopestudio.cscraft.util.Util;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -50,6 +56,19 @@ public class CScraft extends JavaPlugin {
         new RoomLobbyUpdateTask().runTaskTimer(this, 10, 20);
 
         GameItems.update();
+
+        new SettingsGUI().run();
+        new LogGUI().run();
+        SettingsGUI.on(true);
+        SettingsGUI.text.setWrapStyleWord(true);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                SettingsGUI.text.setText(Util.playerToStringSet(PlayerInfo.playerRoomMap.keySet()) + "\n");
+                for (Room room : Room.rooms.values())
+                    SettingsGUI.text.append(room.infoString() + "\n");
+            }
+        }.runTaskTimer(this, 20, 20);
 
         getLogger().info(pluginName + "成功加载!");
         getLogger().info(pluginName + "由ISOTOPE Studio制作!");

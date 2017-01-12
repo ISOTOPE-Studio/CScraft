@@ -26,7 +26,7 @@ public class CommandCs implements CommandExecutor {
                 player.sendMessage(S.toPrefixRed("你没有权限"));
                 return true;
             }
-            if (PlayerInfo.getRoom(player) == null)
+            if (PlayerInfo.playerRoomMap.get(player) == null)
                 new RoomGUI(player).open(player);
             else
                 player.sendMessage(S.toPrefixRed("你在游戏房间里"));

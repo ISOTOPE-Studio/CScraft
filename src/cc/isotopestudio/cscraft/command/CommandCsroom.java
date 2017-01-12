@@ -329,6 +329,11 @@ public class CommandCsroom implements CommandExecutor {
                 }
                 player.sendMessage(S.toBoldDarkAqua("    队B职业: ") +
                         S.toGreen(set.toString()));
+                if (room instanceof TeamRoom) {
+                    TeamRoom teamRoom = (TeamRoom) room;
+                    player.sendMessage(S.toBoldDarkGreen("    目标人数: ") +
+                            S.toGreen("" + teamRoom.getGoal()));
+                }
                 return true;
             }
             if (args[0].equalsIgnoreCase("remove")) {
