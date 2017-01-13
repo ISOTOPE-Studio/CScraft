@@ -7,6 +7,7 @@ package cc.isotopestudio.cscraft.task;
 import cc.isotopestudio.cscraft.element.CSClass;
 import cc.isotopestudio.cscraft.room.InfectRoom;
 import cc.isotopestudio.cscraft.room.ProtectRoom;
+import cc.isotopestudio.cscraft.room.Room;
 import cc.isotopestudio.cscraft.room.TeamRoom;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -22,11 +23,13 @@ public class UpdateConfig extends BukkitRunnable {
         // Update config
 
         // Update class
+        CSClass.classes.clear();
         for (String className : classData.getKeys(false)) {
             new CSClass(className);
         }
 
         // Update room
+        Room.rooms.clear();
         File roomFolder = new File(plugin.getDataFolder() + "/rooms/");
         String dir = roomFolder.getName();
         if (roomFolder.exists()) {
@@ -46,7 +49,7 @@ public class UpdateConfig extends BukkitRunnable {
                             new TeamRoom(roomFileString[1]);
                             break;
                         default:
-                            plugin.getLogger().warning("ï¿½ï¿½ï¿½ï¿½: parsing room data folder");
+                            plugin.getLogger().warning("´íÎó: parsing room data folder");
                             break;
                     }
                 }

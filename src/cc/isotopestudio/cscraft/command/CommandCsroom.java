@@ -45,8 +45,7 @@ public class CommandCsroom implements CommandExecutor {
                 player.sendMessage(S.toYellow("/" + label + " addBclass <名字> <职业名字> - 添加B队职业"));
                 player.sendMessage(S.toYellow("/" + label + " removeAclass <名字> <职业名字> - 刪除A队职业"));
                 player.sendMessage(S.toYellow("/" + label + " removeBclass <名字> <职业名字> - 刪除A队职业"));
-                player.sendMessage(S.toYellow("/" + label + " min <名字> <最少玩家数量>"));
-                player.sendMessage(S.toYellow("/" + label + " max <名字> <最大玩家数量>"));
+                player.sendMessage(S.toYellow("/" + label + " num <名字> <玩家数量>"));
                 player.sendMessage(S.toYellow("/" + label + " effect <漂浮物品ID> <获得药水> <药水等级> <时间> <冷却> - 药水"));
                 player.sendMessage(S.toYellow("/" + label + " reward <名字> 查看奖励 (在配置文件里添加奖励)"));
                 player.sendMessage(S.toYellow("/" + label + " remove <名字> - 删除一个房间"));
@@ -210,45 +209,24 @@ public class CommandCsroom implements CommandExecutor {
                 player.sendMessage(S.toPrefixGreen("成功刪除"));
                 return true;
             }
-            if (args[0].equalsIgnoreCase("min")) {
+            if (args[0].equalsIgnoreCase("num")) {
                 if (args.length < 2) {
                     player.sendMessage(S.toYellow("/" + label + " min <名字> <最少玩家数量>"));
                     return true;
                 }
-                int min;
+                int num;
                 try {
-                    min = Integer.parseInt(args[2]);
-                    if (min < 2) throw new NumberFormatException();
+                    num = Integer.parseInt(args[2]);
+                    if (num < 2) throw new NumberFormatException();
                 } catch (NumberFormatException e) {
                     player.sendMessage(S.toPrefixRed("数字不对"));
                     return true;
                 }
-                if (min > room.getMaxPlayer()) {
-                    player.sendMessage(S.toPrefixRed("最小玩家数量不能大于最大玩家数量"));
+                if (num % 2 != 0) {
+                    player.sendMessage(S.toPrefixRed("玩家数量必须为偶数"));
                     return true;
                 }
-                room.setMinPlayer(min);
-                player.sendMessage(S.toPrefixGreen("成功设置"));
-                return true;
-            }
-            if (args[0].equalsIgnoreCase("max")) {
-                if (args.length < 2) {
-                    player.sendMessage(S.toYellow("/" + label + " max <名字> <最大玩家数量>"));
-                    return true;
-                }
-                int max;
-                try {
-                    max = Integer.parseInt(args[2]);
-                    if (max < 0) throw new NumberFormatException();
-                } catch (NumberFormatException e) {
-                    player.sendMessage(S.toPrefixRed("数字不对"));
-                    return true;
-                }
-                if (max < room.getMinPlayer()) {
-                    player.sendMessage(S.toPrefixRed("最大玩家数量不能小于最小玩家数量"));
-                    return true;
-                }
-                room.setMaxPlayer(max);
+                room.setgetReqPlayerNum(num);
                 player.sendMessage(S.toPrefixGreen("成功设置"));
                 return true;
             }
@@ -315,8 +293,8 @@ public class CommandCsroom implements CommandExecutor {
                         (room.getTeamALocation() != null ? S.toGreen("已设置") : S.toRed("未设置")));
                 player.sendMessage(S.toBoldDarkAqua("    队B出生点: ") +
                         (room.getTeamBLocation() != null ? S.toGreen("已设置") : S.toRed("未设置")));
-                player.sendMessage(S.toBoldDarkAqua("    最小/大玩家: ") +
-                        S.toGreen(room.getMinPlayer() + " / " + room.getMaxPlayer()));
+                player.sendMessage(S.toBoldDarkAqua("    玩家数量: ") +
+                        S.toGreen("" + room.getReqPlayerNum()));
                 Set<String> set = new HashSet<>();
                 for (CSClass csclass : room.getTeamAclass()) {
                     set.add(csclass.getName());

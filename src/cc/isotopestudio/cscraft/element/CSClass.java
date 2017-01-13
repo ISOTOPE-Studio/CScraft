@@ -55,6 +55,12 @@ public class CSClass {
         return name;
     }
 
+    public String getDisplayName() {
+        String name = getMsg("name");
+        if (name != null) return name;
+        return this.name;
+    }
+
     public void setClass(Player player) {
         inventory.putAll(Util.saveInventory(player, config, "inventory"));
         classData.save();
@@ -91,7 +97,9 @@ public class CSClass {
     }
 
     public String getMsg(String path) {
-        return ChatColor.translateAlternateColorCodes('&', classMsgData.getString(name + "." + path));
+        String string = classMsgData.getString(name + "." + path);
+        if(string == null) return null;
+        return ChatColor.translateAlternateColorCodes('&', string);
     }
 
     public List<String> getMsgList(String path) {
@@ -119,5 +127,13 @@ public class CSClass {
                 result.add(classes.get(classString));
             }
         return result;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("CSClass{");
+        sb.append("name='").append(name).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }

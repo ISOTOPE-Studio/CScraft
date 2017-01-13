@@ -1,8 +1,10 @@
 # 这里添加职业的信息文件
 # 如职业名为 class
 class:
+  name: '&a职业名称'
   GUI:
-    name: &a职业1
+    item: DIAMOND_SWORD
+    name: '&a选择职业1'
     lore:
-    - &5装备1
-    - &5装备2
+    - '&5装备1'
+    - '&5装备2'

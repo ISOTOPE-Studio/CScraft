@@ -6,6 +6,7 @@ package cc.isotopestudio.cscraft.task;
 
 import cc.isotopestudio.cscraft.room.Room;
 import cc.isotopestudio.cscraft.room.RoomStatus;
+import cc.isotopestudio.cscraft.util.S;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -19,20 +20,14 @@ public class CheckPlayerLocation extends BukkitRunnable {
         for (Room room : rooms.values()) {
             if (room.getStatus() != RoomStatus.PROGRESS) continue;
             for (Player player : room.getPlayers()) {
-                switch (isOutsideOfRegion(player.getLocation(), room.getPos1(), room.getPos2())) {
-                    case (0): break;
-                    case (1):
-                        break;
-                    case (2):
-                        break;
-                    case (3):
-                        break;
-                    case (-1):
-                        break;
-                    case (-2):
-                        break;
-                    case (-3):
-                        break;
+                if (isOutsideOfRegion(player.getLocation(), room.getPos1(), room.getPos2()) != 0) {
+                    player.damage(2);
+                    player.sendMessage(S.toPrefixRed("你跑到地图外面去了"));
+                    if (room.getTeamAplayer().contains(player)) {
+                        player.teleport(room.getTeamALocation());
+                    } else {
+                        player.teleport(room.getTeamBLocation());
+                    }
                 }
             }
         }

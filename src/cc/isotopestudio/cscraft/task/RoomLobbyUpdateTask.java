@@ -4,11 +4,10 @@ package cc.isotopestudio.cscraft.task;
  * Copyright ISOTOPE Studio
  */
 
-import cc.isotopestudio.cscraft.room.ProtectRoom;
 import cc.isotopestudio.cscraft.room.Room;
 import cc.isotopestudio.cscraft.room.RoomStatus;
-import cc.isotopestudio.cscraft.room.TeamRoom;
 import cc.isotopestudio.cscraft.util.S;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Date;
@@ -16,9 +15,9 @@ import java.util.Date;
 public class RoomLobbyUpdateTask extends BukkitRunnable {
     private int waitCount = 0;
 
-    private static final int waitInterval = 7;
-    private static final int startWaitInterval = 15;
-    private static final int[] startWaitAnnounce = {15, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
+    private static final int waitInterval = 5;
+    private static final int startWaitInterval = 10;
+    private static final int[] startWaitAnnounce = {10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
 
     @Override
     public void run() {
@@ -27,10 +26,12 @@ public class RoomLobbyUpdateTask extends BukkitRunnable {
         for (Room room : Room.rooms.values()) {
             if (room.getStatus() != RoomStatus.WAITING) continue;
 
-            if (room.getPlayers().size() >= room.getMinPlayer()) {
-                if ((room instanceof TeamRoom || room instanceof ProtectRoom)
-                        && room.getPlayers().size() % 2 != 0) {
-                    room.sendAllPlayersMsg(S.toPrefixYellow("玩家数量必须是偶数"));
+            if (room.getPlayers().size() == room.getReqPlayerNum()) {
+                if (room.getPlayerClassMap().size() < room.getPlayers().size()) {
+                    for (Player player : room.getPlayers()) {
+                        if (room.getPlayerClassMap().containsKey(player)) continue;
+                        player.sendMessage(S.toPrefixRed("请选择职业"));
+                    }
                     room.setScheduleStart(-1);
                 } else if (room.getScheduleStart() < 0) {
                     room.setScheduleStart(new Date().getTime() + startWaitInterval * 1000);
@@ -47,11 +48,16 @@ public class RoomLobbyUpdateTask extends BukkitRunnable {
                 room.setScheduleStart(-1);
             }
             if (getRemainSec(room.getScheduleStart()) == 0) {
-                room.start();
+                room.prestart();
             }
-            if (waitCount == 0)
+            if (waitCount == 0) {
                 room.sendAllPlayersMsg(S.toPrefixYellow("你在大厅里，等待其他玩家进入   ") + S.toGreen(
-                        room.getPlayers().size() + " / " + room.getMinPlayer() + " / " + room.getMaxPlayer()));
+                        room.getPlayers().size() + " / " + room.getReqPlayerNum()));
+                for (Player player : room.getPlayers()) {
+                    if (room.getPlayerClassMap().containsKey(player)) continue;
+                    player.sendMessage(S.toPrefixRed("请选择职业"));
+                }
+            }
         }
 
     }

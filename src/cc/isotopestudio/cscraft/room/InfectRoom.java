@@ -26,6 +26,17 @@ public class InfectRoom extends Room {
     }
 
     @Override
+    public void prestart() {
+
+    }
+
+    @Override
+    public void start() {
+        super.start();
+
+    }
+
+    @Override
     public String toString() {
         return S.toBoldDarkGreen("¸ÐÈ¾Ä£Ê½");
     }

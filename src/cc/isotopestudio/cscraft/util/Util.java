@@ -49,6 +49,7 @@ public class Util {
     }
 
     public static Material getMaterialByName(String string) {
+        if (string == null) return null;
         Material material = Material.getMaterial(string);
         if (material != null) return material;
         int id;

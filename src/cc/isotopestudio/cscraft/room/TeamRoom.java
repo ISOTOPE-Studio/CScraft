@@ -10,10 +10,6 @@ import cc.isotopestudio.cscraft.util.S;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import static cc.isotopestudio.cscraft.CScraft.msgFiles;
 import static cc.isotopestudio.cscraft.CScraft.plugin;
 
@@ -59,28 +55,20 @@ public class TeamRoom extends Room {
                 teamAplayer.add(player);
         }
 
-        player.getInventory().setItem(4, GameItems.getTeam1Item());
+        player.getInventory().setItem(3, GameItems.getTeam1Item());
         player.getInventory().setItem(5, GameItems.getTeam2Item());
     }
 
     @Override
     public void start() {
         super.start();
-        List<Player> playerList = new ArrayList<>(this.players);
-        Collections.shuffle(playerList);
-        int i = 0;
-        for (Player player : playerList) {
-            player.getInventory().clear();
-            playerClassMap.get(player).equip(player);
-            if (i < playerList.size() / 2) {
-                teamAplayer.add(player);
-                player.teleport(getTeamALocation());
-            } else {
-                teamBplayer.add(player);
-                player.teleport(getTeamBLocation());
-            }
-            i++;
+        for (Player player : teamAplayer) {
+            player.teleport(getTeamALocation());
         }
+        for (Player player : teamBplayer) {
+            player.teleport(getTeamBLocation());
+        }
+        sendAllPlayersMsg(S.toPrefixYellow("ÓÎÏ·¿ªÊ¼"));
     }
 
     @Override

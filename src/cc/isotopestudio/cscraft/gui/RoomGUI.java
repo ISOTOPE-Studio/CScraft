@@ -50,7 +50,7 @@ public class RoomGUI extends GUI {
                 meta.setDisplayName(S.toBoldRed(room.getName()));
             List<String> lore = new ArrayList<>();
             lore.add(room.toString());
-            lore.add(S.toGreen("玩家: " + room.getPlayers().size() + " / " + room.getMaxPlayer()));
+            lore.add(S.toGreen("玩家: " + room.getPlayers().size() + " / " + room.getReqPlayerNum()));
             lore.addAll(room.getMsgList("GUI.lore"));
             meta.setLore(lore);
             item.setItemMeta(meta);
@@ -73,7 +73,7 @@ public class RoomGUI extends GUI {
                 if (room == null) {
                     player.sendMessage(S.toPrefixRed("房间不存在"));
                 } else {
-                    if (room.getPlayers().size() >= room.getMaxPlayer()) {
+                    if (room.getPlayers().size() >= room.getReqPlayerNum()) {
                         player.sendMessage(S.toPrefixRed("玩家数量已达最大值"));
                     } else {
                         room.join(player);

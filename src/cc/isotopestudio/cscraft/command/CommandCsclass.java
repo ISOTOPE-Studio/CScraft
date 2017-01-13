@@ -103,7 +103,7 @@ public class CommandCsclass implements CommandExecutor {
             }
             if (args[0].equalsIgnoreCase("equip")) {
                 if (args.length < 2) {
-                    player.sendMessage(S.toYellow("/" + label + " equip <名字> - 删除职业"));
+                    player.sendMessage(S.toYellow("/" + label + " equip <名字>"));
                     return true;
                 }
                 CSClass csclass = CSClass.getClassByName(args[1]);

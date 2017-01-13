@@ -36,19 +36,18 @@ public abstract class Room {
     private Location teamA;
     private Location teamB;
     private Location lobby;
-    private int minPlayer;
-    private int maxPlayer;
-    Set<CSClass> teamAclass = new HashSet<>();
-    Set<CSClass> teamBclass = new HashSet<>();
+    private int reqPlayerNum;
+    private Set<CSClass> teamAclass = new HashSet<>();
+    private Set<CSClass> teamBclass = new HashSet<>();
     Set<EffectPlace> effects = new HashSet<>();
 
     // In-game
     private RoomStatus status = RoomStatus.WAITING;
     private long scheduleStart = -1;
-    Set<Player> teamAplayer = new HashSet<>();
-    Set<Player> teamBplayer = new HashSet<>();
-    Set<Player> players = new HashSet<>();
-    Map<Player, CSClass> playerClassMap = new HashMap<>();
+    private Set<Player> teamAplayer = new HashSet<>();
+    private Set<Player> teamBplayer = new HashSet<>();
+    private Set<Player> players = new HashSet<>();
+    private Map<Player, CSClass> playerClassMap = new HashMap<>();
 
 
     public Room(String name) {
@@ -66,8 +65,7 @@ public abstract class Room {
         teamA = Util.stringToLocation(config.getString("teamA"));
         teamB = Util.stringToLocation(config.getString("teamB"));
         lobby = Util.stringToLocation(config.getString("lobby"));
-        minPlayer = config.getInt("min", 2);
-        maxPlayer = config.getInt("max", 4);
+        reqPlayerNum = config.getInt("reqPlayerNum", 4);
         teamAclass.clear();
         teamAclass.addAll(CSClass.parseSet(config.getStringList("teamAclass")));
         teamBclass.clear();
@@ -145,23 +143,13 @@ public abstract class Room {
         config.save();
     }
 
-    public int getMinPlayer() {
-        return minPlayer;
+    public int getReqPlayerNum() {
+        return reqPlayerNum;
     }
 
-    public void setMinPlayer(int minPlayer) {
-        this.minPlayer = minPlayer;
-        config.set("min", minPlayer);
-        config.save();
-    }
-
-    public int getMaxPlayer() {
-        return maxPlayer;
-    }
-
-    public void setMaxPlayer(int maxPlayer) {
-        this.maxPlayer = maxPlayer;
-        config.set("max", maxPlayer);
+    public void setgetReqPlayerNum(int maxPlayer) {
+        this.reqPlayerNum = maxPlayer;
+        config.set("reqPlayerNum", maxPlayer);
         config.save();
     }
 
@@ -293,13 +281,37 @@ public abstract class Room {
         return teamBplayer;
     }
 
+    public Map<Player, CSClass> getPlayerClassMap() {
+        return playerClassMap;
+    }
+
     public void sendAllPlayersMsg(String msg) {
         for (Player player : players)
             player.sendMessage(msg);
     }
 
+    public void prestart() {
+        start();
+    }
+
     public void start() {
         status = RoomStatus.PROGRESS;
+        for (Player player : players) {
+            playerEquip(player);
+        }
+    }
+
+    public void playerEquip(Player player) {
+        playerClassMap.get(player).equip(player);
+    }
+
+    public void playerDeath(Player player) {
+        player.setHealth(player.getMaxHealth());
+        playerClassMap.get(player).equip(player);
+        if (teamAplayer.contains(player))
+            player.teleport(teamA);
+        else
+            player.teleport(teamB);
     }
 
     public String infoString() {
@@ -310,8 +322,7 @@ public abstract class Room {
         sb.append("\nteamA=").append(Util.locationToString(teamA));
         sb.append("\nteamB=").append(Util.locationToString(teamB));
         sb.append("\nlobby=").append(Util.locationToString(lobby));
-        sb.append("\nminPlayer=").append(minPlayer);
-        sb.append("\nmaxPlayer=").append(maxPlayer);
+        sb.append("\nreqPlayerNum=").append(reqPlayerNum);
         sb.append("\nteamAclass=").append(teamAclass);
         sb.append("\nteamBclass=").append(teamBclass);
         sb.append("\neffects=").append(effects);
@@ -320,9 +331,9 @@ public abstract class Room {
         sb.append("\nteamAplayer=").append(Util.playerToStringSet(teamAplayer));
         sb.append("\nteamBplayer=").append(Util.playerToStringSet(teamBplayer));
         sb.append("\nplayers=").append(Util.playerToStringSet(players));
+        sb.append("\nplayerClassMap=").append(Util.playerToStringSet(playerClassMap.keySet())).append("/").append(playerClassMap.values());
         sb.append('}');
         return sb.toString();
     }
-
 
 }
