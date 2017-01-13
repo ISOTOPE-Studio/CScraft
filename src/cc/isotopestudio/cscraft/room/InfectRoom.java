@@ -37,7 +37,22 @@ public class InfectRoom extends Room {
     }
 
     @Override
+    public String getTeamAName() {
+        return S.toBoldDarkAqua("僵尸");
+    }
+
+    @Override
+    public String getTeamBName() {
+        return S.toBoldRed("人类");
+    }
+
+
+    @Override
     public String toString() {
+        return name();
+    }
+
+    public static String name() {
         return S.toBoldDarkGreen("感染模式");
     }
 }

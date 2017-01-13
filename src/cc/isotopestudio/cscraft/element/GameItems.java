@@ -15,6 +15,7 @@ public class GameItems {
     private static ItemStack classItem = new ItemStack(Material.NETHER_STAR);
     private static ItemStack team1Item = new ItemStack(Material.WOOL);
     private static ItemStack team2Item = new ItemStack(Material.WOOL);
+    private static ItemStack infoItem = new ItemStack(Material.SKULL_ITEM);
 
 
     public static void update() {
@@ -35,6 +36,11 @@ public class GameItems {
         meta = team2Item.getItemMeta();
         meta.setDisplayName(S.toBoldRed("加入红队 (右键)"));
         team2Item.setItemMeta(meta);
+
+        infoItem.setDurability((short) 3);
+        meta = infoItem.getItemMeta();
+        meta.setDisplayName(S.toBoldRed("战绩 (右键)"));
+        infoItem.setItemMeta(meta);
     }
 
     public static ItemStack getExitItem() {
@@ -51,5 +57,9 @@ public class GameItems {
 
     public static ItemStack getTeam2Item() {
         return team2Item;
+    }
+
+    public static ItemStack getInfoItem() {
+        return infoItem;
     }
 }

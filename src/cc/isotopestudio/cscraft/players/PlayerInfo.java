@@ -1,4 +1,4 @@
-package cc.isotopestudio.cscraft.listener;
+package cc.isotopestudio.cscraft.players;
 /*
  * Created by Mars Tan on 1/11/2017.
  * Copyright ISOTOPE Studio

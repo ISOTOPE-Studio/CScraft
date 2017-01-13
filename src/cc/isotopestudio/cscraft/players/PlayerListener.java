@@ -1,28 +1,30 @@
-package cc.isotopestudio.cscraft.listener;
+package cc.isotopestudio.cscraft.players;
 /*
  * Created by Mars Tan on 12/31/2016.
  * Copyright ISOTOPE Studio
  */
 
 import cc.isotopestudio.cscraft.CScraft;
+import cc.isotopestudio.cscraft.element.EffectPlace;
 import cc.isotopestudio.cscraft.element.GameItems;
 import cc.isotopestudio.cscraft.gui.ClassGUI;
+import cc.isotopestudio.cscraft.gui.InfoGUI;
 import cc.isotopestudio.cscraft.room.Room;
 import cc.isotopestudio.cscraft.room.RoomStatus;
 import cc.isotopestudio.cscraft.util.S;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.*;
 
-import static cc.isotopestudio.cscraft.listener.PlayerInfo.playerRoomMap;
+import static cc.isotopestudio.cscraft.players.PlayerInfo.playerRoomMap;
+import static cc.isotopestudio.cscraft.room.Room.rooms;
 
 public class PlayerListener implements Listener {
 
@@ -72,24 +74,17 @@ public class PlayerListener implements Listener {
         } else {
             if (event.getFinalDamage() > player.getHealth()) {
                 event.setCancelled(true);
-                room.playerDeath(player);
+                Player killer = null;
+                if (event instanceof EntityDamageByEntityEvent) {
+                    if (((EntityDamageByEntityEvent) event).getDamager() instanceof Player) {
+                        killer = (Player) ((EntityDamageByEntityEvent) event).getDamager();
+                    }
+                }
+                room.playerDeath(killer, player);
             }
 
         }
     }
-
-//    @EventHandler
-//    public void onDeath(PlayerDeathEvent event) {
-//        final Player player = event.getEntity();
-//        if (!playerRoomMap.containsKey(player)) {
-//            return;
-//        }
-//        Room room = playerRoomMap.get(player);
-//        if (room.getStatus() == RoomStatus.WAITING) {
-//
-//        } else {
-//        }
-//    }
 
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
@@ -134,7 +129,10 @@ public class PlayerListener implements Listener {
                 new ClassGUI(room, player).open(player);
             }
         } else {
-
+            if (GameItems.getInfoItem().equals(event.getItem())) {
+                event.setCancelled(true);
+                new InfoGUI(room, player).open(player);
+            }
         }
     }
 
@@ -161,12 +159,32 @@ public class PlayerListener implements Listener {
     }
 
     @EventHandler
-    public void onInventoryClick(FoodLevelChangeEvent event) {
+    public void onFoodLevelChange(FoodLevelChangeEvent event) {
         final Player player = (Player) event.getEntity();
         if (!playerRoomMap.containsKey(player)) {
             return;
         }
         event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onPickUpItem(PlayerPickupItemEvent event) {
+        Item item = event.getItem();
+        for (Room room : rooms.values()) {
+            if (room.getEffectItems().keySet().contains(item)) {
+                event.setCancelled(true);
+                Player player = event.getPlayer();
+                if (!room.getPlayers().contains(player)) {
+                    return;
+                }
+                EffectPlace effectPlace = room.getEffectItems().get(item);
+                player.addPotionEffect(effectPlace.getEffect());
+                room.getEffectItems().remove(item);
+                item.remove();
+                effectPlace.respawn();
+            }
+        }
+
     }
 
 }

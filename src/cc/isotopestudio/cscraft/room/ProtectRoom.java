@@ -34,6 +34,10 @@ public class ProtectRoom extends Room {
 
     @Override
     public String toString() {
+        return name();
+    }
+
+    public static String name() {
         return S.toBoldPurple("йьнюдёй╫");
     }
 }

@@ -30,6 +30,9 @@ public class RoomGUI extends GUI {
         int pos = 0;
         for (Room room : Room.rooms.values()) {
             if (pos >= size) break;
+            if (!room.isReady()) {
+                continue;
+            }
             slotIDMap.put(pos, room.getName());
             ItemStack item = new ItemStack(Material.WOOL);
             switch (room.getStatus()) {

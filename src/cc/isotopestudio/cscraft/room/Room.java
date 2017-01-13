@@ -4,18 +4,27 @@ package cc.isotopestudio.cscraft.room;
  * Copyright ISOTOPE Studio
  */
 
+import cc.isotopestudio.cscraft.CScraft;
 import cc.isotopestudio.cscraft.element.CSClass;
 import cc.isotopestudio.cscraft.element.EffectPlace;
 import cc.isotopestudio.cscraft.element.GameItems;
-import cc.isotopestudio.cscraft.listener.PlayerInfo;
+import cc.isotopestudio.cscraft.players.PlayerInfo;
 import cc.isotopestudio.cscraft.util.PluginFile;
 import cc.isotopestudio.cscraft.util.S;
 import cc.isotopestudio.cscraft.util.Util;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
@@ -39,7 +48,8 @@ public abstract class Room {
     private int reqPlayerNum;
     private Set<CSClass> teamAclass = new HashSet<>();
     private Set<CSClass> teamBclass = new HashSet<>();
-    Set<EffectPlace> effects = new HashSet<>();
+    private Set<EffectPlace> effects = new HashSet<>();
+    private Map<Item, EffectPlace> effectItems = new HashMap<>();
 
     // In-game
     private RoomStatus status = RoomStatus.WAITING;
@@ -48,6 +58,8 @@ public abstract class Room {
     private Set<Player> teamBplayer = new HashSet<>();
     private Set<Player> players = new HashSet<>();
     private Map<Player, CSClass> playerClassMap = new HashMap<>();
+    private Map<Player, Integer> playerKillsMap = new HashMap<>();
+    private Map<Player, Integer> playerDeathMap = new HashMap<>();
 
 
     public Room(String name) {
@@ -71,7 +83,7 @@ public abstract class Room {
         teamBclass.clear();
         teamBclass.addAll(CSClass.parseSet(config.getStringList("teamBclass")));
         for (String s : config.getStringList("effectPlace")) {
-            effects.add(EffectPlace.deserialize(s));
+            effects.add(EffectPlace.deserialize(this, s));
         }
     }
 
@@ -108,8 +120,31 @@ public abstract class Room {
     }
 
     public void setPos2(Location pos2) {
-        this.pos2 = pos2;
-        config.set("pos2", Util.locationToString(pos2));
+        int x1, y1, z1, x2, y2, z2;
+        if (pos1.getBlockX() > pos2.getBlockX()) {
+            x1 = pos2.getBlockX();
+            x2 = pos1.getBlockX();
+        } else {
+            x1 = pos1.getBlockX();
+            x2 = pos2.getBlockX();
+        }
+        if (pos1.getBlockY() > pos2.getBlockY()) {
+            y1 = pos2.getBlockY();
+            y2 = pos1.getBlockY();
+        } else {
+            y1 = pos1.getBlockY();
+            y2 = pos2.getBlockY();
+        }
+        if (pos1.getBlockZ() > pos2.getBlockZ()) {
+            z1 = pos2.getBlockZ();
+            z2 = pos1.getBlockZ();
+        } else {
+            z1 = pos1.getBlockZ();
+            z2 = pos2.getBlockZ();
+        }
+        setPos1(new Location(pos1.getWorld(), x1, y1, z1));
+        this.pos2 = new Location(pos1.getWorld(), x2, y2, z2);
+        config.set("pos2", Util.locationToString(this.pos2));
         config.save();
     }
 
@@ -186,7 +221,7 @@ public abstract class Room {
     }
 
     public void addEffectPlace(Location location, Material material, PotionEffect effect, int cd) {
-        effects.add(new EffectPlace(location, material, effect, cd));
+        effects.add(new EffectPlace(this, location, material, effect, cd));
         List<String> list = new ArrayList<>();
         for (EffectPlace effectPlace : effects) {
             list.add(effectPlace.serialize());
@@ -231,6 +266,10 @@ public abstract class Room {
         this.status = status;
         config.set("status", status.name());
         config.save();
+    }
+
+    public Map<Item, EffectPlace> getEffectItems() {
+        return effectItems;
     }
 
     public void join(Player player) {
@@ -285,6 +324,14 @@ public abstract class Room {
         return playerClassMap;
     }
 
+    public Map<Player, Integer> getPlayerKillsMap() {
+        return playerKillsMap;
+    }
+
+    public Map<Player, Integer> getPlayerDeathMap() {
+        return playerDeathMap;
+    }
+
     public void sendAllPlayersMsg(String msg) {
         for (Player player : players)
             player.sendMessage(msg);
@@ -297,43 +344,110 @@ public abstract class Room {
     public void start() {
         status = RoomStatus.PROGRESS;
         for (Player player : players) {
+            playerKillsMap.put(player, 0);
+            playerDeathMap.put(player, 0);
             playerEquip(player);
+            new InvincibleListener(player);
+        }
+        for (EffectPlace effectPlace : effects) {
+            effectPlace.spawn();
         }
     }
 
     public void playerEquip(Player player) {
         playerClassMap.get(player).equip(player);
+        player.getInventory().setItem(8, GameItems.getInfoItem());
     }
 
-    public void playerDeath(Player player) {
+    public void playerDeath(Player killer, Player player) {
+        if (killer != null)
+            playerKillsMap.put(killer, playerKillsMap.get(killer) + 1);
+
+        playerDeathMap.put(player, playerDeathMap.get(player) + 1);
+        sendAllPlayersMsg(CScraft.prefix + player.getDisplayName() + S.toYellow(" À¿¡À"));
         player.setHealth(player.getMaxHealth());
         playerClassMap.get(player).equip(player);
         if (teamAplayer.contains(player))
             player.teleport(teamA);
         else
             player.teleport(teamB);
+        new InvincibleListener(player);
+    }
+
+    public void teamAWin() {
+    }
+
+    public void teamBWin() {
+    }
+
+    void teleportOut() {
+        playerKillsMap.clear();
+        playerDeathMap.clear();
+        teamAplayer.clear();
+        teamBplayer.clear();
+        status = RoomStatus.WAITING;
+        for (Player player : new HashSet<>(players)) {
+            exit(player);
+        }
+    }
+
+    public String getTeamAName() {
+        return S.toBoldDarkAqua("∫Ï∂”");
+    }
+
+    public String getTeamBName() {
+        return S.toBoldRed("¿∂∂”");
+    }
+
+    public static String name() {
+        return S.toRed("¥ÌŒÛ!");
     }
 
     public String infoString() {
-        final StringBuffer sb = new StringBuffer("Room{");
-        sb.append("\nname='").append(name).append('\'');
-        sb.append("\npos1=").append(Util.locationToString(pos1));
-        sb.append("\npos2=").append(Util.locationToString(pos2));
-        sb.append("\nteamA=").append(Util.locationToString(teamA));
-        sb.append("\nteamB=").append(Util.locationToString(teamB));
-        sb.append("\nlobby=").append(Util.locationToString(lobby));
-        sb.append("\nreqPlayerNum=").append(reqPlayerNum);
-        sb.append("\nteamAclass=").append(teamAclass);
-        sb.append("\nteamBclass=").append(teamBclass);
-        sb.append("\neffects=").append(effects);
-        sb.append("\nstatus=").append(status);
-        sb.append("\nscheduleStart=").append(scheduleStart);
-        sb.append("\nteamAplayer=").append(Util.playerToStringSet(teamAplayer));
-        sb.append("\nteamBplayer=").append(Util.playerToStringSet(teamBplayer));
-        sb.append("\nplayers=").append(Util.playerToStringSet(players));
-        sb.append("\nplayerClassMap=").append(Util.playerToStringSet(playerClassMap.keySet())).append("/").append(playerClassMap.values());
-        sb.append('}');
-        return sb.toString();
+        return "Room{" + "\nname='" + name + '\'' +
+                "\npos1=" + Util.locationToString(pos1) +
+                "\npos2=" + Util.locationToString(pos2) +
+                "\nteamA=" + Util.locationToString(teamA) +
+                "\nteamB=" + Util.locationToString(teamB) +
+                "\nlobby=" + Util.locationToString(lobby) +
+                "\nreqPlayerNum=" + reqPlayerNum +
+                "\nteamAclass=" + teamAclass +
+                "\nteamBclass=" + teamBclass +
+                "\neffects=" + effects +
+                "\nstatus=" + status +
+                "\nscheduleStart=" + scheduleStart +
+                "\nteamAplayer=" + Util.playerToStringSet(teamAplayer) +
+                "\nteamBplayer=" + Util.playerToStringSet(teamBplayer) +
+                "\nplayers=" + Util.playerToStringSet(players) +
+                "\nplayerClassMap=" + Util.playerToStringSet(playerClassMap.keySet()) + "/" + playerClassMap.values() +
+                "\nplayerKillsMap=" + Util.playerToStringSet(playerKillsMap.keySet()) + "/" + playerKillsMap.values() +
+                "\nplayerDeathMap=" + Util.playerToStringSet(playerDeathMap.keySet()) + "/" + playerDeathMap.values() +
+                '}';
     }
+
+
+    static class InvincibleListener implements Listener {
+        private final Player player;
+
+        InvincibleListener(Player player) {
+            this.player = player;
+            Bukkit.getPluginManager().registerEvents(this, plugin);
+            InvincibleListener listener = this;
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    HandlerList.unregisterAll(listener);
+                }
+            }.runTaskLater(plugin, 20 * 5);
+        }
+
+        @EventHandler(priority = EventPriority.HIGHEST)
+        public void onDamage(EntityDamageEvent event) {
+            if (event.getEntity().equals(player)) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
 
 }

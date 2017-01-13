@@ -10,12 +10,13 @@ import cc.isotopestudio.cscraft.util.S;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
-import static cc.isotopestudio.cscraft.CScraft.msgFiles;
-import static cc.isotopestudio.cscraft.CScraft.plugin;
+import static cc.isotopestudio.cscraft.CScraft.*;
 
 public class TeamRoom extends Room {
 
     private int goal;
+    private int teamADeath = 0;
+    private int teamBDeath = 0;
 
     public TeamRoom(String name) {
         super(name);
@@ -44,15 +45,15 @@ public class TeamRoom extends Room {
     @Override
     public void join(Player player) {
         super.join(player);
-        if (teamAplayer.size() > teamBplayer.size()) {
-            teamBplayer.add(player);
-        } else if (teamAplayer.size() < teamBplayer.size()) {
-            teamAplayer.add(player);
+        if (getTeamAplayer().size() > getTeamBplayer().size()) {
+            getTeamBplayer().add(player);
+        } else if (getTeamAplayer().size() < getTeamBplayer().size()) {
+            getTeamAplayer().add(player);
         } else {
             if (Math.random() < 0.5)
-                teamBplayer.add(player);
+                getTeamBplayer().add(player);
             else
-                teamAplayer.add(player);
+                getTeamAplayer().add(player);
         }
 
         player.getInventory().setItem(3, GameItems.getTeam1Item());
@@ -62,17 +63,58 @@ public class TeamRoom extends Room {
     @Override
     public void start() {
         super.start();
-        for (Player player : teamAplayer) {
+        for (Player player : getTeamAplayer()) {
             player.teleport(getTeamALocation());
         }
-        for (Player player : teamBplayer) {
+        for (Player player : getTeamBplayer()) {
             player.teleport(getTeamBLocation());
         }
+        teamADeath = 0;
+        teamBDeath = 0;
         sendAllPlayersMsg(S.toPrefixYellow("游戏开始"));
     }
 
     @Override
+    public void playerDeath(Player killer, Player player) {
+        super.playerDeath(killer, player);
+        if (getTeamAplayer().contains(player)) {
+            teamADeath++;
+        } else {
+            teamBDeath++;
+        }
+        if (teamADeath >= goal) {
+            teamAWin();
+        } else if (teamBDeath >= goal) {
+            teamBWin();
+        }
+    }
+
+    @Override
+    public void teamAWin() {
+        super.teamAWin();
+        sendAllPlayersMsg(prefix + S.toBoldDarkAqua("蓝队获胜"));
+        for (Player player : getPlayers()) {
+            player.getInventory().clear();
+        }
+        teleportOut();
+    }
+
+    @Override
+    public void teamBWin() {
+        super.teamBWin();
+        sendAllPlayersMsg(prefix + S.toBoldDarkAqua("红队获胜"));
+        for (Player player : getPlayers()) {
+            player.getInventory().clear();
+        }
+        teleportOut();
+    }
+
+    @Override
     public String toString() {
+        return name();
+    }
+
+    public static String name() {
         return S.toBoldGold("团队模式");
     }
 }
