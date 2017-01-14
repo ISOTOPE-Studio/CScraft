@@ -22,6 +22,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
+import org.bukkit.inventory.ItemStack;
 
 import static cc.isotopestudio.cscraft.players.PlayerInfo.playerRoomMap;
 import static cc.isotopestudio.cscraft.room.Room.rooms;
@@ -75,12 +76,14 @@ public class PlayerListener implements Listener {
             if (event.getFinalDamage() > player.getHealth()) {
                 event.setCancelled(true);
                 Player killer = null;
+                ItemStack item = null;
                 if (event instanceof EntityDamageByEntityEvent) {
                     if (((EntityDamageByEntityEvent) event).getDamager() instanceof Player) {
                         killer = (Player) ((EntityDamageByEntityEvent) event).getDamager();
+                        item = killer.getItemInHand();
                     }
                 }
-                room.playerDeath(killer, player);
+                room.playerDeath(killer, player, item);
             }
 
         }

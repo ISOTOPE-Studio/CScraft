@@ -58,7 +58,7 @@ public class CSClass {
     public String getDisplayName() {
         String name = getMsg("name");
         if (name != null) return name;
-        return this.name;
+        return this.name + ChatColor.RESET;
     }
 
     public void setClass(Player player) {
@@ -98,7 +98,7 @@ public class CSClass {
 
     public String getMsg(String path) {
         String string = classMsgData.getString(name + "." + path);
-        if(string == null) return null;
+        if (string == null) return null;
         return ChatColor.translateAlternateColorCodes('&', string);
     }
 

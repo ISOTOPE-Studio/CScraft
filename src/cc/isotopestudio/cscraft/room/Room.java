@@ -23,6 +23,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -71,7 +72,7 @@ public abstract class Room {
         loadFromConfig();
     }
 
-    void loadFromConfig() {
+    private void loadFromConfig() {
         pos1 = Util.stringToLocation(config.getString("pos1"));
         pos2 = Util.stringToLocation(config.getString("pos2"));
         teamA = Util.stringToLocation(config.getString("teamA"));
@@ -248,6 +249,8 @@ public abstract class Room {
                 && teamAclass.size() > 0 && teamBclass.size() > 0;
     }
 
+    // In-game
+
     public long getScheduleStart() {
         return scheduleStart;
     }
@@ -256,7 +259,6 @@ public abstract class Room {
         this.scheduleStart = scheduleStart;
     }
 
-    // In-game
 
     public RoomStatus getStatus() {
         return status;
@@ -292,7 +294,6 @@ public abstract class Room {
         PlayerInfo.teleportOut(player);
         leave(player);
     }
-
 
     public void leave(Player player) {
         playerData.set(player.getName() + ".room", null);
@@ -359,9 +360,30 @@ public abstract class Room {
         player.getInventory().setItem(8, GameItems.getInfoItem());
     }
 
-    public void playerDeath(Player killer, Player player) {
-        if (killer != null)
+    public void playerDeath(Player killer, Player player, ItemStack item) {
+        if (killer != null) {
             playerKillsMap.put(killer, playerKillsMap.get(killer) + 1);
+            switch (playerKillsMap.get(killer)) {
+                case (1):
+                    sendAllPlayersMsg(getReplacedMsg(getMsg("msg.kill.1"), player, killer, item));
+                    break;
+                case (2):
+                    sendAllPlayersMsg(getReplacedMsg(getMsg("msg.kill.2"), player, killer, item));
+                    break;
+                case (3):
+                    sendAllPlayersMsg(getReplacedMsg(getMsg("msg.kill.3"), player, killer, item));
+                    break;
+                case (4):
+                    sendAllPlayersMsg(getReplacedMsg(getMsg("msg.kill.4"), player, killer, item));
+                    break;
+                case (5):
+                    sendAllPlayersMsg(getReplacedMsg(getMsg("msg.kill.5"), player, killer, item));
+                    break;
+                default:
+                    sendAllPlayersMsg(getReplacedMsg(getMsg("msg.kill.n"), player, killer, item));
+                    break;
+            }
+        }
 
         playerDeathMap.put(player, playerDeathMap.get(player) + 1);
         sendAllPlayersMsg(CScraft.prefix + player.getDisplayName() + S.toYellow(" À¿¡À"));
@@ -375,9 +397,29 @@ public abstract class Room {
     }
 
     public void teamAWin() {
+        for (String line : getMsgList("msg.win")) {
+            for (Player player : teamAplayer) {
+                player.sendMessage(getReplacedMsg(line, player, null, null));
+            }
+        }
+        for (String line : getMsgList("msg.lose")) {
+            for (Player player : teamBplayer) {
+                player.sendMessage(getReplacedMsg(line, player, null, null));
+            }
+        }
     }
 
     public void teamBWin() {
+        for (String line : getMsgList("msg.win")) {
+            for (Player player : teamBplayer) {
+                player.sendMessage(getReplacedMsg(line, player, null, null));
+            }
+        }
+        for (String line : getMsgList("msg.lose")) {
+            for (Player player : teamAplayer) {
+                player.sendMessage(getReplacedMsg(line, player, null, null));
+            }
+        }
     }
 
     void teleportOut() {
@@ -389,6 +431,31 @@ public abstract class Room {
         for (Player player : new HashSet<>(players)) {
             exit(player);
         }
+    }
+
+    private String getReplacedMsg(String msg, Player player, Player killer, ItemStack item) {
+        msg = msg.replaceAll("<player>", getPlayerFullName(player))
+                .replaceAll("<kill>", String.valueOf(playerKillsMap.get(player)))
+                .replaceAll("<death>", String.valueOf(playerDeathMap.get(player)));
+        if (killer != null)
+            msg = msg.replaceAll("<enemy>", getPlayerFullName(killer));
+        if (item != null)
+            msg = msg.replaceAll("<item>", getItemName(item));
+        return msg;
+    }
+
+    public String getPlayerFullName(Player player) {
+        String result = "";
+        if (playerClassMap.containsKey(player)) {
+            result += "[" + playerClassMap.get(player).getDisplayName() + "]";
+        }
+        result += player.getDisplayName();
+        return result;
+    }
+
+    private String getItemName(ItemStack item) {
+        return item.hasItemMeta() && item.getItemMeta().hasDisplayName() ?
+                item.getItemMeta().getDisplayName() : item.getType().toString();
     }
 
     public String getTeamAName() {
@@ -404,7 +471,7 @@ public abstract class Room {
     }
 
     public String infoString() {
-        return "Room{" + "\nname='" + name + '\'' +
+        return "- Room" + "\nname='" + name + '\'' +
                 "\npos1=" + Util.locationToString(pos1) +
                 "\npos2=" + Util.locationToString(pos2) +
                 "\nteamA=" + Util.locationToString(teamA) +
@@ -421,8 +488,7 @@ public abstract class Room {
                 "\nplayers=" + Util.playerToStringSet(players) +
                 "\nplayerClassMap=" + Util.playerToStringSet(playerClassMap.keySet()) + "/" + playerClassMap.values() +
                 "\nplayerKillsMap=" + Util.playerToStringSet(playerKillsMap.keySet()) + "/" + playerKillsMap.values() +
-                "\nplayerDeathMap=" + Util.playerToStringSet(playerDeathMap.keySet()) + "/" + playerDeathMap.values() +
-                '}';
+                "\nplayerDeathMap=" + Util.playerToStringSet(playerDeathMap.keySet()) + "/" + playerDeathMap.values();
     }
 
 

@@ -9,6 +9,7 @@ import cc.isotopestudio.cscraft.util.PluginFile;
 import cc.isotopestudio.cscraft.util.S;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import static cc.isotopestudio.cscraft.CScraft.*;
 
@@ -75,24 +76,24 @@ public class TeamRoom extends Room {
     }
 
     @Override
-    public void playerDeath(Player killer, Player player) {
-        super.playerDeath(killer, player);
+    public void playerDeath(Player killer, Player player, ItemStack item) {
+        super.playerDeath(killer, player, item);
         if (getTeamAplayer().contains(player)) {
             teamADeath++;
         } else {
             teamBDeath++;
         }
         if (teamADeath >= goal) {
-            teamAWin();
-        } else if (teamBDeath >= goal) {
             teamBWin();
+        } else if (teamBDeath >= goal) {
+            teamAWin();
         }
     }
 
     @Override
     public void teamAWin() {
         super.teamAWin();
-        sendAllPlayersMsg(prefix + S.toBoldDarkAqua("蓝队获胜"));
+//        sendAllPlayersMsg(prefix + S.toBoldDarkAqua("蓝队获胜"));
         for (Player player : getPlayers()) {
             player.getInventory().clear();
         }
@@ -112,6 +113,12 @@ public class TeamRoom extends Room {
     @Override
     public String toString() {
         return name();
+    }
+
+    @Override
+    public String infoString() {
+        return super.infoString() +
+                "\ngoal=" + goal;
     }
 
     public static String name() {

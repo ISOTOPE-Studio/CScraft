@@ -332,7 +332,7 @@ public class CommandCsroom implements CommandExecutor {
                 return true;
             }
             if (args[0].equalsIgnoreCase("goal")) {
-                if (args.length < 2) {
+                if (args.length < 3) {
                     sender.sendMessage(S.toYellow("/" + label + " goal <名字> <数量> - 目标人数"));
                     return true;
                 }
@@ -349,6 +349,32 @@ public class CommandCsroom implements CommandExecutor {
                     return true;
                 }
                 ((TeamRoom) room).setGoal(num);
+                player.sendMessage(S.toPrefixGreen("成功设置"));
+                return true;
+            }
+            if (args[0].equalsIgnoreCase("entityA")) {
+                if (args.length < 2) {
+                    sender.sendMessage(S.toYellow("/" + label + " entityA <名字> - 设置实体A队位置"));
+                    return true;
+                }
+                if (!(room instanceof ProtectRoom)) {
+                    player.sendMessage(S.toPrefixRed("此房间不是") + ProtectRoom.name());
+                    return true;
+                }
+                ((ProtectRoom) room).setEntityA(player.getLocation());
+                player.sendMessage(S.toPrefixGreen("成功设置"));
+                return true;
+            }
+            if (args[0].equalsIgnoreCase("entityB")) {
+                if (args.length < 2) {
+                    sender.sendMessage(S.toYellow("/" + label + " entityB <名字> - 设置实体B队位置"));
+                    return true;
+                }
+                if (!(room instanceof ProtectRoom)) {
+                    player.sendMessage(S.toPrefixRed("此房间不是") + ProtectRoom.name());
+                    return true;
+                }
+                ((ProtectRoom) room).setEntityB(player.getLocation());
                 player.sendMessage(S.toPrefixGreen("成功设置"));
                 return true;
             }
@@ -385,6 +411,8 @@ public class CommandCsroom implements CommandExecutor {
         sender.sendMessage(" - " + TeamRoom.name());
         sender.sendMessage(S.toYellow("/" + label + " goal <名字> <数量> - 目标人数"));
         sender.sendMessage(" - " + ProtectRoom.name());
+        sender.sendMessage(S.toYellow("/" + label + " entityA <名字> - 设置实体A队位置"));
+        sender.sendMessage(S.toYellow("/" + label + " entityB <名字> - 设置实体B队位置"));
         sender.sendMessage(S.toYellow("/" + label + " health <名字> <生命值> - 实体生命值"));
         sender.sendMessage(" - " + InfectRoom.name());
 

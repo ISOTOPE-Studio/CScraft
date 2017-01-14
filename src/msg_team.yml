@@ -13,3 +13,25 @@ GUI:
   - '&cc'
   - '&ee'
   - '&ff'
+msg:
+  win: 
+  - '-------------------'
+  - '   <player>'
+  - '   击杀: <kill>'
+  - '   死亡: <death>'
+  - ' 你胜利了! 恭喜 <player> 获得 奖励'
+  - '------------------'
+  lose: 
+  - '-------------------'
+  - '   <player>'
+  - '   击杀: <kill>'
+  - '   死亡: <death>'
+  - ' 你输了!'
+  - '------------------'
+  kill:
+    '1': '<player>使用<item>强势单杀了<enemy>'
+    '2': '<player>使用<item>神力双杀了<enemy>'
+    '3': '<player>使用<item>神力三杀了<enemy>'
+    '4': '<player>使用<item>神力四杀了<enemy>'
+    '5': '<player>使用<item>神力五杀了<enemy>'
+    n: '<player>使用<item>大杀特杀了<enemy>'
