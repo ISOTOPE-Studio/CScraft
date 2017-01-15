@@ -31,7 +31,7 @@ public class Util {
         int x = Integer.parseInt(s[1]);
         int y = Integer.parseInt(s[2]);
         int z = Integer.parseInt(s[3]);
-        return new Location(world, x, y, z);
+        return new Location(world, x + .5, y, z + .5);
     }
 
     public static String potionEffectToString(PotionEffect effect) {

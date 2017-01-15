@@ -15,6 +15,7 @@ commands:
   cs:
     description: CScraft
     usage: /<command>
+    aliases: [csjoin, crackshot]
   csreload:
     description: CScraft
     usage: /<command>

@@ -234,6 +234,28 @@ public class CommandCsroom implements CommandExecutor {
                 player.sendMessage(S.toPrefixGreen("成功设置"));
                 return true;
             }
+            if (args[0].equalsIgnoreCase("colorcap")) {
+                if (args.length < 3) {
+                    sender.sendMessage(S.toYellow("/" + label + " colorcap <房间> <true|false> - 带颜色的帽子"));
+                    return true;
+                }
+                switch (args[2]) {
+                    case ("true"): {
+                        room.setUseColorCap(true);
+                        break;
+                    }
+                    case ("false"): {
+                        room.setUseColorCap(false);
+                        break;
+                    }
+                    default: {
+                        player.sendMessage(S.toPrefixRed("参数不对"));
+                        return true;
+                    }
+                }
+                player.sendMessage(S.toPrefixGreen("成功设置"));
+                return true;
+            }
             if (args[0].equalsIgnoreCase("effect")) {
                 if (args.length < 6) {
                     player.sendMessage(S.toYellow("/" + label + " effect <房间> <漂浮物品ID> <获得药水> <药水等级> <时间> <冷却> - 药水"));
@@ -378,6 +400,27 @@ public class CommandCsroom implements CommandExecutor {
                 player.sendMessage(S.toPrefixGreen("成功设置"));
                 return true;
             }
+            if (args[0].equalsIgnoreCase("health")) {
+                if (args.length < 3) {
+                    sender.sendMessage(S.toYellow("/" + label + " health <名字> <数量> - 实体生命值"));
+                    return true;
+                }
+                if (!(room instanceof ProtectRoom)) {
+                    player.sendMessage(S.toPrefixRed("此房间不是") + TeamRoom.name());
+                    return true;
+                }
+                int num;
+                try {
+                    num = Integer.parseInt(args[2]);
+                    if (num < 1) throw new NumberFormatException();
+                } catch (NumberFormatException e) {
+                    player.sendMessage(S.toPrefixRed("数字不对"));
+                    return true;
+                }
+                ((ProtectRoom) room).setHealth(num);
+                player.sendMessage(S.toPrefixGreen("成功设置"));
+                return true;
+            }
             player.sendMessage(S.toPrefixRed("未知命令, 输入 /" + label + " 查看帮助"));
             return true;
         }
@@ -397,6 +440,7 @@ public class CommandCsroom implements CommandExecutor {
         sender.sendMessage(S.toYellow("/" + label + " removeAclass <名字> <职业名字> - 刪除A队职业"));
         sender.sendMessage(S.toYellow("/" + label + " removeBclass <名字> <职业名字> - 刪除A队职业"));
         sender.sendMessage(S.toYellow("/" + label + " num <名字> <玩家数量>"));
+        sender.sendMessage(S.toYellow("/" + label + " colorcap <true|false> - 带颜色的帽子"));
         sender.sendMessage(S.toYellow("/" + label + " info <名字> - 查看信息"));
         sender.sendMessage(S.toYellow("/" + label + " list - 查看房间列表"));
         sender.sendMessage(S.toYellow("/csreload - 重载所有配置"));

@@ -26,6 +26,7 @@ public class RoomLobbyUpdateTask extends BukkitRunnable {
         for (Room room : Room.rooms.values()) {
             if (room.getStatus() != RoomStatus.WAITING) continue;
 
+            room.updateScoreBoardAtLobby();
             if (room.getPlayers().size() == room.getReqPlayerNum()) {
                 if (room.getPlayerClassMap().size() < room.getPlayers().size()) {
                     for (Player player : room.getPlayers()) {
@@ -47,10 +48,10 @@ public class RoomLobbyUpdateTask extends BukkitRunnable {
             } else {
                 room.setScheduleStart(-1);
             }
-            if (getRemainSec(room.getScheduleStart()) == 0) {
+            if (room.getScheduleStart() > 0 && getRemainSec(room.getScheduleStart()) <= 0) {
                 room.prestart();
             }
-            if (waitCount == 0) {
+            if (waitCount == 0 && room.getScheduleStart() != -1) {
                 room.sendAllPlayersMsg(S.toPrefixYellow("你在大厅里，等待其他玩家进入   ") + S.toGreen(
                         room.getPlayers().size() + " / " + room.getReqPlayerNum()));
                 for (Player player : room.getPlayers()) {

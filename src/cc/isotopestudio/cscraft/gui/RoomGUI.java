@@ -5,6 +5,7 @@
 package cc.isotopestudio.cscraft.gui;
 
 import cc.isotopestudio.cscraft.room.Room;
+import cc.isotopestudio.cscraft.room.RoomStatus;
 import cc.isotopestudio.cscraft.util.S;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -76,7 +77,9 @@ public class RoomGUI extends GUI {
                 if (room == null) {
                     player.sendMessage(S.toPrefixRed("房间不存在"));
                 } else {
-                    if (room.getPlayers().size() >= room.getReqPlayerNum()) {
+                    if (room.getStatus() == RoomStatus.PROGRESS) {
+                        return;
+                    } else if (room.getPlayers().size() >= room.getReqPlayerNum()) {
                         player.sendMessage(S.toPrefixRed("玩家数量已达最大值"));
                     } else {
                         room.join(player);

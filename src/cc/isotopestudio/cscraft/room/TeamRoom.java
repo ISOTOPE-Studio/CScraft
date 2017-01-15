@@ -11,7 +11,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import static cc.isotopestudio.cscraft.CScraft.*;
+import static cc.isotopestudio.cscraft.CScraft.msgFiles;
+import static cc.isotopestudio.cscraft.CScraft.plugin;
 
 public class TeamRoom extends Room {
 
@@ -88,26 +89,6 @@ public class TeamRoom extends Room {
         } else if (teamBDeath >= goal) {
             teamAWin();
         }
-    }
-
-    @Override
-    public void teamAWin() {
-        super.teamAWin();
-//        sendAllPlayersMsg(prefix + S.toBoldDarkAqua("蓝队获胜"));
-        for (Player player : getPlayers()) {
-            player.getInventory().clear();
-        }
-        teleportOut();
-    }
-
-    @Override
-    public void teamBWin() {
-        super.teamBWin();
-        sendAllPlayersMsg(prefix + S.toBoldDarkAqua("红队获胜"));
-        for (Player player : getPlayers()) {
-            player.getInventory().clear();
-        }
-        teleportOut();
     }
 
     @Override

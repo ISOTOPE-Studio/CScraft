@@ -21,7 +21,8 @@ public class CheckPlayerLocation extends BukkitRunnable {
             if (room.getStatus() != RoomStatus.PROGRESS) continue;
             for (Player player : room.getPlayers()) {
                 if (isOutsideOfRegion(player.getLocation(), room.getPos1(), room.getPos2()) != 0) {
-                    player.damage(2);
+                    if (player.getHealth() > 2)
+                        player.damage(2);
                     player.sendMessage(S.toPrefixRed("你跑到地图外面去了"));
                     if (room.getTeamAplayer().contains(player)) {
                         player.teleport(room.getTeamALocation());

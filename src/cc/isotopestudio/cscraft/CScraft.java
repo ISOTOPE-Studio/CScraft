@@ -11,6 +11,7 @@ import cc.isotopestudio.cscraft.players.PlayerInfo;
 import cc.isotopestudio.cscraft.players.PlayerListener;
 import cc.isotopestudio.cscraft.room.Room;
 import cc.isotopestudio.cscraft.task.CheckPlayerLocation;
+import cc.isotopestudio.cscraft.task.RoomGameUpdateTask;
 import cc.isotopestudio.cscraft.task.RoomLobbyUpdateTask;
 import cc.isotopestudio.cscraft.task.UpdateConfig;
 import cc.isotopestudio.cscraft.util.PluginFile;
@@ -57,6 +58,7 @@ public class CScraft extends JavaPlugin {
         new UpdateConfig().run();
         new CheckPlayerLocation().runTaskTimer(this, 20, 20);
         new RoomLobbyUpdateTask().runTaskTimer(this, 10, 20);
+        new RoomGameUpdateTask().runTaskTimer(this, 10, 20);
 
         GameItems.update();
 

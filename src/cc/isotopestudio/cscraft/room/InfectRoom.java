@@ -33,7 +33,6 @@ public class InfectRoom extends Room {
     @Override
     public void start() {
         super.start();
-
     }
 
     @Override

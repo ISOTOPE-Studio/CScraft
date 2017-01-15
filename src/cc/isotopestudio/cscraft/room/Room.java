@@ -12,10 +12,7 @@ import cc.isotopestudio.cscraft.players.PlayerInfo;
 import cc.isotopestudio.cscraft.util.PluginFile;
 import cc.isotopestudio.cscraft.util.S;
 import cc.isotopestudio.cscraft.util.Util;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -24,8 +21,12 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Scoreboard;
 
 import java.util.*;
 
@@ -47,10 +48,12 @@ public abstract class Room {
     private Location teamB;
     private Location lobby;
     private int reqPlayerNum;
+    private boolean useColorCap;
     private Set<CSClass> teamAclass = new HashSet<>();
     private Set<CSClass> teamBclass = new HashSet<>();
     private Set<EffectPlace> effects = new HashSet<>();
     private Map<Item, EffectPlace> effectItems = new HashMap<>();
+    private List<String> rewards = new ArrayList<>();
 
     // In-game
     private RoomStatus status = RoomStatus.WAITING;
@@ -58,6 +61,7 @@ public abstract class Room {
     private Set<Player> teamAplayer = new HashSet<>();
     private Set<Player> teamBplayer = new HashSet<>();
     private Set<Player> players = new HashSet<>();
+    Map<Player, Scoreboard> scoreboards = new HashMap<>();
     private Map<Player, CSClass> playerClassMap = new HashMap<>();
     private Map<Player, Integer> playerKillsMap = new HashMap<>();
     private Map<Player, Integer> playerDeathMap = new HashMap<>();
@@ -79,6 +83,7 @@ public abstract class Room {
         teamB = Util.stringToLocation(config.getString("teamB"));
         lobby = Util.stringToLocation(config.getString("lobby"));
         reqPlayerNum = config.getInt("reqPlayerNum", 4);
+        useColorCap = config.getBoolean("useColorCap", true);
         teamAclass.clear();
         teamAclass.addAll(CSClass.parseSet(config.getStringList("teamAclass")));
         teamBclass.clear();
@@ -86,6 +91,14 @@ public abstract class Room {
         for (String s : config.getStringList("effectPlace")) {
             effects.add(EffectPlace.deserialize(this, s));
         }
+        rewards.clear();
+        if (!config.isSet("reward")) {
+            rewards.add("give <player> MINECRAFT:DIAMOND 1");
+            config.set("reward", rewards);
+        } else {
+            rewards = config.getStringList("reward");
+        }
+        config.save();
     }
 
     // Settings
@@ -189,6 +202,16 @@ public abstract class Room {
         config.save();
     }
 
+    public boolean isUseColorCap() {
+        return useColorCap;
+    }
+
+    public void setUseColorCap(boolean useColorCap) {
+        this.useColorCap = useColorCap;
+        config.set("useColorCap", useColorCap);
+        config.save();
+    }
+
     /**
      * DON'T Write unless modifying settings
      */
@@ -288,6 +311,15 @@ public abstract class Room {
         players.add(player);
         PlayerInfo.playerRoomMap.put(player, this);
         sendAllPlayersMsg(S.toPrefixAqua(player.getDisplayName()) + S.toAqua(" 加入房间"));
+
+        final Scoreboard board = Bukkit.getScoreboardManager().getNewScoreboard();
+        Objective objective = board.registerNewObjective(getMsg("name"), "Scoreboard");
+        objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+
+        scoreboards.put(player, board);
+        player.setScoreboard(board);
+
+        updateScoreBoardAtLobby();
     }
 
     public void exit(Player player) {
@@ -298,9 +330,27 @@ public abstract class Room {
     public void leave(Player player) {
         playerData.set(player.getName() + ".room", null);
         players.remove(player);
+        if (teamAplayer.contains(player)) teamAplayer.remove(player);
+        if (teamBplayer.contains(player)) teamBplayer.remove(player);
         PlayerInfo.playerRoomMap.remove(player);
         sendAllPlayersMsg(S.toPrefixAqua(player.getDisplayName()) + S.toAqua(" 退出房间"));
         playerData.save();
+        scoreboards.remove(player);
+        player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
+    }
+
+    public void updateScoreBoardAtLobby() {
+        for (Player player : players) {
+            scoreboards.get(player).getObjective(DisplaySlot.SIDEBAR).getScore(getTeamAName()).setScore(getTeamAplayer().size());
+            scoreboards.get(player).getObjective(DisplaySlot.SIDEBAR).getScore(getTeamBName()).setScore(getTeamBplayer().size());
+        }
+    }
+
+    public void updateScoreBoardInGame() {
+        for (Player player : players) {
+            scoreboards.get(player).getObjective(DisplaySlot.SIDEBAR).getScore(S.toBoldGreen("击杀")).setScore(playerKillsMap.get(player));
+            scoreboards.get(player).getObjective(DisplaySlot.SIDEBAR).getScore(S.toBoldRed("死亡")).setScore(playerDeathMap.get(player));
+        }
     }
 
     /**
@@ -349,13 +399,33 @@ public abstract class Room {
             playerDeathMap.put(player, 0);
             playerEquip(player);
             new InvincibleListener(player);
+            final Scoreboard board = Bukkit.getScoreboardManager().getNewScoreboard();
+            Objective objective = board.registerNewObjective(getMsg("name"), "Scoreboard");
+            objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+
+            scoreboards.put(player, board);
+            player.setScoreboard(board);
         }
         for (EffectPlace effectPlace : effects) {
             effectPlace.spawn();
         }
     }
 
-    public void playerEquip(Player player) {
+    public void playerEquip(Player player) {if (useColorCap) {
+        if (teamAplayer.contains(player)) {
+            ItemStack cap = new ItemStack(Material.LEATHER_HELMET);
+            LeatherArmorMeta lch = (LeatherArmorMeta) cap.getItemMeta();
+            lch.setColor(Color.fromRGB(255, 0, 0));
+            cap.setItemMeta(lch);
+            player.getEquipment().setHelmet(cap);
+        } else {
+            ItemStack cap = new ItemStack(Material.LEATHER_HELMET);
+            LeatherArmorMeta lch = (LeatherArmorMeta) cap.getItemMeta();
+            lch.setColor(Color.fromRGB(0, 0, 255));
+            cap.setItemMeta(lch);
+            player.getEquipment().setHelmet(cap);
+        }
+    }
         playerClassMap.get(player).equip(player);
         player.getInventory().setItem(8, GameItems.getInfoItem());
     }
@@ -365,22 +435,22 @@ public abstract class Room {
             playerKillsMap.put(killer, playerKillsMap.get(killer) + 1);
             switch (playerKillsMap.get(killer)) {
                 case (1):
-                    sendAllPlayersMsg(getReplacedMsg(getMsg("msg.kill.1"), player, killer, item));
+                    sendAllPlayersMsg(getReplacedMsg(getMsg("msg.kill.1"), killer, player, item));
                     break;
                 case (2):
-                    sendAllPlayersMsg(getReplacedMsg(getMsg("msg.kill.2"), player, killer, item));
+                    sendAllPlayersMsg(getReplacedMsg(getMsg("msg.kill.2"), killer, player, item));
                     break;
                 case (3):
-                    sendAllPlayersMsg(getReplacedMsg(getMsg("msg.kill.3"), player, killer, item));
+                    sendAllPlayersMsg(getReplacedMsg(getMsg("msg.kill.3"), killer, player, item));
                     break;
                 case (4):
-                    sendAllPlayersMsg(getReplacedMsg(getMsg("msg.kill.4"), player, killer, item));
+                    sendAllPlayersMsg(getReplacedMsg(getMsg("msg.kill.4"), killer, player, item));
                     break;
                 case (5):
-                    sendAllPlayersMsg(getReplacedMsg(getMsg("msg.kill.5"), player, killer, item));
+                    sendAllPlayersMsg(getReplacedMsg(getMsg("msg.kill.5"), killer, player, item));
                     break;
                 default:
-                    sendAllPlayersMsg(getReplacedMsg(getMsg("msg.kill.n"), player, killer, item));
+                    sendAllPlayersMsg(getReplacedMsg(getMsg("msg.kill.n"), killer, player, item));
                     break;
             }
         }
@@ -397,48 +467,71 @@ public abstract class Room {
     }
 
     public void teamAWin() {
-        for (String line : getMsgList("msg.win")) {
-            for (Player player : teamAplayer) {
+        for (Player player : teamAplayer) {
+            player.getInventory().clear();
+            sendReward(player);
+            for (String line : getMsgList("msg.win")) {
                 player.sendMessage(getReplacedMsg(line, player, null, null));
             }
         }
-        for (String line : getMsgList("msg.lose")) {
-            for (Player player : teamBplayer) {
+        for (Player player : teamBplayer) {
+            player.getInventory().clear();
+            for (String line : getMsgList("msg.lose")) {
                 player.sendMessage(getReplacedMsg(line, player, null, null));
             }
         }
+        resetRoom();
     }
 
     public void teamBWin() {
-        for (String line : getMsgList("msg.win")) {
-            for (Player player : teamBplayer) {
+        for (Player player : teamBplayer) {
+            player.getInventory().clear();
+            sendReward(player);
+            for (String line : getMsgList("msg.win")) {
                 player.sendMessage(getReplacedMsg(line, player, null, null));
             }
         }
-        for (String line : getMsgList("msg.lose")) {
-            for (Player player : teamAplayer) {
+        for (Player player : teamAplayer) {
+            player.getInventory().clear();
+            for (String line : getMsgList("msg.lose")) {
                 player.sendMessage(getReplacedMsg(line, player, null, null));
             }
         }
+        resetRoom();
     }
 
-    void teleportOut() {
+    public void sendReward(Player player) {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                for (String line : rewards) {
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), line.replaceAll("<player>", player.getName()));
+                }
+            }
+        }.runTaskLater(plugin, 1);
+    }
+
+    void resetRoom() {
+        playerClassMap.clear();
         playerKillsMap.clear();
         playerDeathMap.clear();
         teamAplayer.clear();
         teamBplayer.clear();
+        for (Item item : effectItems.keySet()) {
+            item.remove();
+        }
         status = RoomStatus.WAITING;
         for (Player player : new HashSet<>(players)) {
             exit(player);
         }
     }
 
-    private String getReplacedMsg(String msg, Player player, Player killer, ItemStack item) {
+    private String getReplacedMsg(String msg, Player player, Player enemy, ItemStack item) {
         msg = msg.replaceAll("<player>", getPlayerFullName(player))
                 .replaceAll("<kill>", String.valueOf(playerKillsMap.get(player)))
                 .replaceAll("<death>", String.valueOf(playerDeathMap.get(player)));
-        if (killer != null)
-            msg = msg.replaceAll("<enemy>", getPlayerFullName(killer));
+        if (enemy != null)
+            msg = msg.replaceAll("<enemy>", getPlayerFullName(enemy));
         if (item != null)
             msg = msg.replaceAll("<item>", getItemName(item));
         return msg;
@@ -459,11 +552,11 @@ public abstract class Room {
     }
 
     public String getTeamAName() {
-        return S.toBoldDarkAqua("红队");
+        return S.toBoldRed("红队");
     }
 
     public String getTeamBName() {
-        return S.toBoldRed("蓝队");
+        return S.toBoldDarkAqua("蓝队");
     }
 
     public static String name() {
@@ -481,6 +574,8 @@ public abstract class Room {
                 "\nteamAclass=" + teamAclass +
                 "\nteamBclass=" + teamBclass +
                 "\neffects=" + effects +
+                "\nrewards=" + rewards +
+                "\nuseColorCap=" + useColorCap +
                 "\nstatus=" + status +
                 "\nscheduleStart=" + scheduleStart +
                 "\nteamAplayer=" + Util.playerToStringSet(teamAplayer) +
