@@ -23,6 +23,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
@@ -305,7 +306,7 @@ public abstract class Room {
         playerData.set(player.getName() + ".location", Util.locationToString(player.getLocation()));
         playerData.save();
         player.getInventory().clear();
-        player.teleport(lobby);
+        PlayerInfo.teleport(player, lobby);
         player.getInventory().setItem(0, GameItems.getClassItem());
         player.getInventory().setItem(8, GameItems.getExitItem());
         players.add(player);
@@ -411,23 +412,32 @@ public abstract class Room {
         }
     }
 
-    public void playerEquip(Player player) {if (useColorCap) {
-        if (teamAplayer.contains(player)) {
-            ItemStack cap = new ItemStack(Material.LEATHER_HELMET);
-            LeatherArmorMeta lch = (LeatherArmorMeta) cap.getItemMeta();
-            lch.setColor(Color.fromRGB(255, 0, 0));
-            cap.setItemMeta(lch);
-            player.getEquipment().setHelmet(cap);
-        } else {
-            ItemStack cap = new ItemStack(Material.LEATHER_HELMET);
-            LeatherArmorMeta lch = (LeatherArmorMeta) cap.getItemMeta();
-            lch.setColor(Color.fromRGB(0, 0, 255));
-            cap.setItemMeta(lch);
-            player.getEquipment().setHelmet(cap);
+    private static final PotionEffect INVISIBLE = new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, true);
+
+    public void playerEquip(Player player) {
+        if (useColorCap) {
+            if (teamAplayer.contains(player)) {
+                ItemStack cap = new ItemStack(Material.LEATHER_HELMET);
+                LeatherArmorMeta lch = (LeatherArmorMeta) cap.getItemMeta();
+                lch.setColor(Color.fromRGB(255, 0, 0));
+                cap.setItemMeta(lch);
+                player.getEquipment().setHelmet(cap);
+            } else {
+                ItemStack cap = new ItemStack(Material.LEATHER_HELMET);
+                LeatherArmorMeta lch = (LeatherArmorMeta) cap.getItemMeta();
+                lch.setColor(Color.fromRGB(0, 0, 255));
+                cap.setItemMeta(lch);
+                player.getEquipment().setHelmet(cap);
+            }
         }
-    }
-        playerClassMap.get(player).equip(player);
+        CSClass csclass = playerClassMap.get(player);
+        csclass.equip(player);
         player.getInventory().setItem(8, GameItems.getInfoItem());
+        if (csclass.isInvisible()) {
+            player.addPotionEffect(INVISIBLE);
+        }
+        player.setMaxHealth(csclass.getHealth());
+        player.setHealth(csclass.getHealth());
     }
 
     public void playerDeath(Player killer, Player player, ItemStack item) {
@@ -458,11 +468,11 @@ public abstract class Room {
         playerDeathMap.put(player, playerDeathMap.get(player) + 1);
         sendAllPlayersMsg(CScraft.prefix + player.getDisplayName() + S.toYellow(" À¿¡À"));
         player.setHealth(player.getMaxHealth());
-        playerClassMap.get(player).equip(player);
+        playerEquip(player);
         if (teamAplayer.contains(player))
-            player.teleport(teamA);
+            PlayerInfo.teleport(player, teamA);
         else
-            player.teleport(teamB);
+            PlayerInfo.teleport(player, teamB);
         new InvincibleListener(player);
     }
 

@@ -167,15 +167,17 @@ public class ProtectRoom extends Room implements Listener {
 
     @EventHandler
     public void onDamage(EntityDamageEvent event) {
-        if (event instanceof EntityDamageByEntityEvent) {
-            EntityDamageByEntityEvent event1 = (EntityDamageByEntityEvent) event;
-            if (event1.getDamager() instanceof Player)
-                if ((event1.getEntity() == entityA && getTeamBplayer().contains(event1.getDamager())) ||
-                        (event1.getEntity() == entityB && getTeamAplayer().contains(event1.getDamager()))) {
-                    return;
-                }
+        if (event.getEntity() == entityA || event.getEntity() == entityB) {
+            if (event instanceof EntityDamageByEntityEvent) {
+                EntityDamageByEntityEvent event1 = (EntityDamageByEntityEvent) event;
+                if (event1.getDamager() instanceof Player)
+                    if ((event1.getEntity() == entityA && getTeamBplayer().contains(event1.getDamager())) ||
+                            (event1.getEntity() == entityB && getTeamAplayer().contains(event1.getDamager()))) {
+                        return;
+                    }
+            }
+            event.setCancelled(true);
         }
-        event.setCancelled(true);
     }
 
     private class NoMoveTask extends BukkitRunnable {

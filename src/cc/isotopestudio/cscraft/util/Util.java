@@ -17,6 +17,8 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.*;
 
+import static cc.isotopestudio.cscraft.CScraft.playerData;
+
 public class Util {
     public static String locationToString(Location loc) {
         if (loc == null) return "";
@@ -119,6 +121,8 @@ public class Util {
             player.getInventory().setBoots(equipment[3]);
         for (int i : inventory.keySet())
             player.getInventory().setItem(i, inventory.get(i));
+        playerData.set(player.getName(), null);
+        playerData.save();
     }
 
     public static Set<String> playerToStringSet(Collection<Player> players) {

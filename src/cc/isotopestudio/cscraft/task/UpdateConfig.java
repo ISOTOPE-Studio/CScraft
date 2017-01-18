@@ -38,7 +38,7 @@ public class UpdateConfig extends BukkitRunnable {
                 for (File roomFile : files) {
 //                    String roomFileName = roomFile.getName().substring(roomFile.getName().indexOf(dir));
                     String[] roomFileString = roomFile.getName().split("\\.");
-                    switch (roomFileString[0]){
+                    switch (roomFileString[0]) {
                         case "InfectRoom":
                             new InfectRoom(roomFileString[1]);
                             break;

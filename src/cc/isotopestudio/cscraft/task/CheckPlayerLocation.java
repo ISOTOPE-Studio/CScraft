@@ -4,6 +4,7 @@ package cc.isotopestudio.cscraft.task;
  * Copyright ISOTOPE Studio
  */
 
+import cc.isotopestudio.cscraft.players.PlayerInfo;
 import cc.isotopestudio.cscraft.room.Room;
 import cc.isotopestudio.cscraft.room.RoomStatus;
 import cc.isotopestudio.cscraft.util.S;
@@ -25,9 +26,9 @@ public class CheckPlayerLocation extends BukkitRunnable {
                         player.damage(2);
                     player.sendMessage(S.toPrefixRed("你跑到地图外面去了"));
                     if (room.getTeamAplayer().contains(player)) {
-                        player.teleport(room.getTeamALocation());
+                        PlayerInfo.teleport(player, room.getTeamALocation());
                     } else {
-                        player.teleport(room.getTeamBLocation());
+                        PlayerInfo.teleport(player, room.getTeamBLocation());
                     }
                 }
             }

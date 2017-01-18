@@ -6,6 +6,7 @@ package cc.isotopestudio.cscraft.gui;
 
 import cc.isotopestudio.cscraft.CScraft;
 import cc.isotopestudio.cscraft.element.CSClass;
+import cc.isotopestudio.cscraft.element.GameItems;
 import cc.isotopestudio.cscraft.room.Room;
 import cc.isotopestudio.cscraft.util.S;
 import cc.isotopestudio.cscraft.util.Util;
@@ -40,6 +41,10 @@ public class ClassGUI extends GUI {
         }
         for (CSClass csclass : classes) {
             if (pos >= size) break;
+            if (csclass.getPermission() != null && !player.hasPermission(csclass.getPermission())) {
+                setOption(pos++, GameItems.getNoPermission());
+                continue;
+            }
             slotIDMap.put(pos, csclass.getName());
             Material material = Util.getMaterialByName(csclass.getMsg("GUI.item"));
             ItemStack item;

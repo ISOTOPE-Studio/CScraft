@@ -11,6 +11,10 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 public class GameItems {
 
+    // GUI
+    private static ItemStack noPermission = new ItemStack(Material.STAINED_GLASS_PANE);
+
+    // Game
     private static ItemStack exitItem = new ItemStack(Material.COMPASS);
     private static ItemStack classItem = new ItemStack(Material.NETHER_STAR);
     private static ItemStack team1Item = new ItemStack(Material.WOOL);
@@ -19,7 +23,12 @@ public class GameItems {
 
 
     public static void update() {
-        ItemMeta meta = exitItem.getItemMeta();
+        noPermission.setDurability((short) 7);
+        ItemMeta meta = noPermission.getItemMeta();
+        meta.setDisplayName(S.toBoldRed("无权限"));
+        noPermission.setItemMeta(meta);
+
+        meta = exitItem.getItemMeta();
         meta.setDisplayName(S.toBoldRed("退出 (右键)"));
         exitItem.setItemMeta(meta);
 
@@ -61,5 +70,9 @@ public class GameItems {
 
     public static ItemStack getInfoItem() {
         return infoItem;
+    }
+
+    public static ItemStack getNoPermission() {
+        return noPermission;
     }
 }

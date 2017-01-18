@@ -5,6 +5,7 @@ package cc.isotopestudio.cscraft.room;
  */
 
 import cc.isotopestudio.cscraft.element.GameItems;
+import cc.isotopestudio.cscraft.players.PlayerInfo;
 import cc.isotopestudio.cscraft.util.PluginFile;
 import cc.isotopestudio.cscraft.util.S;
 import org.bukkit.ChatColor;
@@ -66,10 +67,10 @@ public class TeamRoom extends Room {
     public void start() {
         super.start();
         for (Player player : getTeamAplayer()) {
-            player.teleport(getTeamALocation());
+            PlayerInfo.teleport(player, getTeamALocation());
         }
         for (Player player : getTeamBplayer()) {
-            player.teleport(getTeamBLocation());
+            PlayerInfo.teleport(player, getTeamBLocation());
         }
         teamADeath = 0;
         teamBDeath = 0;

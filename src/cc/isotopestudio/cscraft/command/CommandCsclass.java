@@ -30,6 +30,8 @@ public class CommandCsclass implements CommandExecutor {
                 player.sendMessage(S.toPrefixGreen("帮助菜单"));
                 player.sendMessage(S.toYellow("/" + label + " set <名字> - 背包里的装备当此职业的装备"));
                 player.sendMessage(S.toYellow("/" + label + " setinvisible <名字> <true|false> - 隐身"));
+                player.sendMessage(S.toYellow("/" + label + " health <名字> <生命值> - 最大生命值"));
+                player.sendMessage(S.toYellow("/" + label + " permission <名字> <权限> - 设置权限"));
                 player.sendMessage(S.toYellow("/" + label + " delete <名字> - 删除职业"));
                 player.sendMessage(S.toRed("    会删除所有房间内的此职业"));
                 player.sendMessage(S.toYellow("/" + label + " list - 查看职业列表"));
@@ -51,7 +53,7 @@ public class CommandCsclass implements CommandExecutor {
                 return true;
             }
             if (args[0].equalsIgnoreCase("setinvisible")) {
-                if (args.length < 2) {
+                if (args.length < 3) {
                     player.sendMessage(S.toYellow("/" + label + " setinvisible <名字> <true|false> - 隐身"));
                     return true;
                 }
@@ -68,6 +70,42 @@ public class CommandCsclass implements CommandExecutor {
                             player.sendMessage(S.toPrefixRed("参数错误"));
                             return true;
                     }
+                    player.sendMessage(S.toPrefixGreen("成功设置"));
+                } else {
+                    player.sendMessage(S.toPrefixRed("职业不存在"));
+                }
+                return true;
+            }
+            if (args[0].equalsIgnoreCase("health")) {
+                if (args.length < 3) {
+                    player.sendMessage(S.toYellow("/" + label + " health <名字> <生命值> - 最大生命值"));
+                    return true;
+                }
+                CSClass csclass = CSClass.getClassByName(args[1]);
+                if (csclass != null) {
+                    int num;
+                    try {
+                        num = Integer.parseInt(args[2]);
+                        if (num < 1) throw new NumberFormatException();
+                    } catch (NumberFormatException e) {
+                        player.sendMessage(S.toPrefixRed("数字不对"));
+                        return true;
+                    }
+                    csclass.setHealth(num);
+                    player.sendMessage(S.toPrefixGreen("成功设置"));
+                } else {
+                    player.sendMessage(S.toPrefixRed("职业不存在"));
+                }
+                return true;
+            }
+            if (args[0].equalsIgnoreCase("permission")) {
+                if (args.length < 3) {
+                    player.sendMessage(S.toYellow("/" + label + " permission <名字> <权限> - 设置权限"));
+                    return true;
+                }
+                CSClass csclass = CSClass.getClassByName(args[1]);
+                if (csclass != null) {
+                    csclass.setPermission(args[2]);
                     player.sendMessage(S.toPrefixGreen("成功设置"));
                 } else {
                     player.sendMessage(S.toPrefixRed("职业不存在"));

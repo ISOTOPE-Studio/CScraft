@@ -23,7 +23,9 @@ public class CSClass {
     private final String name;
     private final Map<Integer, ItemStack> inventory = new HashMap<>();
     private final ItemStack[] equipment = new ItemStack[4];
+    private int health;
     private boolean invisible = false;
+    private String permission;
 
     public CSClass(String name) {
         this.name = name;
@@ -49,6 +51,9 @@ public class CSClass {
                 inventory.put(Integer.parseInt(key), itemSection.getItemStack(key));
             }
         }
+        invisible = config.getBoolean("invisible");
+        permission = config.getString("permission");
+        health = config.getInt("health");
     }
 
     public String getName() {
@@ -90,6 +95,27 @@ public class CSClass {
         classData.save();
     }
 
+    public String getPermission() {
+        return permission;
+    }
+
+    public void setPermission(String permission) {
+        this.permission = permission;
+        config.set("permission", permission);
+        classData.save();
+    }
+
+    public int getHealth() {
+        if (health == 0) return 20;
+        return health;
+    }
+
+    public void setHealth(int health) {
+        this.health = health;
+        config.set("health", health);
+        classData.save();
+    }
+
     public void remove() {
         classes.remove(name);
         classData.set(name, null);
@@ -109,6 +135,7 @@ public class CSClass {
         }
         return list;
     }
+
 
     public static CSClass getClassByName(String name) {
         if (classes.containsKey(name))

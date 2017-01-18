@@ -12,8 +12,10 @@ import cc.isotopestudio.cscraft.gui.InfoGUI;
 import cc.isotopestudio.cscraft.room.Room;
 import cc.isotopestudio.cscraft.room.RoomStatus;
 import cc.isotopestudio.cscraft.util.S;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -23,7 +25,9 @@ import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 
+import static cc.isotopestudio.cscraft.CScraft.plugin;
 import static cc.isotopestudio.cscraft.players.PlayerInfo.playerRoomMap;
 import static cc.isotopestudio.cscraft.room.Room.rooms;
 
@@ -38,10 +42,20 @@ public class PlayerListener implements Listener {
                 default:
                     return;
                 case "leaveAtLobby":
-                    PlayerInfo.teleportOut(player);
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            PlayerInfo.teleportOut(player);
+                        }
+                    }.runTaskLater(plugin, 2);
                     break;
                 case "leaveAtGame":
-                    PlayerInfo.teleportOut(player);
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            PlayerInfo.teleportOut(player);
+                        }
+                    }.runTaskLater(plugin, 2);
                     break;
             }
     }
@@ -73,19 +87,57 @@ public class PlayerListener implements Listener {
         if (room.getStatus() == RoomStatus.WAITING) {
             event.setCancelled(true);
         } else {
+            if (room.isUseColorCap() && player.getInventory().getHelmet() != null) {
+                player.getInventory().getHelmet().setDurability((short) 0);
+            }
+            EntityDamageByEntityEvent event1 = null;
+            if (event instanceof EntityDamageByEntityEvent) {
+                event1 = (EntityDamageByEntityEvent) event;
+                Player damager = null;
+                if (event1.getDamager() instanceof Player) {
+                    damager = ((Player) event1.getDamager());
+                }
+                if (event1.getDamager() instanceof Projectile) {
+                    if (((Projectile) event1.getDamager()).getShooter() instanceof Player) {
+                        damager = (Player) ((Arrow) event1.getDamager()).getShooter();
+                    }
+                }
+                if (damager != null)
+                    if ((room.getTeamAplayer().contains(player) && room.getTeamAplayer().contains(damager)) ||
+                            (room.getTeamBplayer().contains(player) && room.getTeamBplayer().contains(damager))) {
+                        event.setCancelled(true);
+                        return;
+                    }
+            }
             if (event.getFinalDamage() > player.getHealth()) {
                 event.setCancelled(true);
                 Player killer = null;
                 ItemStack item = null;
-                if (event instanceof EntityDamageByEntityEvent) {
-                    if (((EntityDamageByEntityEvent) event).getDamager() instanceof Player) {
-                        killer = (Player) ((EntityDamageByEntityEvent) event).getDamager();
+                if (event1 != null) {
+                    if (event1.getDamager() instanceof Player) {
+                        killer = (Player) event1.getDamager();
                         item = killer.getItemInHand();
+                    } else if (event1.getDamager() instanceof Projectile) {
+                        if (((Projectile) (event1.getDamager())).getShooter() instanceof Player) {
+                            killer = ((Player) ((Projectile) (event1.getDamager())).getShooter());
+                        }
                     }
                 }
                 room.playerDeath(killer, player, item);
             }
 
+        }
+    }
+
+    @EventHandler
+    public void onRespawn(PlayerRespawnEvent event) {
+        final Player player = event.getPlayer();
+        if (!playerRoomMap.containsKey(player)) {
+            return;
+        }
+        Room room = playerRoomMap.get(player);
+        if (room.getStatus() == RoomStatus.PROGRESS) {
+            room.playerDeath(player.getKiller(), player, player.getKiller() != null ? player.getKiller().getItemInHand() : null);
         }
     }
 
@@ -166,7 +218,8 @@ public class PlayerListener implements Listener {
         final Player player = (Player) event.getEntity();
         if (!playerRoomMap.containsKey(player)) {
             return;
-        }
+        } else if (playerRoomMap.get(player).getStatus() == RoomStatus.PROGRESS)
+            return;
         event.setCancelled(true);
     }
 

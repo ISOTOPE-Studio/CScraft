@@ -9,11 +9,13 @@ import cc.isotopestudio.cscraft.util.S;
 import cc.isotopestudio.cscraft.util.Util;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static cc.isotopestudio.cscraft.CScraft.playerData;
+import static cc.isotopestudio.cscraft.CScraft.plugin;
 
 public class PlayerInfo {
 
@@ -38,10 +40,23 @@ public class PlayerInfo {
             player.sendMessage(S.toPrefixRed("ÄãµÄÊý¾ÝËð»µ!"));
             return;
         }
+        teleport(player, location);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                Util.loadInventory(playerData.getConfigurationSection(player.getName() + ".inventory"), player);
+            }
+        }.runTaskLater(plugin, 10);
+    }
+
+    public static void teleport(Player player, Location location) {
         player.teleport(location);
-        Util.loadInventory(playerData.getConfigurationSection(player.getName() + ".inventory"), player);
-        playerData.set(player.getName(), null);
-        playerData.save();
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                player.teleport(location);
+            }
+        }.runTaskLater(plugin, 1);
     }
 
 }
