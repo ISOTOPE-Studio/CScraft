@@ -18,27 +18,18 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ClassGUI extends GUI {
 
     private Map<Integer, String> slotIDMap = new HashMap<>();
     private Room room;
 
-    public ClassGUI(Room room, Player player) {
+    public ClassGUI(Room room, Player player, Collection<CSClass> classes) {
         super(S.toBoldGold("—°‘Ò÷∞“µ") + "[" + player.getName() + "]", 2 * 9, player);
         this.room = room;
         this.page = 0;
         int pos = 0;
-        List<CSClass> classes = new ArrayList<>();
-        if (room.getTeamAplayer().contains(player)) {
-            classes.addAll(room.getTeamAclass());
-        } else if (room.getTeamBplayer().contains(player)) {
-            classes.addAll(room.getTeamBclass());
-        }
         for (CSClass csclass : classes) {
             if (pos >= size) break;
             if (csclass.getPermission() != null && !player.hasPermission(csclass.getPermission())) {

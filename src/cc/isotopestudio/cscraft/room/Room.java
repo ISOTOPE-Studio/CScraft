@@ -283,7 +283,6 @@ public abstract class Room {
         this.scheduleStart = scheduleStart;
     }
 
-
     public RoomStatus getStatus() {
         return status;
     }
@@ -390,6 +389,24 @@ public abstract class Room {
     }
 
     public void prestart() {
+        for (Player player : players) {
+            if (!playerClassMap.containsKey(player)) {
+                List<CSClass> classes = new ArrayList<>();
+                if (teamAplayer.contains(player))
+                    classes.addAll(teamAclass);
+                else
+                    classes.addAll(teamBclass);
+                for (CSClass csclass : new HashSet<>(classes)) {
+                    if (csclass.getPermission() == null || player.hasPermission(csclass.getPermission())) {
+                        continue;
+                    }
+                    classes.remove(csclass);
+                }
+                Collections.shuffle(classes);
+                playerClassMap.put(player, classes.get(0));
+                player.sendMessage(S.toPrefixRed("已超时, 随机选择职业"));
+            }
+        }
         start();
     }
 
@@ -410,6 +427,7 @@ public abstract class Room {
         for (EffectPlace effectPlace : effects) {
             effectPlace.spawn();
         }
+        sendAllPlayersMsg(S.toPrefixYellow("游戏开始"));
     }
 
     private static final PotionEffect INVISIBLE = new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, true);
@@ -438,6 +456,9 @@ public abstract class Room {
         }
         player.setMaxHealth(csclass.getHealth());
         player.setHealth(csclass.getHealth());
+        for (PotionEffect effect : csclass.getEffects()) {
+            player.addPotionEffect(effect, false);
+        }
     }
 
     public void playerDeath(Player killer, Player player, ItemStack item) {
@@ -510,6 +531,13 @@ public abstract class Room {
         resetRoom();
     }
 
+    public void timeout() {
+        for (Player player : players) {
+            player.sendMessage(S.toPrefixRed("游戏时间超时 退出游戏"));
+        }
+        resetRoom();
+    }
+
     public void sendReward(Player player) {
         new BukkitRunnable() {
             @Override
@@ -535,6 +563,12 @@ public abstract class Room {
             exit(player);
         }
     }
+
+    public int getIntervalSec() {
+        return (int) Math.round((new Date().getTime() - scheduleStart) / 1000.0);
+    }
+
+    // INFO
 
     private String getReplacedMsg(String msg, Player player, Player enemy, ItemStack item) {
         msg = msg.replaceAll("<player>", getPlayerFullName(player))

@@ -11,6 +11,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 public class CommandCsclass implements CommandExecutor {
 
@@ -32,6 +34,7 @@ public class CommandCsclass implements CommandExecutor {
                 player.sendMessage(S.toYellow("/" + label + " setinvisible <名字> <true|false> - 隐身"));
                 player.sendMessage(S.toYellow("/" + label + " health <名字> <生命值> - 最大生命值"));
                 player.sendMessage(S.toYellow("/" + label + " permission <名字> <权限> - 设置权限"));
+                player.sendMessage(S.toYellow("/" + label + " addEffect <名字> <获得药水> <药水等级> - 添加药水"));
                 player.sendMessage(S.toYellow("/" + label + " delete <名字> - 删除职业"));
                 player.sendMessage(S.toRed("    会删除所有房间内的此职业"));
                 player.sendMessage(S.toYellow("/" + label + " list - 查看职业列表"));
@@ -106,6 +109,35 @@ public class CommandCsclass implements CommandExecutor {
                 CSClass csclass = CSClass.getClassByName(args[1]);
                 if (csclass != null) {
                     csclass.setPermission(args[2]);
+                    player.sendMessage(S.toPrefixGreen("成功设置"));
+                } else {
+                    player.sendMessage(S.toPrefixRed("职业不存在"));
+                }
+                return true;
+            }
+            if (args[0].equalsIgnoreCase("addeffect")) {
+                if (args.length < 4) {
+                    player.sendMessage(S.toYellow("/" + label + " addEffect <名字> <获得药水> <药水等级> - 添加药水"));
+                    return true;
+                }
+                CSClass csclass = CSClass.getClassByName(args[1]);
+                if (csclass != null) {
+                    boolean failed = false;
+                    PotionEffectType type = PotionEffectType.getByName(args[2]);
+                    if (type == null) {
+                        player.sendMessage(S.toPrefixRed("药水名称不存在"));
+                        failed = true;
+                    }
+                    int level = 0;
+                    try {
+                        level = Integer.parseInt(args[3]);
+                        if (level < 0 || level > 255) throw new NumberFormatException();
+                    } catch (NumberFormatException e) {
+                        player.sendMessage(S.toPrefixRed("药水等级数字不对"));
+                        failed = true;
+                    }
+                    if (failed) return true;
+                    csclass.addEffect(new PotionEffect(type, Integer.MAX_VALUE, level));
                     player.sendMessage(S.toPrefixGreen("成功设置"));
                 } else {
                     player.sendMessage(S.toPrefixRed("职业不存在"));

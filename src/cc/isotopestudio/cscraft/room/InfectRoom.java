@@ -4,9 +4,11 @@ package cc.isotopestudio.cscraft.room;
  * Copyright ISOTOPE Studio
  */
 
+import cc.isotopestudio.cscraft.element.GameItems;
 import cc.isotopestudio.cscraft.util.PluginFile;
 import cc.isotopestudio.cscraft.util.S;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 
 import static cc.isotopestudio.cscraft.CScraft.msgFiles;
 import static cc.isotopestudio.cscraft.CScraft.plugin;
@@ -26,8 +28,12 @@ public class InfectRoom extends Room {
     }
 
     @Override
-    public void prestart() {
+    public void join(Player player) {
+        super.join(player);
 
+        player.getInventory().setItem(3, GameItems.getAntigenClassItem());
+        player.getInventory().setItem(4, GameItems.getZombieClassItem());
+        player.getInventory().setItem(5, GameItems.getHumanClassItem());
     }
 
     @Override

@@ -9,6 +9,7 @@ import cc.isotopestudio.cscraft.element.EffectPlace;
 import cc.isotopestudio.cscraft.element.GameItems;
 import cc.isotopestudio.cscraft.gui.ClassGUI;
 import cc.isotopestudio.cscraft.gui.InfoGUI;
+import cc.isotopestudio.cscraft.room.InfectRoom;
 import cc.isotopestudio.cscraft.room.Room;
 import cc.isotopestudio.cscraft.room.RoomStatus;
 import cc.isotopestudio.cscraft.util.S;
@@ -181,7 +182,10 @@ public class PlayerListener implements Listener {
                     room.sendAllPlayersMsg(CScraft.prefix + player.getDisplayName() + S.toGreen(" º”»Î") + S.toBoldRed("∫Ï∂”"));
                 }
             } else if (GameItems.getClassItem().equals(event.getItem())) {
-                new ClassGUI(room, player).open(player);
+                if (room instanceof InfectRoom) {
+
+                } else
+                    new ClassGUI(room, player, room.getTeamAplayer().contains(player) ? room.getTeamAclass() : room.getTeamBclass()).open(player);
             }
         } else {
             if (GameItems.getInfoItem().equals(event.getItem())) {
@@ -204,23 +208,15 @@ public class PlayerListener implements Listener {
         if (!playerRoomMap.containsKey(player)) {
             return;
         }
-        Room room = playerRoomMap.get(player);
         event.setCancelled(true);
-        if (room.getStatus() == RoomStatus.WAITING) {
-
-        } else {
-        }
-
     }
 
     @EventHandler
     public void onFoodLevelChange(FoodLevelChangeEvent event) {
         final Player player = (Player) event.getEntity();
-        if (!playerRoomMap.containsKey(player)) {
-            return;
-        } else if (playerRoomMap.get(player).getStatus() == RoomStatus.PROGRESS)
-            return;
-        event.setCancelled(true);
+        if (playerRoomMap.containsKey(player)) {
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler
@@ -234,7 +230,7 @@ public class PlayerListener implements Listener {
                     return;
                 }
                 EffectPlace effectPlace = room.getEffectItems().get(item);
-                player.addPotionEffect(effectPlace.getEffect());
+                player.addPotionEffect(effectPlace.getEffect(), false);
                 room.getEffectItems().remove(item);
                 item.remove();
                 effectPlace.respawn();

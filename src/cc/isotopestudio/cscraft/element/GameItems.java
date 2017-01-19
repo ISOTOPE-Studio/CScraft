@@ -21,6 +21,10 @@ public class GameItems {
     private static ItemStack team2Item = new ItemStack(Material.WOOL);
     private static ItemStack infoItem = new ItemStack(Material.SKULL_ITEM);
 
+    // InfectRoom
+    private static ItemStack antigenClassItem = new ItemStack(Material.WOOL);
+    private static ItemStack zombieClassItem = new ItemStack(Material.WOOL);
+    private static ItemStack humanClassItem = new ItemStack(Material.WOOL);
 
     public static void update() {
         noPermission.setDurability((short) 7);
@@ -50,6 +54,10 @@ public class GameItems {
         meta = infoItem.getItemMeta();
         meta.setDisplayName(S.toBoldRed("Õ½¼¨ (ÓÒ¼ü)"));
         infoItem.setItemMeta(meta);
+
+        antigenClassItem.setDurability((short) 14);
+        zombieClassItem.setDurability((short) 5);
+        humanClassItem.setDurability((short) 11);
     }
 
     public static ItemStack getExitItem() {
@@ -74,5 +82,17 @@ public class GameItems {
 
     public static ItemStack getNoPermission() {
         return noPermission;
+    }
+
+    public static ItemStack getAntigenClassItem() {
+        return antigenClassItem;
+    }
+
+    public static ItemStack getZombieClassItem() {
+        return zombieClassItem;
+    }
+
+    public static ItemStack getHumanClassItem() {
+        return humanClassItem;
     }
 }

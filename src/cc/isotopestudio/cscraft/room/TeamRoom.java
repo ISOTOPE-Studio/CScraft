@@ -74,7 +74,6 @@ public class TeamRoom extends Room {
         }
         teamADeath = 0;
         teamBDeath = 0;
-        sendAllPlayersMsg(S.toPrefixYellow("сно╥©╙й╪"));
     }
 
     @Override

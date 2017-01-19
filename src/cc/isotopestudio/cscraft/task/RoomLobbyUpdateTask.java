@@ -16,8 +16,8 @@ public class RoomLobbyUpdateTask extends BukkitRunnable {
     private int waitCount = 0;
 
     private static final int waitInterval = 5;
-    private static final int startWaitInterval = 10;
-    private static final int[] startWaitAnnounce = {10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
+    private static final int startWaitInterval = 30;
+    private static final int[] startWaitAnnounce = {30, 15, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
 
     @Override
     public void run() {
@@ -27,36 +27,46 @@ public class RoomLobbyUpdateTask extends BukkitRunnable {
             if (room.getStatus() != RoomStatus.WAITING) continue;
 
             room.updateScoreBoardAtLobby();
-            if (room.getPlayers().size() == room.getReqPlayerNum()) {
+
+            // Full Player
+            if (room.getPlayers().size() >= room.getReqPlayerNum()) {
+
+                // Selecting class not finished
                 if (room.getPlayerClassMap().size() < room.getPlayers().size()) {
                     for (Player player : room.getPlayers()) {
                         if (room.getPlayerClassMap().containsKey(player)) continue;
                         player.sendMessage(S.toPrefixRed("请选择职业"));
                     }
-                    room.setScheduleStart(-1);
-                } else if (room.getScheduleStart() < 0) {
+                }
+
+                // Start counting
+                if (room.getScheduleStart() < 0) {
                     room.setScheduleStart(new Date().getTime() + startWaitInterval * 1000);
                     room.sendAllPlayersMsg(S.toPrefixYellow("还有 " + startWaitInterval + " 秒开始游戏"));
-                } else {
-                    int sec = getRemainSec(room.getScheduleStart());
-                    for (int num : startWaitAnnounce) {
-                        if (num == sec) {
-                            room.sendAllPlayersMsg(S.toPrefixYellow("还有 " + sec + " 秒开始游戏"));
-                        }
+                }
+                int sec = getRemainSec(room.getScheduleStart());
+                for (int num : startWaitAnnounce) {
+                    if (num == sec) {
+                        room.sendAllPlayersMsg(S.toPrefixYellow("还有 " + sec + " 秒开始游戏"));
                     }
                 }
-            } else {
+
+                // Start
+                if (room.getScheduleStart() > 0 && getRemainSec(room.getScheduleStart()) <= 0) {
+                    room.prestart();
+                }
+            }
+
+            // Waiting
+            else {
                 room.setScheduleStart(-1);
-            }
-            if (room.getScheduleStart() > 0 && getRemainSec(room.getScheduleStart()) <= 0) {
-                room.prestart();
-            }
-            if (waitCount == 0 && room.getScheduleStart() != -1) {
-                room.sendAllPlayersMsg(S.toPrefixYellow("你在大厅里，等待其他玩家进入   ") + S.toGreen(
-                        room.getPlayers().size() + " / " + room.getReqPlayerNum()));
-                for (Player player : room.getPlayers()) {
-                    if (room.getPlayerClassMap().containsKey(player)) continue;
-                    player.sendMessage(S.toPrefixRed("请选择职业"));
+                if (waitCount == 0) {
+                    room.sendAllPlayersMsg(S.toPrefixYellow("你在大厅里，等待其他玩家进入   ") +
+                            S.toGreen(room.getPlayers().size() + " / " + room.getReqPlayerNum()));
+                    for (Player player : room.getPlayers()) {
+                        if (room.getPlayerClassMap().containsKey(player)) continue;
+                        player.sendMessage(S.toPrefixRed("请选择职业"));
+                    }
                 }
             }
         }

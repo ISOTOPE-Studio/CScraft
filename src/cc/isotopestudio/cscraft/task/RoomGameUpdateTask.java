@@ -24,9 +24,15 @@ public class RoomGameUpdateTask extends BukkitRunnable {
             room.updateScoreBoardInGame();
             if (room.getTeamAplayer().size() == 0) {
                 room.teamBWin();
+                continue;
             } else if (room.getTeamBplayer().size() == 0) {
                 room.teamAWin();
+                continue;
             }
+            if (room.getIntervalSec() >= 600) {
+                room.timeout();
+            }
+
         }
     }
 

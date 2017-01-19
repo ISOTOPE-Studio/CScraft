@@ -14,10 +14,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
 import static cc.isotopestudio.cscraft.CScraft.playerData;
+import static cc.isotopestudio.cscraft.CScraft.plugin;
 
 public class Util {
     public static String locationToString(Location loc) {
@@ -106,23 +108,28 @@ public class Util {
         equipment[3] = config.getItemStack("equipment.boots");
         Map<Integer, ItemStack> inventory = new HashMap<>();
         ConfigurationSection itemSection = config.getConfigurationSection("item");
-        if (itemSection != null) {
-            for (String key : itemSection.getKeys(false)) {
-                inventory.put(Integer.parseInt(key), itemSection.getItemStack(key));
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (itemSection != null) {
+                    for (String key : itemSection.getKeys(false)) {
+                        inventory.put(Integer.parseInt(key), itemSection.getItemStack(key));
+                    }
+                }
+                if (equipment[0] != null)
+                    player.getInventory().setHelmet(equipment[0]);
+                if (equipment[1] != null)
+                    player.getInventory().setChestplate(equipment[1]);
+                if (equipment[2] != null)
+                    player.getInventory().setLeggings(equipment[2]);
+                if (equipment[3] != null)
+                    player.getInventory().setBoots(equipment[3]);
+                for (int i : inventory.keySet())
+                    player.getInventory().setItem(i, inventory.get(i));
+                playerData.set(player.getName(), null);
+                playerData.save();
             }
-        }
-        if (equipment[0] != null)
-            player.getInventory().setHelmet(equipment[0]);
-        if (equipment[1] != null)
-            player.getInventory().setChestplate(equipment[1]);
-        if (equipment[2] != null)
-            player.getInventory().setLeggings(equipment[2]);
-        if (equipment[3] != null)
-            player.getInventory().setBoots(equipment[3]);
-        for (int i : inventory.keySet())
-            player.getInventory().setItem(i, inventory.get(i));
-        playerData.set(player.getName(), null);
-        playerData.save();
+        }.runTaskLater(plugin,2);
     }
 
     public static Set<String> playerToStringSet(Collection<Player> players) {
