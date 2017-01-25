@@ -57,7 +57,7 @@ public class CScraft extends JavaPlugin {
         this.getCommand("cs").setExecutor(new CommandCs());
         this.getCommand("csreload").setExecutor(new CommandCsreload());
 
-        plugin.getServer().getPluginManager().registerEvents(new PlayerListener(), this);
+        PlayerListener.enableListener();
 
         new UpdateConfig().run();
         new CheckPlayerLocation().runTaskTimer(this, 20, 20);

@@ -4,6 +4,7 @@ package cc.isotopestudio.cscraft.element;
  * Copyright ISOTOPE Studio
  */
 
+import cc.isotopestudio.cscraft.room.Room;
 import cc.isotopestudio.cscraft.util.S;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -40,14 +41,14 @@ public class GameItems {
         meta.setDisplayName(S.toBoldGold("选择职业 (右键)"));
         classItem.setItemMeta(meta);
 
-        team1Item.setDurability((short) 11);
+        team1Item.setDurability((short) 14);
         meta = team1Item.getItemMeta();
-        meta.setDisplayName(S.toBoldDarkAqua("加入蓝队 (右键)"));
+        meta.setDisplayName(S.toYellow("加入") + Room.TEAMANAME + " (右键)");
         team1Item.setItemMeta(meta);
 
-        team2Item.setDurability((short) 14);
+        team2Item.setDurability((short) 11);
         meta = team2Item.getItemMeta();
-        meta.setDisplayName(S.toBoldRed("加入红队 (右键)"));
+        meta.setDisplayName(S.toYellow("加入") + Room.TEAMBNAME + " (右键)");
         team2Item.setItemMeta(meta);
 
         infoItem.setDurability((short) 3);

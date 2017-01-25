@@ -42,7 +42,6 @@ public class RoomLobbyUpdateTask extends BukkitRunnable {
                 // Start counting
                 if (room.getScheduleStart() < 0) {
                     room.setScheduleStart(new Date().getTime() + startWaitInterval * 1000);
-                    room.sendAllPlayersMsg(S.toPrefixYellow("还有 " + startWaitInterval + " 秒开始游戏"));
                 }
                 int sec = getRemainSec(room.getScheduleStart());
                 for (int num : startWaitAnnounce) {

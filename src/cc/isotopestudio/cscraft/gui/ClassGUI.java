@@ -66,9 +66,9 @@ public class ClassGUI extends GUI {
                 if (csclass == null) {
                     player.sendMessage(S.toPrefixRed("职业不存在"));
                 } else {
-                    room.getPlayerClassMap().put(player, csclass);
-                    room.sendAllPlayersMsg(CScraft.prefix + player.getDisplayName() + S.toYellow(" 选择职业 ")
+                    room.sendAllPlayersMsg(CScraft.prefix + room.getPlayerFullName(player) + S.toYellow(" 选择职业 ")
                             + csclass.getDisplayName());
+                    room.getPlayerClassMap().put(player, csclass);
                 }
                 player.closeInventory();
             }

@@ -10,6 +10,7 @@ import cc.isotopestudio.cscraft.element.EffectPlace;
 import cc.isotopestudio.cscraft.element.GameItems;
 import cc.isotopestudio.cscraft.element.RoomStatus;
 import cc.isotopestudio.cscraft.players.PlayerInfo;
+import cc.isotopestudio.cscraft.util.ParticleEffect;
 import cc.isotopestudio.cscraft.util.PluginFile;
 import cc.isotopestudio.cscraft.util.S;
 import cc.isotopestudio.cscraft.util.Util;
@@ -50,12 +51,16 @@ public abstract class Room {
     private Location teamB;
     private Location lobby;
     private int reqPlayerNum;
+    private int gameTimeoutMin;
     private boolean useColorCap;
     private Set<CSClass> teamAclass = new HashSet<>();
     private Set<CSClass> teamBclass = new HashSet<>();
     private Set<EffectPlace> effects = new HashSet<>();
     private Map<Item, EffectPlace> effectItems = new HashMap<>();
     private List<String> rewards = new ArrayList<>();
+
+    public final static String TEAMANAME = S.toBoldRed("∫Ï∂”");
+    public final static String TEAMBNAME = S.toBoldDarkAqua("¿∂∂”");
 
     // In-game
     private RoomStatus status = RoomStatus.WAITING;
@@ -85,6 +90,7 @@ public abstract class Room {
         teamB = Util.stringToLocation(config.getString("teamB"));
         lobby = Util.stringToLocation(config.getString("lobby"));
         reqPlayerNum = config.getInt("reqPlayerNum", 4);
+        gameTimeoutMin = config.getInt("gameTimeoutMin", 10);
         useColorCap = config.getBoolean("useColorCap", true);
         teamAclass.clear();
         teamAclass.addAll(CSClass.parseSet(config.getStringList("teamAclass")));
@@ -204,6 +210,16 @@ public abstract class Room {
         config.save();
     }
 
+    public int getGameTimeoutMin() {
+        return gameTimeoutMin;
+    }
+
+    public void setGameTimeoutMin(int gameTimeoutMin) {
+        this.gameTimeoutMin = gameTimeoutMin;
+        config.set("gameTimeoutMin", gameTimeoutMin);
+        config.save();
+    }
+
     public boolean isUseColorCap() {
         return useColorCap;
     }
@@ -256,10 +272,6 @@ public abstract class Room {
         config.save();
     }
 
-    public Set<EffectPlace> getEffectPlaces() {
-        return effects;
-    }
-
     public void remove() {
         config.getFile().delete();
         msgData.getFile().delete();
@@ -286,12 +298,6 @@ public abstract class Room {
 
     public RoomStatus getStatus() {
         return status;
-    }
-
-    public void setStatus(RoomStatus status) {
-        this.status = status;
-        config.set("status", status.name());
-        config.save();
     }
 
     public Map<Item, EffectPlace> getEffectItems() {
@@ -342,15 +348,27 @@ public abstract class Room {
 
     public void updateScoreBoardAtLobby() {
         for (Player player : players) {
-            scoreboards.get(player).getObjective(DisplaySlot.SIDEBAR).getScore(getPlayerTeamName(player)).setScore(getTeamAplayer().size());
-            scoreboards.get(player).getObjective(DisplaySlot.SIDEBAR).getScore(getPlayerTeamName(player)).setScore(getTeamBplayer().size());
+            final Scoreboard board = Bukkit.getScoreboardManager().getNewScoreboard();
+            Objective objective = board.registerNewObjective(getMsg("name"), "Scoreboard");
+            objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+
+            scoreboards.put(player, board);
+            player.setScoreboard(board);
+            board.getObjective(DisplaySlot.SIDEBAR).getScore(TEAMANAME).setScore(getTeamAplayer().size());
+            board.getObjective(DisplaySlot.SIDEBAR).getScore(TEAMBNAME).setScore(getTeamBplayer().size());
         }
     }
 
     public void updateScoreBoardInGame() {
         for (Player player : players) {
-            scoreboards.get(player).getObjective(DisplaySlot.SIDEBAR).getScore(S.toBoldGreen("ª˜…±")).setScore(playerKillsMap.get(player));
-            scoreboards.get(player).getObjective(DisplaySlot.SIDEBAR).getScore(S.toBoldRed("À¿Õˆ")).setScore(playerDeathMap.get(player));
+            final Scoreboard board = Bukkit.getScoreboardManager().getNewScoreboard();
+            Objective objective = board.registerNewObjective(getMsg("name"), "Scoreboard");
+            objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+
+            scoreboards.put(player, board);
+            player.setScoreboard(board);
+            board.getObjective(DisplaySlot.SIDEBAR).getScore(S.toBoldGreen("ª˜…±")).setScore(playerKillsMap.get(player));
+            board.getObjective(DisplaySlot.SIDEBAR).getScore(S.toBoldRed("À¿Õˆ")).setScore(playerDeathMap.get(player));
         }
     }
 
@@ -462,7 +480,19 @@ public abstract class Room {
         }
     }
 
+    private void fireParticle(Location location, int count) {
+        if (count > 0)
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    ParticleEffect.FLAME.display((float) (Math.random() * 1), 2 + (float) (Math.random() * 0.5), (float) (Math.random() * 1), 0, 5 * (11 - count), location, 50);
+                    fireParticle(location, count - 1);
+                }
+            }.runTaskLater(plugin, 1);
+    }
+
     public void playerDeath(Player killer, Player player, ItemStack item) {
+        fireParticle(player.getLocation(), 10);
         if (killer != null) {
             playerKillsMap.put(killer, playerKillsMap.get(killer) + 1);
             switch (playerKillsMap.get(killer)) {
@@ -488,7 +518,7 @@ public abstract class Room {
         }
 
         playerDeathMap.put(player, playerDeathMap.get(player) + 1);
-        sendAllPlayersMsg(CScraft.prefix + player.getDisplayName() + S.toYellow(" À¿¡À"));
+        sendAllPlayersMsg(CScraft.prefix + getPlayerFullName(player) + S.toYellow(" À¿¡À"));
         player.setHealth(player.getMaxHealth());
         playerEquip(player);
         if (teamAplayer.contains(player))
@@ -539,7 +569,7 @@ public abstract class Room {
         resetRoom();
     }
 
-    public void sendReward(Player player) {
+    private void sendReward(Player player) {
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -547,7 +577,7 @@ public abstract class Room {
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), line.replaceAll("<player>", player.getName()));
                 }
             }
-        }.runTaskLater(plugin, 1);
+        }.runTaskLater(plugin, 20);
     }
 
     void resetRoom() {
@@ -583,12 +613,14 @@ public abstract class Room {
     }
 
     public String getPlayerFullName(Player player) {
-        String result = "";
+        String result = String.valueOf(ChatColor.RESET);
+        if (teamAplayer.contains(player) || teamBplayer.contains(player))
+            result += "[" + getPlayerTeamName(player) + "]";
         if (playerClassMap.containsKey(player)) {
             result += "[" + playerClassMap.get(player).getDisplayName() + "]";
         }
         result += player.getDisplayName();
-        return result;
+        return result + ChatColor.RESET;
     }
 
     private String getItemName(ItemStack item) {
@@ -597,7 +629,7 @@ public abstract class Room {
     }
 
     public String getPlayerTeamName(Player player) {
-        return teamAplayer.contains(player) ? S.toBoldRed("∫Ï∂”") : S.toBoldDarkAqua("¿∂∂”");
+        return teamAplayer.contains(player) ? TEAMANAME : TEAMBNAME;
     }
 
     public static String name() {

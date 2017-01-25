@@ -22,11 +22,15 @@ import java.util.Map;
 import java.util.Set;
 
 public class HostileSnowman extends EntitySnowman {
-    private final Set<String> attackablePlayer;
+    private final Set<Player> attackablePlayer;
+    private final Set<String> attackablePlayerName;
+    private final Location location;
 
-    public HostileSnowman(World world, Set<Player> attackablePlayer) {
+    private HostileSnowman(World world, Location location, Set<Player> attackablePlayer) {
         super(world);
-        this.attackablePlayer = Util.playerToStringSet(attackablePlayer);
+        this.location = location;
+        this.attackablePlayer = attackablePlayer;
+        this.attackablePlayerName = Util.playerToStringSet(attackablePlayer);
         try {
             Field bField = PathfinderGoalSelector.class.getDeclaredField("b");
             bField.setAccessible(true);
@@ -46,12 +50,11 @@ public class HostileSnowman extends EntitySnowman {
 //        this.goalSelector.a(9, new PathfinderGoalInteract(this, EntityHuman.class, 3.0F, 1.0F));
         this.goalSelector.a(9, new PathfinderGoalInteract(this, EntitySnowman.class, 5.0F, 0.02F));
         this.goalSelector.a(9, new PathfinderGoalRandomStroll(this, 0.6D));
-        this.goalSelector.a(10, new PathfinderGoalLookAtPlayer(this, EntityHuman.class, 8.0F));
 
         this.goalSelector.a(1, new PathfinderGoalArrowAttack(this, 1.25, 20, 10.0f));
-        this.goalSelector.a(3, new PathfinderGoalLookAtPlayer(this, EntityHuman.class, 6.0f));
+//        this.goalSelector.a(3, new PathfinderGoalLookAtPlayer(this, EntityHuman.class, 6.0f));
         this.goalSelector.a(4, new PathfinderGoalRandomLookaround(this));
-        this.targetSelector.a(2, new PathfinderGoalNearestAttackableTarget(this, EntityHuman.class, true));
+        this.targetSelector.a(2, new PathfinderGoalNearestAttackableTarget<>(this, EntityHuman.class, true));
 
     }
 
@@ -64,20 +67,33 @@ public class HostileSnowman extends EntitySnowman {
     }
 
     @Override
-    public void a(EntityLiving entityliving, float f) {
-        if (!(entityliving instanceof EntityHuman)) return;
-        String playerName = ((EntityHuman) entityliving).getBukkitEntity().getName();
-        if (!attackablePlayer.contains(playerName)) return;
-        HurtfulSnowball entitysnowball = new HurtfulSnowball(this.world, this);
-        double d0 = entityliving.locY + (double) entityliving.getHeadHeight() - 1.100000023841858D;
-        double d1 = entityliving.locX - this.locX;
-        double d2 = d0 - entitysnowball.locY;
-        double d3 = entityliving.locZ - this.locZ;
-        float f1 = MathHelper.sqrt(d1 * d1 + d3 * d3) * 0.2F;
-        entitysnowball.shoot(d1, d2 + (double) f1, d3, 1.6F, 12.0F);
+    public void a(EntityLiving useless, float f) {
+        if (!(useless instanceof EntityHuman)) return;
 
-        this.makeSound("random.bow", 1.0F, 1.0F / (this.bc().nextFloat() * 0.4F + 0.8F));
-        this.world.addEntity(entitysnowball);
+        String playerName = ((EntityHuman) useless).getBukkitEntity().getName();
+        if (!attackablePlayerName.contains(playerName)) return;
+
+        Player nearestPlayer = null;
+        double min = 8;
+        for (Player player : attackablePlayer) {
+            if (player.getLocation().distance(location) < min) {
+                nearestPlayer = player;
+                min = player.getLocation().distance(location);
+            }
+        }
+        if (nearestPlayer != null) {
+            HurtfulSnowball entitysnowball = new HurtfulSnowball(this.world, this);
+            Location loc = nearestPlayer.getLocation();
+            double d0 = loc.getY() + (double) useless.getHeadHeight() - 1.100000023841858D;
+            double d1 = loc.getX() - this.locX;
+            double d2 = d0 - entitysnowball.locY;
+            double d3 = loc.getZ() - this.locZ;
+            float f1 = MathHelper.sqrt(d1 * d1 + d3 * d3) * 0.2F;
+            entitysnowball.shoot(d1, d2 + (double) f1, d3, 1.6F, 12.0F);
+
+            this.makeSound("random.bow", 1.0F, 1.0F / (this.bc().nextFloat() * 0.4F + 0.8F));
+            this.world.addEntity(entitysnowball);
+        }
     }
 
     @Override
@@ -87,7 +103,7 @@ public class HostileSnowman extends EntitySnowman {
     @Override
     public String toString() {
         return "HostileSnowman{"
-                + "attackablePlayer=" + attackablePlayer +
+                + "attackablePlayer=" + attackablePlayerName +
                 "\nisAlive=" + isAlive() +
                 "\nisInvisible=" + isInvisible() +
                 "\nlocation=" + (int) locX + (int) locY + (int) locZ +
@@ -96,7 +112,7 @@ public class HostileSnowman extends EntitySnowman {
 
     public static HostileSnowman spawn(Location loc, Set<Player> attackablePlayer) {
         World mcWorld = ((CraftWorld) loc.getWorld()).getHandle();
-        final HostileSnowman customEnt = new HostileSnowman(mcWorld, attackablePlayer);
+        final HostileSnowman customEnt = new HostileSnowman(mcWorld, loc, attackablePlayer);
         customEnt.setLocation(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
         ((CraftLivingEntity) customEnt.getBukkitEntity()).setRemoveWhenFarAway(false); //Do we want to remove it when the NPC is far away? I won
         mcWorld.addEntity(customEnt, CreatureSpawnEvent.SpawnReason.CUSTOM);
@@ -131,7 +147,7 @@ public class HostileSnowman extends EntitySnowman {
 
     private class HurtfulSnowball extends EntitySnowball {
 
-        public HurtfulSnowball(World world, EntityLiving entityLiving) {
+        HurtfulSnowball(World world, EntityLiving entityLiving) {
             super(world, entityLiving);
         }
 

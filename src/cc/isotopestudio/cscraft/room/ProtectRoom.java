@@ -9,8 +9,10 @@ import cc.isotopestudio.cscraft.element.HostileSnowman;
 import cc.isotopestudio.cscraft.util.PluginFile;
 import cc.isotopestudio.cscraft.util.S;
 import cc.isotopestudio.cscraft.util.Util;
+import com.shampaggon.crackshot.events.WeaponDamageEntityEvent;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowman;
 import org.bukkit.event.EventHandler;
@@ -163,17 +165,40 @@ public class ProtectRoom extends Room implements Listener {
 
     @EventHandler
     public void onDamage(EntityDamageEvent event) {
-        if (event.getEntity() == snowmanA || event.getEntity() == snowmanB) {
+        Entity victim = event.getEntity();
+        if (victim == snowmanA || victim == snowmanB) {
             if (event instanceof EntityDamageByEntityEvent) {
                 EntityDamageByEntityEvent event1 = (EntityDamageByEntityEvent) event;
                 if (event1.getDamager() instanceof Player)
-                    if ((event1.getEntity() == snowmanA && getTeamBplayer().contains(event1.getDamager())) ||
-                            (event1.getEntity() == snowmanB && getTeamAplayer().contains(event1.getDamager()))) {
+                    if ((victim == snowmanA && getTeamBplayer().contains(event1.getDamager())) ||
+                            (victim == snowmanB && getTeamAplayer().contains(event1.getDamager()))) {
                         return;
                     }
             }
+            if (event.getCause() == EntityDamageEvent.DamageCause.PROJECTILE) {
+                return;
+            }
             event.setCancelled(true);
         }
+    }
+
+    @EventHandler
+    public void onDamage(WeaponDamageEntityEvent event) {
+        Entity victim = event.getVictim();
+//        System.out.println(event.getDamager()); // snowball
+//        System.out.println(event.getVictim()); //
+//        System.out.println(event.getPlayer()); // shooter
+        if (victim == snowmanA || victim == snowmanB) {
+//            System.out.println(victim == snowmanA);
+//            System.out.println(getTeamBplayer().contains(event.getPlayer()));
+//            System.out.println(victim == snowmanB);
+//            System.out.println(getTeamAplayer().contains(event.getPlayer()));
+            if ((victim == snowmanA && getTeamBplayer().contains(event.getPlayer())) ||
+                    (victim == snowmanB && getTeamAplayer().contains(event.getPlayer())))
+                return;
+
+        }
+        event.setCancelled(true);
     }
 
 }

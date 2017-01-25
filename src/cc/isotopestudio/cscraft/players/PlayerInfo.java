@@ -22,12 +22,12 @@ public class PlayerInfo {
 
     public static Map<Player, Room> playerRoomMap = new HashMap<>();
 
-    static void setPlayerError(Player player, String error) {
+    public static void setPlayerError(Player player, String error) {
         playerData.set(player.getName() + ".error", error);
         playerData.save();
     }
 
-    static String getPlayerError(Player player) {
+    public static String getPlayerError(Player player) {
         return playerData.getString(player.getName() + ".error");
     }
 

@@ -77,6 +77,10 @@ public class CSClass {
 
     public void equip(Player player) {
         player.getInventory().clear();
+        player.getInventory().setHelmet(null);
+        player.getInventory().setChestplate(null);
+        player.getInventory().setLeggings(null);
+        player.getInventory().setBoots(null);
         if (equipment[0] != null)
             player.getInventory().setHelmet(equipment[0]);
         if (equipment[1] != null)
@@ -123,10 +127,10 @@ public class CSClass {
     public void addEffect(PotionEffect effect) {
         effects.add(effect);
         List<String> list = new ArrayList<>();
-        for(PotionEffect potionEffect : effects) {
+        for (PotionEffect potionEffect : effects) {
             list.add(Util.potionEffectToString(potionEffect));
         }
-        config.set("effects",list);
+        config.set("effects", list);
         classData.save();
     }
 

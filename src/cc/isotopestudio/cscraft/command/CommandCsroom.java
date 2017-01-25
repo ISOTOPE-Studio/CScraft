@@ -238,6 +238,23 @@ public class CommandCsroom implements CommandExecutor {
                 player.sendMessage(S.toPrefixGreen("成功设置"));
                 return true;
             }
+            if (args[0].equalsIgnoreCase("timeout")) {
+                if (args.length < 2) {
+                    sender.sendMessage(S.toYellow("/" + label + " timeout <名字> <最大游戏时长 分钟>"));
+                    return true;
+                }
+                int num;
+                try {
+                    num = Integer.parseInt(args[2]);
+                    if (num < 1) throw new NumberFormatException();
+                } catch (NumberFormatException e) {
+                    player.sendMessage(S.toPrefixRed("数字不对"));
+                    return true;
+                }
+                room.setGameTimeoutMin(num);
+                player.sendMessage(S.toPrefixGreen("成功设置"));
+                return true;
+            }
             if (args[0].equalsIgnoreCase("colorcap")) {
                 if (args.length < 3) {
                     sender.sendMessage(S.toYellow("/" + label + " colorcap <房间> <true|false> - 带颜色的帽子"));
@@ -325,6 +342,8 @@ public class CommandCsroom implements CommandExecutor {
                         (room.getTeamBLocation() != null ? S.toGreen("已设置") : S.toRed("未设置")));
                 player.sendMessage(S.toBoldDarkAqua("    玩家数量: ") +
                         S.toGreen("" + room.getReqPlayerNum()));
+                player.sendMessage(S.toBoldDarkAqua("    最大游戏时长 分钟: ") +
+                        S.toGreen("" + room.getGameTimeoutMin()));
                 Set<String> set = new HashSet<>();
                 for (CSClass csclass : room.getTeamAclass()) {
                     set.add(csclass.getName());
@@ -444,6 +463,7 @@ public class CommandCsroom implements CommandExecutor {
         sender.sendMessage(S.toYellow("/" + label + " removeAclass <名字> <职业名字> - 刪除A队职业"));
         sender.sendMessage(S.toYellow("/" + label + " removeBclass <名字> <职业名字> - 刪除A队职业"));
         sender.sendMessage(S.toYellow("/" + label + " num <名字> <玩家数量>"));
+        sender.sendMessage(S.toYellow("/" + label + " timeout <名字> <最大游戏时长 分钟>"));
         sender.sendMessage(S.toYellow("/" + label + " colorcap <true|false> - 带颜色的帽子"));
         sender.sendMessage(S.toYellow("/" + label + " info <名字> - 查看信息"));
         sender.sendMessage(S.toYellow("/" + label + " list - 查看房间列表"));

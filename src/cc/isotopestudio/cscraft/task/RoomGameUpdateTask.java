@@ -29,7 +29,7 @@ public class RoomGameUpdateTask extends BukkitRunnable {
                 room.teamAWin();
                 continue;
             }
-            if (room.getIntervalSec() >= 600) {
+            if (room.getIntervalSec() >= room.getGameTimeoutMin() * 60) {
                 room.timeout();
             }
 
