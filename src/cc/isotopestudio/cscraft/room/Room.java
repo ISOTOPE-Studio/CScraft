@@ -8,6 +8,7 @@ import cc.isotopestudio.cscraft.CScraft;
 import cc.isotopestudio.cscraft.element.CSClass;
 import cc.isotopestudio.cscraft.element.EffectPlace;
 import cc.isotopestudio.cscraft.element.GameItems;
+import cc.isotopestudio.cscraft.element.RoomStatus;
 import cc.isotopestudio.cscraft.players.PlayerInfo;
 import cc.isotopestudio.cscraft.util.PluginFile;
 import cc.isotopestudio.cscraft.util.S;
@@ -341,8 +342,8 @@ public abstract class Room {
 
     public void updateScoreBoardAtLobby() {
         for (Player player : players) {
-            scoreboards.get(player).getObjective(DisplaySlot.SIDEBAR).getScore(getTeamAName()).setScore(getTeamAplayer().size());
-            scoreboards.get(player).getObjective(DisplaySlot.SIDEBAR).getScore(getTeamBName()).setScore(getTeamBplayer().size());
+            scoreboards.get(player).getObjective(DisplaySlot.SIDEBAR).getScore(getPlayerTeamName(player)).setScore(getTeamAplayer().size());
+            scoreboards.get(player).getObjective(DisplaySlot.SIDEBAR).getScore(getPlayerTeamName(player)).setScore(getTeamBplayer().size());
         }
     }
 
@@ -595,12 +596,8 @@ public abstract class Room {
                 item.getItemMeta().getDisplayName() : item.getType().toString();
     }
 
-    public String getTeamAName() {
-        return S.toBoldRed("红队");
-    }
-
-    public String getTeamBName() {
-        return S.toBoldDarkAqua("蓝队");
+    public String getPlayerTeamName(Player player) {
+        return teamAplayer.contains(player) ? S.toBoldRed("红队") : S.toBoldDarkAqua("蓝队");
     }
 
     public static String name() {

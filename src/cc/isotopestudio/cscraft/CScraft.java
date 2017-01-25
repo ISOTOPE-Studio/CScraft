@@ -7,6 +7,7 @@ import cc.isotopestudio.cscraft.command.CommandCsroom;
 import cc.isotopestudio.cscraft.debugGUI.LogGUI;
 import cc.isotopestudio.cscraft.debugGUI.SettingsGUI;
 import cc.isotopestudio.cscraft.element.GameItems;
+import cc.isotopestudio.cscraft.element.HostileSnowman;
 import cc.isotopestudio.cscraft.players.PlayerInfo;
 import cc.isotopestudio.cscraft.players.PlayerListener;
 import cc.isotopestudio.cscraft.room.Room;
@@ -16,6 +17,7 @@ import cc.isotopestudio.cscraft.task.RoomLobbyUpdateTask;
 import cc.isotopestudio.cscraft.task.UpdateConfig;
 import cc.isotopestudio.cscraft.util.PluginFile;
 import cc.isotopestudio.cscraft.util.Util;
+import net.minecraft.server.v1_8_R3.EntitySnowman;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -47,6 +49,8 @@ public class CScraft extends JavaPlugin {
         playerData = new PluginFile(this, "player.yml");
         classMsgData = new PluginFile(this, "classMsg.yml", "classMsg.yml");
         classMsgData.setEditable(false);
+
+        HostileSnowman.registerEntity("Snowman", 97, EntitySnowman.class, HostileSnowman.class);
 
         this.getCommand("csclass").setExecutor(new CommandCsclass());
         this.getCommand("csroom").setExecutor(new CommandCsroom());

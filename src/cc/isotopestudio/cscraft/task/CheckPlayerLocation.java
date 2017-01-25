@@ -4,9 +4,9 @@ package cc.isotopestudio.cscraft.task;
  * Copyright ISOTOPE Studio
  */
 
+import cc.isotopestudio.cscraft.element.RoomStatus;
 import cc.isotopestudio.cscraft.players.PlayerInfo;
 import cc.isotopestudio.cscraft.room.Room;
-import cc.isotopestudio.cscraft.room.RoomStatus;
 import cc.isotopestudio.cscraft.util.S;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;

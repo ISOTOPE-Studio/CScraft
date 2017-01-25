@@ -5,7 +5,11 @@ package cc.isotopestudio.cscraft.command;
  */
 
 import cc.isotopestudio.cscraft.element.CSClass;
-import cc.isotopestudio.cscraft.room.*;
+import cc.isotopestudio.cscraft.element.RoomStatus;
+import cc.isotopestudio.cscraft.room.InfectRoom;
+import cc.isotopestudio.cscraft.room.ProtectRoom;
+import cc.isotopestudio.cscraft.room.Room;
+import cc.isotopestudio.cscraft.room.TeamRoom;
 import cc.isotopestudio.cscraft.util.S;
 import cc.isotopestudio.cscraft.util.Util;
 import org.bukkit.Material;

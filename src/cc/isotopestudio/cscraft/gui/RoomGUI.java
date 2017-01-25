@@ -4,8 +4,8 @@
 
 package cc.isotopestudio.cscraft.gui;
 
+import cc.isotopestudio.cscraft.element.RoomStatus;
 import cc.isotopestudio.cscraft.room.Room;
-import cc.isotopestudio.cscraft.room.RoomStatus;
 import cc.isotopestudio.cscraft.util.S;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -53,7 +53,6 @@ public class RoomGUI extends GUI {
             else
                 meta.setDisplayName(S.toBoldRed(room.getName()));
             List<String> lore = new ArrayList<>();
-            lore.add(room.toString());
             lore.add(S.toGreen("Íæ¼Ò: " + room.getPlayers().size() + " / " + room.getReqPlayerNum()));
             lore.addAll(room.getMsgList("GUI.lore"));
             meta.setLore(lore);

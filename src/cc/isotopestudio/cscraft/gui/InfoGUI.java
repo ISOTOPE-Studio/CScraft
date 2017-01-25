@@ -57,10 +57,7 @@ public class InfoGUI extends GUI {
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(player.getDisplayName());
         List<String> lore = new ArrayList<>();
-        if (room.getTeamAplayer().contains(player))
-            lore.add(S.toBoldGold("∂”ŒÈ: " + room.getTeamAName()));
-        else
-            lore.add(S.toBoldGold("∂”ŒÈ: " + room.getTeamBName()));
+        lore.add(S.toBoldGold("∂”ŒÈ: " + room.getPlayerTeamName(player)));
         lore.add(S.toBoldGold("ª˜…±: ") + S.toBoldGreen("" + room.getPlayerKillsMap().get(player)));
         lore.add(S.toBoldGold("À¿Õˆ: ") + S.toBoldRed("" + room.getPlayerDeathMap().get(player)));
         meta.setLore(lore);

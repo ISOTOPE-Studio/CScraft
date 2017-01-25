@@ -100,6 +100,10 @@ public class Util {
 
     public static void loadInventory(ConfigurationSection config, Player player) {
         player.getInventory().clear();
+        player.getInventory().setHelmet(null);
+        player.getInventory().setChestplate(null);
+        player.getInventory().setLeggings(null);
+        player.getInventory().setBoots(null);
         if (config == null) return;
         ItemStack[] equipment = new ItemStack[4];
         equipment[0] = config.getItemStack("equipment.helmet");
@@ -129,7 +133,7 @@ public class Util {
                 playerData.set(player.getName(), null);
                 playerData.save();
             }
-        }.runTaskLater(plugin,2);
+        }.runTaskLater(plugin, 2);
     }
 
     public static Set<String> playerToStringSet(Collection<Player> players) {

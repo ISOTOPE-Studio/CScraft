@@ -5,13 +5,12 @@ package cc.isotopestudio.cscraft.room;
  */
 
 import cc.isotopestudio.cscraft.element.GameItems;
+import cc.isotopestudio.cscraft.element.HostileSnowman;
 import cc.isotopestudio.cscraft.util.PluginFile;
 import cc.isotopestudio.cscraft.util.S;
 import cc.isotopestudio.cscraft.util.Util;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowman;
 import org.bukkit.event.EventHandler;
@@ -20,9 +19,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.DisplaySlot;
 
 import static cc.isotopestudio.cscraft.CScraft.msgFiles;
@@ -33,8 +29,8 @@ public class ProtectRoom extends Room implements Listener {
     private Location entityALocation;
     private Location entityBLocation;
 
-    private Snowman entityA;
-    private Snowman entityB;
+    private HostileSnowman hostileSnowmanA;
+    private HostileSnowman hostileSnowmanB;
 
     private int health;
 
@@ -46,7 +42,7 @@ public class ProtectRoom extends Room implements Listener {
 
         entityALocation = Util.stringToLocation(config.getString("entityA"));
         entityBLocation = Util.stringToLocation(config.getString("entityB"));
-        health = config.getInt("health");
+        health = config.getInt("health", 20);
     }
 
     public void setEntityA(Location entityA) {
@@ -72,8 +68,6 @@ public class ProtectRoom extends Room implements Listener {
         return super.isReady() && entityALocation != null && entityBLocation != null;
     }
 
-    private static final PotionEffect SLOW = new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 200);
-
     @Override
     public void join(Player player) {
         super.join(player);
@@ -92,48 +86,44 @@ public class ProtectRoom extends Room implements Listener {
         player.getInventory().setItem(5, GameItems.getTeam2Item());
     }
 
-    private NoMoveTask noMoveTask1;
-    private NoMoveTask noMoveTask2;
+    private Snowman snowmanA;
+    private Snowman snowmanB;
 
     @Override
-    public void prestart() {
-        super.prestart();
-        entityA = (Snowman) entityALocation.getWorld().spawnEntity(entityALocation, EntityType.SNOWMAN);
-        entityB = (Snowman) entityBLocation.getWorld().spawnEntity(entityBLocation, EntityType.SNOWMAN);
-        entityA.setMaxHealth(health);
-        entityA.setHealth(health);
-        entityB.setMaxHealth(health);
-        entityB.setHealth(health);
-        entityA.addPotionEffect(SLOW, true);
-        entityB.addPotionEffect(SLOW, true);
-        entityA.setCanPickupItems(false);
-        entityB.setCanPickupItems(false);
+    public void start() {
+        super.start();
+        hostileSnowmanA = HostileSnowman.spawn(entityALocation, getTeamBplayer());
+        hostileSnowmanB = HostileSnowman.spawn(entityBLocation, getTeamAplayer());
+        snowmanA = (Snowman) hostileSnowmanA.getBukkitEntity();
+        snowmanB = (Snowman) hostileSnowmanB.getBukkitEntity();
+        snowmanA.setCustomName(getPlayerTeamName(getTeamBplayer().iterator().next()));
+        snowmanB.setCustomName(getPlayerTeamName(getTeamAplayer().iterator().next()));
+        snowmanA.setMaxHealth(health);
+        snowmanA.setHealth(health);
+        snowmanB.setMaxHealth(health);
+        snowmanB.setHealth(health);
+        snowmanA.setCanPickupItems(false);
+        snowmanB.setCanPickupItems(false);
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
-        noMoveTask1 = new NoMoveTask(entityA, entityALocation);
-        noMoveTask2 = new NoMoveTask(entityB, entityBLocation);
-        noMoveTask1.runTaskTimer(plugin, 1, 10);
-        noMoveTask2.runTaskTimer(plugin, 1, 10);
     }
 
     @Override
     void resetRoom() {
         super.resetRoom();
-        noMoveTask1.cancel();
-        noMoveTask2.cancel();
         HandlerList.unregisterAll(this);
-        entityA.remove();
-        entityB.remove();
+        snowmanA.remove();
+        snowmanB.remove();
     }
 
     @Override
     public void updateScoreBoardInGame() {
         for (Player player : getPlayers()) {
             if (getTeamAplayer().contains(player)) {
-                scoreboards.get(player).getObjective(DisplaySlot.SIDEBAR).getScore(S.toBoldGreen("我方血量")).setScore((int) Math.round(entityA.getHealth()));
-                scoreboards.get(player).getObjective(DisplaySlot.SIDEBAR).getScore(S.toBoldRed("敌方血量")).setScore((int) Math.round(entityB.getHealth()));
+                scoreboards.get(player).getObjective(DisplaySlot.SIDEBAR).getScore(S.toBoldGreen("我方血量")).setScore((int) Math.round(snowmanA.getHealth()));
+                scoreboards.get(player).getObjective(DisplaySlot.SIDEBAR).getScore(S.toBoldRed("敌方血量")).setScore((int) Math.round(snowmanB.getHealth()));
             } else {
-                scoreboards.get(player).getObjective(DisplaySlot.SIDEBAR).getScore(S.toBoldGreen("我方血量")).setScore((int) Math.round(entityB.getHealth()));
-                scoreboards.get(player).getObjective(DisplaySlot.SIDEBAR).getScore(S.toBoldRed("敌方血量")).setScore((int) Math.round(entityA.getHealth()));
+                scoreboards.get(player).getObjective(DisplaySlot.SIDEBAR).getScore(S.toBoldGreen("我方血量")).setScore((int) Math.round(snowmanB.getHealth()));
+                scoreboards.get(player).getObjective(DisplaySlot.SIDEBAR).getScore(S.toBoldRed("敌方血量")).setScore((int) Math.round(snowmanA.getHealth()));
             }
         }
     }
@@ -146,7 +136,10 @@ public class ProtectRoom extends Room implements Listener {
     @Override
     public String infoString() {
         return super.infoString() +
-                "\nentityA=" + Util.locationToString(entityALocation) +
+                "\nentityALoc=" + Util.locationToString(entityALocation) +
+                "\nentityBLoc=" + Util.locationToString(entityBLocation) +
+                "\nentityA=" + (hostileSnowmanA == null ? "null" : hostileSnowmanA.toString()) +
+                "\nentityA=" + (hostileSnowmanB == null ? "null" : hostileSnowmanB.toString()) +
                 "\nentityB=" + Util.locationToString(entityBLocation) +
                 "\nhealth=" + health;
     }
@@ -157,44 +150,29 @@ public class ProtectRoom extends Room implements Listener {
 
     @EventHandler
     public void onDeath(EntityDeathEvent event) {
-        event.getDrops().clear();
-        event.setDroppedExp(0);
-        if (event.getEntity() == entityA)
+        if (event.getEntity() == snowmanA) {
             teamBWin();
-        else if (event.getEntity() == entityB)
+            event.getDrops().clear();
+            event.setDroppedExp(0);
+        } else if (event.getEntity() == snowmanB) {
             teamAWin();
+            event.getDrops().clear();
+            event.setDroppedExp(0);
+        }
     }
 
     @EventHandler
     public void onDamage(EntityDamageEvent event) {
-        if (event.getEntity() == entityA || event.getEntity() == entityB) {
+        if (event.getEntity() == snowmanA || event.getEntity() == snowmanB) {
             if (event instanceof EntityDamageByEntityEvent) {
                 EntityDamageByEntityEvent event1 = (EntityDamageByEntityEvent) event;
                 if (event1.getDamager() instanceof Player)
-                    if ((event1.getEntity() == entityA && getTeamBplayer().contains(event1.getDamager())) ||
-                            (event1.getEntity() == entityB && getTeamAplayer().contains(event1.getDamager()))) {
+                    if ((event1.getEntity() == snowmanA && getTeamBplayer().contains(event1.getDamager())) ||
+                            (event1.getEntity() == snowmanB && getTeamAplayer().contains(event1.getDamager()))) {
                         return;
                     }
             }
             event.setCancelled(true);
-        }
-    }
-
-    private class NoMoveTask extends BukkitRunnable {
-
-        private final Entity entity;
-        private final Location location;
-
-        private NoMoveTask(Entity entity, Location location) {
-            this.entity = entity;
-            this.location = location;
-        }
-
-        @Override
-        public void run() {
-            if (entity.getLocation().distance(location) > 2) {
-                entity.teleport(location);
-            }
         }
     }
 

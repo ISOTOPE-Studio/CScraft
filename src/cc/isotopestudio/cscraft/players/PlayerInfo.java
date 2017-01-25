@@ -32,7 +32,6 @@ public class PlayerInfo {
     }
 
     public static void teleportOut(Player player) {
-        player.setMaxHealth(20);
         for (PotionEffect effect : player.getActivePotionEffects())
             player.removePotionEffect(effect.getType());
         final Location location = Util.stringToLocation(playerData.getString(player.getName() + ".location"));
@@ -45,6 +44,7 @@ public class PlayerInfo {
             @Override
             public void run() {
                 Util.loadInventory(playerData.getConfigurationSection(player.getName() + ".inventory"), player);
+                player.setMaxHealth(20);
             }
         }.runTaskLater(plugin, 10);
     }

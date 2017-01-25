@@ -5,7 +5,6 @@ package cc.isotopestudio.cscraft.element;
  */
 
 import cc.isotopestudio.cscraft.room.Room;
-import cc.isotopestudio.cscraft.room.RoomStatus;
 import cc.isotopestudio.cscraft.util.Util;
 import org.bukkit.Location;
 import org.bukkit.Material;

@@ -4,8 +4,8 @@ package cc.isotopestudio.cscraft.task;
  * Copyright ISOTOPE Studio
  */
 
+import cc.isotopestudio.cscraft.element.RoomStatus;
 import cc.isotopestudio.cscraft.room.Room;
-import cc.isotopestudio.cscraft.room.RoomStatus;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class RoomGameUpdateTask extends BukkitRunnable {

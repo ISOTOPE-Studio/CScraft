@@ -7,13 +7,13 @@ package cc.isotopestudio.cscraft.players;
 import cc.isotopestudio.cscraft.CScraft;
 import cc.isotopestudio.cscraft.element.EffectPlace;
 import cc.isotopestudio.cscraft.element.GameItems;
+import cc.isotopestudio.cscraft.element.RoomStatus;
 import cc.isotopestudio.cscraft.gui.ClassGUI;
 import cc.isotopestudio.cscraft.gui.InfoGUI;
 import cc.isotopestudio.cscraft.room.InfectRoom;
 import cc.isotopestudio.cscraft.room.Room;
-import cc.isotopestudio.cscraft.room.RoomStatus;
 import cc.isotopestudio.cscraft.util.S;
-import org.bukkit.entity.Arrow;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -27,6 +27,8 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.Set;
 
 import static cc.isotopestudio.cscraft.CScraft.plugin;
 import static cc.isotopestudio.cscraft.players.PlayerInfo.playerRoomMap;
@@ -100,7 +102,7 @@ public class PlayerListener implements Listener {
                 }
                 if (event1.getDamager() instanceof Projectile) {
                     if (((Projectile) event1.getDamager()).getShooter() instanceof Player) {
-                        damager = (Player) ((Arrow) event1.getDamager()).getShooter();
+                        damager = (Player) ((Projectile) event1.getDamager()).getShooter();
                     }
                 }
                 if (damager != null)
@@ -237,6 +239,29 @@ public class PlayerListener implements Listener {
             }
         }
 
+    }
+
+    @EventHandler
+    public void onChat(AsyncPlayerChatEvent event) {
+        final Player player = event.getPlayer();
+        Set<Player> recipients = event.getRecipients();
+
+        // Player in room
+        if (playerRoomMap.containsKey(player)) {
+            event.setCancelled(true);
+            Room room = playerRoomMap.get(player);
+            recipients = room.getTeamAplayer().contains(player) ? room.getTeamAplayer() : room.getTeamBplayer();
+            for (Player recipient : recipients) {
+                recipient.sendMessage("[" + room.getPlayerTeamName(player) + "]" + player.getDisplayName() + ChatColor.RESET + ": " + event.getMessage());
+            }
+        }
+        // Player outside
+        else {
+            for (Room room : Room.rooms.values()) {
+                if (room.getStatus() == RoomStatus.PROGRESS)
+                    recipients.removeAll(room.getPlayers());
+            }
+        }
     }
 
 }
