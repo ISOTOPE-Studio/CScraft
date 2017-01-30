@@ -7,6 +7,7 @@ package cc.isotopestudio.cscraft.players.listener;
 import cc.isotopestudio.cscraft.element.EffectPlace;
 import cc.isotopestudio.cscraft.element.RoomStatus;
 import cc.isotopestudio.cscraft.room.Room;
+import cc.isotopestudio.cscraft.util.S;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -109,7 +110,7 @@ public class RoomListener implements Listener {
                 if (event.getMessage().contains("&w")) {
                     for (Player recipient : room.getPlayers()) {
                         String msg = event.getMessage().replaceFirst("&w", "");
-                        recipient.sendMessage(room.getPlayerFullName(player) + ": " + msg);
+                        recipient.sendMessage(S.toBoldGold("[ȫ]") + room.getPlayerFullName(player) + ": " + msg);
                     }
                 } else {
                     recipients = room.getTeamAplayer().contains(player) ? room.getTeamAplayer() : room.getTeamBplayer();

@@ -452,6 +452,11 @@ public abstract class Room {
     private static final PotionEffect INVISIBLE = new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, true);
 
     public void playerEquip(Player player) {
+        player.getInventory().clear();
+        player.getInventory().setHelmet(null);
+        player.getInventory().setChestplate(null);
+        player.getInventory().setLeggings(null);
+        player.getInventory().setBoots(null);
         if (useColorCap) {
             if (teamAplayer.contains(player)) {
                 ItemStack cap = new ItemStack(Material.LEATHER_HELMET);

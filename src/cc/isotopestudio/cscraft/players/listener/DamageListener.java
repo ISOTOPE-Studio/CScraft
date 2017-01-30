@@ -27,7 +27,7 @@ public class DamageListener implements Listener {
         if (!playerRoomMap.containsKey(player)) {
             return;
         }
-        System.out.print("EntityDamageEvent");
+//        System.out.print("EntityDamageEvent");
         Room room = playerRoomMap.get(player);
         if (room.getStatus() == RoomStatus.WAITING) {
             event.setCancelled(true);

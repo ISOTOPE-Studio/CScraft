@@ -10,6 +10,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.*;
 
@@ -29,6 +30,8 @@ public class CSClass {
     private String permission;
     private final List<PotionEffect> effects = new ArrayList<>();
 
+    private static final PotionEffect SATURATION = new PotionEffect(PotionEffectType.SATURATION, Integer.MAX_VALUE, 1);
+
     public CSClass(String name) {
         this.name = name;
         config = classData.getConfigurationSection(name);
@@ -39,6 +42,7 @@ public class CSClass {
         } else {
             loadFromConfig();
         }
+        effects.add(SATURATION);
         classes.put(name, this);
     }
 
@@ -76,11 +80,6 @@ public class CSClass {
     }
 
     public void equip(Player player) {
-        player.getInventory().clear();
-        player.getInventory().setHelmet(null);
-        player.getInventory().setChestplate(null);
-        player.getInventory().setLeggings(null);
-        player.getInventory().setBoots(null);
         if (equipment[0] != null)
             player.getInventory().setHelmet(equipment[0]);
         if (equipment[1] != null)
