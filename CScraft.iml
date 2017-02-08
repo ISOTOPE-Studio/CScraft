@@ -11,11 +11,11 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../Server/1.8.8/spigot-1.8.8.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../../Spigot/builds/spigot-1.8.8.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/../../../Server/1.8.8/spigot-1.8.8.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../../Spigot/builds/spigot-1.8.8.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>

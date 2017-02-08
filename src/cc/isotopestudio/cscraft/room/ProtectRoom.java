@@ -78,10 +78,13 @@ public class ProtectRoom extends Room implements Listener {
         } else if (getTeamAplayer().size() < getTeamBplayer().size()) {
             getTeamAplayer().add(player);
         } else {
-            if (Math.random() < 0.5)
+            if (Math.random() < 0.5) {
                 getTeamBplayer().add(player);
-            else
+                player.getEquipment().setHelmet(GameItems.getBlueTeamCap());
+            } else {
                 getTeamAplayer().add(player);
+                player.getEquipment().setHelmet(GameItems.getRedTeamCap());
+            }
         }
 
         player.getInventory().setItem(3, GameItems.getTeam1Item());

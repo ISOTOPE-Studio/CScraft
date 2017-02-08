@@ -451,7 +451,7 @@ public abstract class Room {
 
     private static final PotionEffect INVISIBLE = new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, true);
 
-    public void playerEquip(Player player) {
+    private void playerEquip(Player player) {
         player.getInventory().clear();
         player.getInventory().setHelmet(null);
         player.getInventory().setChestplate(null);
@@ -459,17 +459,9 @@ public abstract class Room {
         player.getInventory().setBoots(null);
         if (useColorCap) {
             if (teamAplayer.contains(player)) {
-                ItemStack cap = new ItemStack(Material.LEATHER_HELMET);
-                LeatherArmorMeta lch = (LeatherArmorMeta) cap.getItemMeta();
-                lch.setColor(Color.fromRGB(255, 0, 0));
-                cap.setItemMeta(lch);
-                player.getEquipment().setHelmet(cap);
+                player.getEquipment().setHelmet(GameItems.getRedTeamCap());
             } else {
-                ItemStack cap = new ItemStack(Material.LEATHER_HELMET);
-                LeatherArmorMeta lch = (LeatherArmorMeta) cap.getItemMeta();
-                lch.setColor(Color.fromRGB(0, 0, 255));
-                cap.setItemMeta(lch);
-                player.getEquipment().setHelmet(cap);
+                player.getEquipment().setHelmet(GameItems.getBlueTeamCap());
             }
         }
         CSClass csclass = playerClassMap.get(player);

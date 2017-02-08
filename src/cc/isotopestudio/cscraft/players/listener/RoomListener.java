@@ -34,6 +34,7 @@ public class RoomListener implements Listener {
         if (!playerRoomMap.containsKey(player)) {
             return;
         }
+        player.spigot().respawn();
         event.setKeepInventory(true);
         event.setDeathMessage("");
         event.setKeepLevel(true);
@@ -65,14 +66,6 @@ public class RoomListener implements Listener {
             return;
         }
         event.setCancelled(true);
-    }
-
-    @EventHandler
-    public void onFoodLevelChange(FoodLevelChangeEvent event) {
-        final Player player = (Player) event.getEntity();
-        if (playerRoomMap.containsKey(player)) {
-            event.setCancelled(true);
-        }
     }
 
     @EventHandler

@@ -6,9 +6,11 @@ package cc.isotopestudio.cscraft.element;
 
 import cc.isotopestudio.cscraft.room.Room;
 import cc.isotopestudio.cscraft.util.S;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 public class GameItems {
 
@@ -26,6 +28,12 @@ public class GameItems {
     private static ItemStack antigenClassItem = new ItemStack(Material.WOOL);
     private static ItemStack zombieClassItem = new ItemStack(Material.WOOL);
     private static ItemStack humanClassItem = new ItemStack(Material.WOOL);
+
+    // cap
+    private static ItemStack redTeamCap = new ItemStack(Material.LEATHER_HELMET);
+    private static ItemStack blueTeamCap = new ItemStack(Material.LEATHER_HELMET);
+
+
 
     public static void update() {
         noPermission.setDurability((short) 7);
@@ -59,6 +67,14 @@ public class GameItems {
         antigenClassItem.setDurability((short) 14);
         zombieClassItem.setDurability((short) 5);
         humanClassItem.setDurability((short) 11);
+
+        LeatherArmorMeta lch = (LeatherArmorMeta) redTeamCap.getItemMeta();
+        lch.setColor(Color.fromRGB(255, 0, 0));
+        redTeamCap.setItemMeta(lch);
+
+        lch = (LeatherArmorMeta) blueTeamCap.getItemMeta();
+        lch.setColor(Color.fromRGB(0, 0, 255));
+        blueTeamCap.setItemMeta(lch);
     }
 
     public static ItemStack getExitItem() {
@@ -66,34 +82,42 @@ public class GameItems {
     }
 
     public static ItemStack getClassItem() {
-        return classItem;
+        return classItem.clone();
     }
 
     public static ItemStack getTeam1Item() {
-        return team1Item;
+        return team1Item.clone();
     }
 
     public static ItemStack getTeam2Item() {
-        return team2Item;
+        return team2Item.clone();
     }
 
     public static ItemStack getInfoItem() {
-        return infoItem;
+        return infoItem.clone();
     }
 
     public static ItemStack getNoPermission() {
-        return noPermission;
+        return noPermission.clone();
     }
 
     public static ItemStack getAntigenClassItem() {
-        return antigenClassItem;
+        return antigenClassItem.clone();
     }
 
     public static ItemStack getZombieClassItem() {
-        return zombieClassItem;
+        return zombieClassItem.clone();
     }
 
     public static ItemStack getHumanClassItem() {
-        return humanClassItem;
+        return humanClassItem.clone();
+    }
+
+    public static ItemStack getRedTeamCap() {
+        return redTeamCap;
+    }
+
+    public static ItemStack getBlueTeamCap() {
+        return blueTeamCap;
     }
 }

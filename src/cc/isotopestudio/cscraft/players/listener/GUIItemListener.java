@@ -44,6 +44,7 @@ public class GUIItemListener implements Listener {
                     room.getTeamBplayer().remove(player);
                     room.getTeamAplayer().add(player);
                     room.getPlayerClassMap().remove(player);
+                    player.getEquipment().setHelmet(GameItems.getRedTeamCap());
                     room.sendAllPlayersMsg(CScraft.prefix + player.getDisplayName() + S.toGreen(" 加入") + Room.TEAMANAME);
                 }
             } else if (GameItems.getTeam2Item().equals(event.getItem())) {
@@ -58,6 +59,7 @@ public class GUIItemListener implements Listener {
                     room.getTeamAplayer().remove(player);
                     room.getTeamBplayer().add(player);
                     room.getPlayerClassMap().remove(player);
+                    player.getEquipment().setHelmet(GameItems.getBlueTeamCap());
                     room.sendAllPlayersMsg(CScraft.prefix + player.getDisplayName() + S.toGreen(" 加入") + Room.TEAMBNAME);
                 }
             } else if (GameItems.getClassItem().equals(event.getItem())) {
