@@ -345,21 +345,58 @@ public class CommandCsroom implements CommandExecutor {
                 player.sendMessage(S.toBoldDarkAqua("    最大游戏时长 分钟: ") +
                         S.toGreen("" + room.getGameTimeoutMin()));
                 Set<String> set = new HashSet<>();
-                for (CSClass csclass : room.getTeamAclass()) {
-                    set.add(csclass.getName());
+                if (room instanceof InfectRoom) {
+                    InfectRoom infectRoom = (InfectRoom) room;
+
+                    CSClass teamZombieDefaultClass = infectRoom.getTeamZombieDefaultClass();
+                    player.sendMessage(S.toBoldDarkAqua("    默认僵尸职业: ") +
+                            ( teamZombieDefaultClass == null?S.toRed("未设置"):S.toGreen(teamZombieDefaultClass.getName())));
+
+                    for (CSClass csclass : infectRoom.getTeamAclass()) {
+                        set.add(csclass.getName());
+                    }
+                    player.sendMessage(S.toBoldDarkAqua("    僵尸职业: ") +
+                            S.toGreen(set.toString()));
+
+                    CSClass teamAntigenDefaultClass = infectRoom.getTeamAntigenDefaultClass();
+                    player.sendMessage(S.toBoldDarkAqua("    默认母体职业: ") +
+                            ( teamAntigenDefaultClass == null?S.toRed("未设置"):S.toGreen(teamAntigenDefaultClass.getName())));
+
+                    set.clear();
+                    for (CSClass csclass : infectRoom.getTeamAntigenClass()) {
+                        set.add(csclass.getName());
+                    }
+                    player.sendMessage(S.toBoldDarkAqua("    母体职业: ") +
+                            S.toGreen(set.toString()));
+
+                    set.clear();
+                    for (CSClass csclass : infectRoom.getTeamBclass()) {
+                        set.add(csclass.getName());
+                    }
+                    player.sendMessage(S.toBoldDarkAqua("    人类职业: ") +
+                            S.toGreen(set.toString()));
+                } else {
+                    for (CSClass csclass : room.getTeamAclass()) {
+                        set.add(csclass.getName());
+                    }
+                    player.sendMessage(S.toBoldDarkAqua("    队A职业: ") +
+                            S.toGreen(set.toString()));
+                    set.clear();
+                    for (CSClass csclass : room.getTeamBclass()) {
+                        set.add(csclass.getName());
+                    }
+                    player.sendMessage(S.toBoldDarkAqua("    队B职业: ") +
+                            S.toGreen(set.toString()));
                 }
-                player.sendMessage(S.toBoldDarkAqua("    队A职业: ") +
-                        S.toGreen(set.toString()));
-                set = new HashSet<>();
-                for (CSClass csclass : room.getTeamBclass()) {
-                    set.add(csclass.getName());
-                }
-                player.sendMessage(S.toBoldDarkAqua("    队B职业: ") +
-                        S.toGreen(set.toString()));
                 if (room instanceof TeamRoom) {
                     TeamRoom teamRoom = (TeamRoom) room;
                     player.sendMessage(S.toBoldDarkGreen("    目标人数: ") +
                             S.toGreen("" + teamRoom.getGoal()));
+                }
+                if (room instanceof ProtectRoom) {
+                    ProtectRoom protectRoom = (ProtectRoom) room;
+                    player.sendMessage(S.toBoldDarkGreen("    实体血量: ") +
+                            S.toGreen("" + protectRoom.getHealth()));
                 }
                 return true;
             }
@@ -444,6 +481,88 @@ public class CommandCsroom implements CommandExecutor {
                 player.sendMessage(S.toPrefixGreen("成功设置"));
                 return true;
             }
+            if (args[0].equalsIgnoreCase("defaultAntigen")) {
+                if (args.length < 3) {
+                    sender.sendMessage(S.toYellow("/" + label + " defaultAntigen <名字> - 设置默认母体职业"));
+                    return true;
+                }
+                if (!(room instanceof InfectRoom)) {
+                    player.sendMessage(S.toPrefixRed("此房间不是") + InfectRoom.name());
+                    return true;
+                }
+                if (!CSClass.classes.containsKey(args[2])) {
+                    player.sendMessage(S.toPrefixRed(args[2] + "不存在"));
+                    return true;
+                }
+                InfectRoom infectRoom = (InfectRoom) room;
+                CSClass csclass = CSClass.getClassByName(args[2]);
+                infectRoom.setTeamAntigenDefaultClass(csclass);
+                player.sendMessage(S.toPrefixGreen("成功设置"));
+                return true;
+            }
+            if (args[0].equalsIgnoreCase("defaultZombie")) {
+                if (args.length < 3) {
+                    sender.sendMessage(S.toYellow("/" + label + " defaultZombie <名字> - 设置实体僵尸职业"));
+                    return true;
+                }
+                if (!(room instanceof InfectRoom)) {
+                    player.sendMessage(S.toPrefixRed("此房间不是") + InfectRoom.name());
+                    return true;
+                }
+                if (!CSClass.classes.containsKey(args[2])) {
+                    player.sendMessage(S.toPrefixRed(args[2] + "不存在"));
+                    return true;
+                }
+                InfectRoom infectRoom = (InfectRoom) room;
+                CSClass csclass = CSClass.getClassByName(args[2]);
+                infectRoom.setTeamZombieDefaultClass(csclass);
+                player.sendMessage(S.toPrefixGreen("成功设置"));
+                return true;
+            }
+            if (args[0].equalsIgnoreCase("addAntigenClass")) {
+                if (args.length < 3) {
+                    sender.sendMessage(S.toYellow("/" + label + " addAntigenClass <名字> <职业名字> - 添加母体职业"));
+                    return true;
+                }
+                if (!(room instanceof InfectRoom)) {
+                    player.sendMessage(S.toPrefixRed("此房间不是") + InfectRoom.name());
+                    return true;
+                }
+                if (!CSClass.classes.containsKey(args[2])) {
+                    player.sendMessage(S.toPrefixRed(args[2] + "不存在"));
+                    return true;
+                }
+                InfectRoom infectRoom = (InfectRoom) room;
+                CSClass csclass = CSClass.getClassByName(args[2]);
+                if (infectRoom.getTeamAntigenClass().contains(csclass)) {
+                    player.sendMessage(S.toPrefixRed(args[2] + "已经在列表中了"));
+                    return true;
+                }
+                infectRoom.getTeamAntigenClass().add(csclass);
+                infectRoom.saveTeamAntigenClass();
+                player.sendMessage(S.toPrefixGreen("成功添加"));
+                return true;
+            }
+            if (args[0].equalsIgnoreCase("removeAclass")) {
+                if (args.length < 3) {
+                    sender.sendMessage(S.toYellow("/" + label + " removeAntigenClass <名字> <职业名字> - 刪除母体职业"));
+                    return true;
+                }
+                if (!(room instanceof InfectRoom)) {
+                    player.sendMessage(S.toPrefixRed("此房间不是") + InfectRoom.name());
+                    return true;
+                }
+                InfectRoom infectRoom = (InfectRoom) room;
+                CSClass csclass = CSClass.getClassByName(args[2]);
+                if (!infectRoom.getTeamAntigenClass().contains(csclass)) {
+                    player.sendMessage(S.toPrefixRed(args[2] + "不存在"));
+                    return true;
+                }
+                infectRoom.getTeamAntigenClass().remove(csclass);
+                infectRoom.saveTeamAntigenClass();
+                player.sendMessage(S.toPrefixGreen("成功刪除"));
+                return true;
+            }
             player.sendMessage(S.toPrefixRed("未知命令, 输入 /" + label + " 查看帮助"));
             return true;
         }
@@ -483,6 +602,14 @@ public class CommandCsroom implements CommandExecutor {
         sender.sendMessage(S.toYellow("/" + label + " entityB <名字> - 设置实体B队位置"));
         sender.sendMessage(S.toYellow("/" + label + " health <名字> <生命值> - 实体生命值"));
         sender.sendMessage(" - " + InfectRoom.name());
+        sender.sendMessage(S.toYellow("/" + label + " defaultAntigen <名字> - 设置默认母体职业"));
+        sender.sendMessage(S.toYellow("/" + label + " defaultZombie <名字> - 设置实体僵尸职业"));
+        sender.sendMessage(S.toYellow("/" + label + " addAclass <名字> <职业名字> - 添加僵尸职业"));
+        sender.sendMessage(S.toYellow("/" + label + " addBclass <名字> <职业名字> - 添加人类职业"));
+        sender.sendMessage(S.toYellow("/" + label + " addAntigenClass <名字> <职业名字> - 添加母体职业"));
+        sender.sendMessage(S.toYellow("/" + label + " removeAclass <名字> <职业名字> - 刪除僵尸职业"));
+        sender.sendMessage(S.toYellow("/" + label + " removeBclass <名字> <职业名字> - 刪除人类职业"));
+        sender.sendMessage(S.toYellow("/" + label + " removeAntigenClass <名字> <职业名字> - 刪除母体职业"));
 
     }
 

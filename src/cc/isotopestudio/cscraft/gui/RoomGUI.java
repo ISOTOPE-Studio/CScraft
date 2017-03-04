@@ -36,6 +36,15 @@ public class RoomGUI extends GUI {
             }
             slotIDMap.put(pos, room.getName());
             ItemStack item = new ItemStack(Material.WOOL);
+
+            int playerNum = room.getPlayers().size();
+            if (playerNum < 2)
+                item.setAmount(1);
+            else if (playerNum >= 64)
+                item.setAmount(64);
+            else
+                item.setAmount(playerNum);
+
             switch (room.getStatus()) {
                 case WAITING:
                     // change
@@ -53,7 +62,7 @@ public class RoomGUI extends GUI {
             else
                 meta.setDisplayName(S.toBoldRed(room.getName()));
             List<String> lore = new ArrayList<>();
-            lore.add(S.toGreen("Íæ¼Ò: " + room.getPlayers().size() + " / " + room.getReqPlayerNum()));
+            lore.add(S.toGreen("Íæ¼Ò: " + playerNum + " / " + room.getReqPlayerNum()));
             lore.addAll(room.getMsgList("GUI.lore"));
             meta.setLore(lore);
             item.setItemMeta(meta);

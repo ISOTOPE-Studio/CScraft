@@ -34,7 +34,6 @@ public class GameItems {
     private static ItemStack blueTeamCap = new ItemStack(Material.LEATHER_HELMET);
 
 
-
     public static void update() {
         noPermission.setDurability((short) 7);
         ItemMeta meta = noPermission.getItemMeta();

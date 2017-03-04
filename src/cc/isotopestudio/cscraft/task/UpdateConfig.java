@@ -31,7 +31,6 @@ public class UpdateConfig extends BukkitRunnable {
         // Update room
         Room.rooms.clear();
         File roomFolder = new File(plugin.getDataFolder() + "/rooms/");
-        String dir = roomFolder.getName();
         if (roomFolder.exists()) {
             File[] files = roomFolder.listFiles();
             if (files != null)

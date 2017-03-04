@@ -63,10 +63,18 @@ public class GUIItemListener implements Listener {
                     room.sendAllPlayersMsg(CScraft.prefix + player.getDisplayName() + S.toGreen(" º”»Î") + Room.TEAMBNAME);
                 }
             } else if (GameItems.getClassItem().equals(event.getItem())) {
-                if (room instanceof InfectRoom) {
-
-                } else
+                if (!(room instanceof InfectRoom)) {
                     new ClassGUI(room, player, room.getTeamAplayer().contains(player) ? room.getTeamAclass() : room.getTeamBclass()).open(player);
+                }
+            } else if (GameItems.getHumanClassItem().equals(event.getItem())){
+                if (room instanceof InfectRoom)
+                    new ClassGUI(room,player,room.getTeamAclass());
+            } else if (GameItems.getAntigenClassItem().equals(event.getItem())){
+                if (room instanceof InfectRoom)
+                    new ClassGUI(room,player, ((InfectRoom) room).getTeamAntigenClass());
+            } else if (GameItems.getZombieClassItem().equals(event.getItem())){
+                if (room instanceof InfectRoom)
+                    new ClassGUI(room,player,room.getTeamBclass());
             }
         } else {
             if (GameItems.getInfoItem().equals(event.getItem())) {

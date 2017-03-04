@@ -59,6 +59,10 @@ public class ProtectRoom extends Room implements Listener {
         config.save();
     }
 
+    public int getHealth() {
+        return health;
+    }
+
     public void setHealth(int health) {
         this.health = health;
         config.set("health", health);

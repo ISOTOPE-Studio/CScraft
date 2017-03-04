@@ -11,7 +11,9 @@ import cc.isotopestudio.cscraft.util.S;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static cc.isotopestudio.cscraft.CScraft.msgFiles;
@@ -24,6 +26,10 @@ public class InfectRoom extends Room {
     // Team B: Human
 
     // Settings
+    // teamAclass for zombie
+    // teamBclass for Human
+    private CSClass teamAntigenDefaultClass;
+    private CSClass teamZombieDefaultClass;
     private Set<CSClass> teamAntigenClass = new HashSet<>();
 
     // In-game
@@ -34,19 +40,59 @@ public class InfectRoom extends Room {
         msgData = new PluginFile(plugin, "rooms/" + ChatColor.stripColor(getClass().getSimpleName()) + "." + name + "/msg.yml", "msg_infect.yml");
         msgFiles.add(msgData);
         msgData.setEditable(false);
+        teamAntigenDefaultClass = CSClass.getClassByName(config.getString("teamAntigenDefaultClass"));
+        teamZombieDefaultClass = CSClass.getClassByName(config.getString("teamZombieDefaultClass"));
+        teamAntigenClass.clear();
+        teamAntigenClass.addAll(CSClass.parseSet(config.getStringList("teamAntigenClass")));
+    }
+
+    public CSClass getTeamAntigenDefaultClass() {
+        return teamAntigenDefaultClass;
+    }
+
+
+    public void setTeamAntigenDefaultClass(CSClass teamAntigenDefaultClass) {
+        this.teamAntigenDefaultClass = teamAntigenDefaultClass;
+        config.set("teamAntigenDefaultClass", teamAntigenDefaultClass.getName());
+    }
+
+    public CSClass getTeamZombieDefaultClass() {
+        return teamZombieDefaultClass;
+    }
+
+    public void setTeamZombieDefaultClass(CSClass teamZombieDefaultClass) {
+        this.teamZombieDefaultClass = teamZombieDefaultClass;
+        config.set("teamZombieDefaultClass", teamZombieDefaultClass.getName());
+    }
+
+    public Set<CSClass> getTeamAntigenClass() {
+        return teamAntigenClass;
+    }
+
+    public void saveTeamAntigenClass() {
+        List<String> list = new ArrayList<>();
+        for (CSClass csclass : teamAntigenClass) {
+            list.add(csclass.getName());
+        }
+        config.set("teamAntigenClass", list);
+        config.save();
+    }
+
+
+    public Set<Player> getTeamAntigenPlayers() {
+        return teamAntigenPlayer;
     }
 
     @Override
     public boolean isReady() {
-        return false;
+        return super.isReady() && teamAntigenDefaultClass != null && teamZombieDefaultClass != null
+                && teamAntigenClass.size() > 0;
     }
 
     @Override
     public void join(Player player) {
         super.join(player);
 
-        player.getInventory().setItem(3, GameItems.getAntigenClassItem());
-        player.getInventory().setItem(4, GameItems.getZombieClassItem());
         player.getInventory().setItem(5, GameItems.getHumanClassItem());
     }
 

@@ -8,18 +8,16 @@ import cc.isotopestudio.cscraft.element.EffectPlace;
 import cc.isotopestudio.cscraft.element.RoomStatus;
 import cc.isotopestudio.cscraft.room.Room;
 import cc.isotopestudio.cscraft.util.S;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerPickupItemEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.*;
 
 import java.util.Set;
 
@@ -118,6 +116,23 @@ public class RoomListener implements Listener {
             for (Room room : Room.rooms.values()) {
                 if (room.getStatus() == RoomStatus.PROGRESS)
                     recipients.removeAll(room.getPlayers());
+            }
+        }
+    }
+
+    @EventHandler
+    public void onInteract(PlayerInteractEvent event) {
+        final Player player = event.getPlayer();
+        // Player in room
+        if (playerRoomMap.containsKey(player)) {
+            Block block = event.getClickedBlock();
+            if (block == null || block.getType() == Material.AIR) {
+                return;
+            }
+            Material type = block.getType();
+            if (type == Material.WORKBENCH || type == Material.FURNACE || type == Material.CHEST
+                    || type == Material.TRAPPED_CHEST) {
+                event.setCancelled(true);
             }
         }
     }

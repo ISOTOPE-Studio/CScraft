@@ -14,7 +14,10 @@ import cc.isotopestudio.cscraft.util.ParticleEffect;
 import cc.isotopestudio.cscraft.util.PluginFile;
 import cc.isotopestudio.cscraft.util.S;
 import cc.isotopestudio.cscraft.util.Util;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -23,7 +26,6 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -655,7 +657,6 @@ public abstract class Room {
                 "\nplayerKillsMap=" + Util.playerToStringSet(playerKillsMap.keySet()) + "/" + playerKillsMap.values() +
                 "\nplayerDeathMap=" + Util.playerToStringSet(playerDeathMap.keySet()) + "/" + playerDeathMap.values();
     }
-
 
     static class InvincibleListener implements Listener {
         private final Player player;
