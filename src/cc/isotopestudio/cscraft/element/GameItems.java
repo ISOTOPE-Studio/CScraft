@@ -63,9 +63,20 @@ public class GameItems {
         meta.setDisplayName(S.toBoldRed("战绩 (右键)"));
         infoItem.setItemMeta(meta);
 
+        meta = antigenClassItem.getItemMeta();
         antigenClassItem.setDurability((short) 14);
+        meta.setDisplayName(S.toBoldGold("选择母体职业 (右键)"));
+        antigenClassItem.setItemMeta(meta);
+
+        meta = zombieClassItem.getItemMeta();
         zombieClassItem.setDurability((short) 5);
+        meta.setDisplayName(S.toBoldGold("选择僵尸职业 (右键)"));
+        zombieClassItem.setItemMeta(meta);
+
+        meta = humanClassItem.getItemMeta();
         humanClassItem.setDurability((short) 11);
+        meta.setDisplayName(S.toBoldGold("选择人类职业 (右键)"));
+        humanClassItem.setItemMeta(meta);
 
         LeatherArmorMeta lch = (LeatherArmorMeta) redTeamCap.getItemMeta();
         lch.setColor(Color.fromRGB(255, 0, 0));

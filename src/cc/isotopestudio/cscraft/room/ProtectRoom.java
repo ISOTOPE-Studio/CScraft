@@ -6,6 +6,7 @@ package cc.isotopestudio.cscraft.room;
 
 import cc.isotopestudio.cscraft.element.GameItems;
 import cc.isotopestudio.cscraft.element.HostileSnowman;
+import cc.isotopestudio.cscraft.players.PlayerInfo;
 import cc.isotopestudio.cscraft.util.PluginFile;
 import cc.isotopestudio.cscraft.util.S;
 import cc.isotopestudio.cscraft.util.Util;
@@ -21,6 +22,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scoreboard.DisplaySlot;
 
 import static cc.isotopestudio.cscraft.CScraft.msgFiles;
@@ -95,12 +97,30 @@ public class ProtectRoom extends Room implements Listener {
         player.getInventory().setItem(5, GameItems.getTeam2Item());
     }
 
+    @Override
+    public void playerDeath(Player killer, Player player, ItemStack item) {
+        super.playerDeath(killer, player, item);
+        if (getTeamAplayer().contains(player))
+            PlayerInfo.teleport(player, getTeamALocation());
+        else
+            PlayerInfo.teleport(player, getTeamBLocation());
+
+    }
+
     private Snowman snowmanA;
     private Snowman snowmanB;
 
     @Override
     public void start() {
         super.start();
+
+        for (Player player : getTeamAplayer()) {
+            PlayerInfo.teleport(player, getTeamALocation());
+        }
+        for (Player player : getTeamBplayer()) {
+            PlayerInfo.teleport(player, getTeamBLocation());
+        }
+
         hostileSnowmanA = HostileSnowman.spawn(entityALocation, getTeamBplayer());
         hostileSnowmanB = HostileSnowman.spawn(entityBLocation, getTeamAplayer());
         snowmanA = (Snowman) hostileSnowmanA.getBukkitEntity();

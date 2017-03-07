@@ -56,6 +56,9 @@ public class CommandCsroom implements CommandExecutor {
                 if (page == 2) {
                     sendHelpPage2(label, sender);
                     return true;
+                } else if (page == 3) {
+                    sendHelpPage3(label, sender);
+                    return true;
                 } else {
                     sendHelpPage1(label, sender);
                     return true;
@@ -347,10 +350,11 @@ public class CommandCsroom implements CommandExecutor {
                 Set<String> set = new HashSet<>();
                 if (room instanceof InfectRoom) {
                     InfectRoom infectRoom = (InfectRoom) room;
-
+                    player.sendMessage(S.toBoldDarkAqua("    母体数量: ") +
+                            S.toGreen("" + infectRoom.getAntigenNum()));
                     CSClass teamZombieDefaultClass = infectRoom.getTeamZombieDefaultClass();
                     player.sendMessage(S.toBoldDarkAqua("    默认僵尸职业: ") +
-                            ( teamZombieDefaultClass == null?S.toRed("未设置"):S.toGreen(teamZombieDefaultClass.getName())));
+                            (teamZombieDefaultClass == null ? S.toRed("未设置") : S.toGreen(teamZombieDefaultClass.getName())));
 
                     for (CSClass csclass : infectRoom.getTeamAclass()) {
                         set.add(csclass.getName());
@@ -360,7 +364,7 @@ public class CommandCsroom implements CommandExecutor {
 
                     CSClass teamAntigenDefaultClass = infectRoom.getTeamAntigenDefaultClass();
                     player.sendMessage(S.toBoldDarkAqua("    默认母体职业: ") +
-                            ( teamAntigenDefaultClass == null?S.toRed("未设置"):S.toGreen(teamAntigenDefaultClass.getName())));
+                            (teamAntigenDefaultClass == null ? S.toRed("未设置") : S.toGreen(teamAntigenDefaultClass.getName())));
 
                     set.clear();
                     for (CSClass csclass : infectRoom.getTeamAntigenClass()) {
@@ -466,7 +470,7 @@ public class CommandCsroom implements CommandExecutor {
                     return true;
                 }
                 if (!(room instanceof ProtectRoom)) {
-                    player.sendMessage(S.toPrefixRed("此房间不是") + TeamRoom.name());
+                    player.sendMessage(S.toPrefixRed("此房间不是") + ProtectRoom.name());
                     return true;
                 }
                 int num;
@@ -481,9 +485,34 @@ public class CommandCsroom implements CommandExecutor {
                 player.sendMessage(S.toPrefixGreen("成功设置"));
                 return true;
             }
+            if (args[0].equalsIgnoreCase("antigenNum")) {
+                if (args.length < 3) {
+                    sender.sendMessage(S.toYellow("/" + label + " antigenNum <名字> <数量> - 设置母体数量"));
+                    return true;
+                }
+                if (!(room instanceof InfectRoom)) {
+                    player.sendMessage(S.toPrefixRed("此房间不是") + InfectRoom.name());
+                    return true;
+                }
+                int num;
+                try {
+                    num = Integer.parseInt(args[2]);
+                    if (num < 1) throw new NumberFormatException();
+                } catch (NumberFormatException e) {
+                    player.sendMessage(S.toPrefixRed("数字不对"));
+                    return true;
+                }
+                if (num >= room.getReqPlayerNum()) {
+                    player.sendMessage(S.toPrefixRed("母体数量相比于玩家数量太小了"));
+                    return true;
+                }
+                ((InfectRoom) room).setAntigenNum(num);
+                player.sendMessage(S.toPrefixGreen("成功设置"));
+                return true;
+            }
             if (args[0].equalsIgnoreCase("defaultAntigen")) {
                 if (args.length < 3) {
-                    sender.sendMessage(S.toYellow("/" + label + " defaultAntigen <名字> - 设置默认母体职业"));
+                    sender.sendMessage(S.toYellow("/" + label + " defaultAntigen <名字> <职业名字> - 设置默认母体职业"));
                     return true;
                 }
                 if (!(room instanceof InfectRoom)) {
@@ -502,7 +531,7 @@ public class CommandCsroom implements CommandExecutor {
             }
             if (args[0].equalsIgnoreCase("defaultZombie")) {
                 if (args.length < 3) {
-                    sender.sendMessage(S.toYellow("/" + label + " defaultZombie <名字> - 设置实体僵尸职业"));
+                    sender.sendMessage(S.toYellow("/" + label + " defaultZombie <名字> <职业名字> - 设置实体僵尸职业"));
                     return true;
                 }
                 if (!(room instanceof InfectRoom)) {
@@ -570,7 +599,7 @@ public class CommandCsroom implements CommandExecutor {
     }
 
     private void sendHelpPage1(String label, CommandSender sender) {
-        sender.sendMessage(S.toPrefixGreen("帮助菜单"));
+        sender.sendMessage(S.toPrefixGreen("帮助菜单 1"));
         sender.sendMessage(S.toYellow("/" + label + " create <名字> <team|infect|protect> - 创建<团队|感染|守卫>"));
         sender.sendMessage(S.toYellow("/" + label + " lobby <名字> - 等待大厅"));
         sender.sendMessage(S.toYellow("/" + label + " pos1 <名字> - 设置当前位置为边界"));
@@ -591,7 +620,7 @@ public class CommandCsroom implements CommandExecutor {
     }
 
     private void sendHelpPage2(String label, CommandSender sender) {
-        sender.sendMessage(S.toPrefixGreen("帮助菜单"));
+        sender.sendMessage(S.toPrefixGreen("帮助菜单 2"));
         sender.sendMessage(S.toYellow("/" + label + " effect <名字> <漂浮物品ID> <获得药水> <药水等级> <时间> <冷却> - 药水"));
         sender.sendMessage(S.toYellow("/" + label + " reward <名字> 查看奖励 (在配置文件里添加奖励)"));
         sender.sendMessage(S.toYellow("/" + label + " remove <名字> - 删除一个房间"));
@@ -601,9 +630,16 @@ public class CommandCsroom implements CommandExecutor {
         sender.sendMessage(S.toYellow("/" + label + " entityA <名字> - 设置实体A队位置"));
         sender.sendMessage(S.toYellow("/" + label + " entityB <名字> - 设置实体B队位置"));
         sender.sendMessage(S.toYellow("/" + label + " health <名字> <生命值> - 实体生命值"));
+        sender.sendMessage(S.toYellow("/" + label + " help 3"));
+
+    }
+
+    private void sendHelpPage3(String label, CommandSender sender) {
+        sender.sendMessage(S.toPrefixGreen("帮助菜单 3"));
         sender.sendMessage(" - " + InfectRoom.name());
-        sender.sendMessage(S.toYellow("/" + label + " defaultAntigen <名字> - 设置默认母体职业"));
-        sender.sendMessage(S.toYellow("/" + label + " defaultZombie <名字> - 设置实体僵尸职业"));
+        sender.sendMessage(S.toYellow("/" + label + " antigenNum <名字> <数量> - 设置母体数量"));
+        sender.sendMessage(S.toYellow("/" + label + " defaultAntigen <名字> <职业名字> - 设置默认母体职业"));
+        sender.sendMessage(S.toYellow("/" + label + " defaultZombie <名字> <职业名字> - 设置实体僵尸职业"));
         sender.sendMessage(S.toYellow("/" + label + " addAclass <名字> <职业名字> - 添加僵尸职业"));
         sender.sendMessage(S.toYellow("/" + label + " addBclass <名字> <职业名字> - 添加人类职业"));
         sender.sendMessage(S.toYellow("/" + label + " addAntigenClass <名字> <职业名字> - 添加母体职业"));

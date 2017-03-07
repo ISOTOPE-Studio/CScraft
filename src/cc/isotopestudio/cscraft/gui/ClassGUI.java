@@ -68,7 +68,7 @@ public class ClassGUI extends GUI {
                 } else {
                     room.sendAllPlayersMsg(CScraft.prefix + room.getPlayerFullName(player) + S.toYellow(" —°‘Ò÷∞“µ ")
                             + csclass.getDisplayName());
-                    room.getPlayerClassMap().put(player, csclass);
+                    room.playerJoinClass(player, csclass);
                 }
                 player.closeInventory();
             }

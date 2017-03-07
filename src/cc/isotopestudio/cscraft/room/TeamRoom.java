@@ -82,6 +82,10 @@ public class TeamRoom extends Room {
     @Override
     public void playerDeath(Player killer, Player player, ItemStack item) {
         super.playerDeath(killer, player, item);
+        if (getTeamAplayer().contains(player))
+            PlayerInfo.teleport(player, getTeamALocation());
+        else
+            PlayerInfo.teleport(player, getTeamBLocation());
         if (getTeamAplayer().contains(player)) {
             teamADeath++;
         } else {

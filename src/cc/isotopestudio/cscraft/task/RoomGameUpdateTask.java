@@ -5,7 +5,9 @@ package cc.isotopestudio.cscraft.task;
  */
 
 import cc.isotopestudio.cscraft.element.RoomStatus;
+import cc.isotopestudio.cscraft.room.InfectRoom;
 import cc.isotopestudio.cscraft.room.Room;
+import cc.isotopestudio.cscraft.util.S;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class RoomGameUpdateTask extends BukkitRunnable {
@@ -22,17 +24,26 @@ public class RoomGameUpdateTask extends BukkitRunnable {
         for (Room room : Room.rooms.values()) {
             if (room.getStatus() != RoomStatus.PROGRESS) continue;
             room.updateScoreBoardInGame();
-            if (room.getTeamAplayer().size() == 0) {
-                room.teamBWin();
-                continue;
-            } else if (room.getTeamBplayer().size() == 0) {
-                room.teamAWin();
-                continue;
+
+            if (room instanceof InfectRoom) {
+                InfectRoom infectRoom = (InfectRoom) room;
+                if (infectRoom.antigenCounting >= 0) {
+                    infectRoom.sendAllPlayersMsg(S.toBoldDarkGreen("母体还有 " + infectRoom.antigenCounting + " 秒生成"));
+                    infectRoom.antigenCounting--;
+                }
+            } else {
+                if (room.getTeamAplayer().size() == 0) {
+                    room.teamBWin();
+                    continue;
+                } else if (room.getTeamBplayer().size() == 0) {
+                    room.teamAWin();
+                    continue;
+                }
             }
+
             if (room.getIntervalSec() >= room.getGameTimeoutMin() * 60) {
                 room.timeout();
             }
-
         }
     }
 

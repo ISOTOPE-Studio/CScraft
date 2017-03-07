@@ -313,7 +313,7 @@ public abstract class Room {
         Util.saveInventory(player, playerData.getConfigurationSection(player.getName()), "inventory");
         playerData.set(player.getName() + ".location", Util.locationToString(player.getLocation()));
         playerData.save();
-        player.getInventory().clear();
+        PlayerInfo.clearInventory(player);
         PlayerInfo.teleport(player, lobby);
         player.getInventory().setItem(0, GameItems.getClassItem());
         player.getInventory().setItem(8, GameItems.getExitItem());
@@ -404,6 +404,10 @@ public abstract class Room {
         return playerDeathMap;
     }
 
+    public void playerJoinClass(Player player, CSClass csclass) {
+        playerClassMap.put(player, csclass);
+    }
+
     public void sendAllPlayersMsg(String msg) {
         for (Player player : players)
             player.sendMessage(msg);
@@ -453,12 +457,8 @@ public abstract class Room {
 
     private static final PotionEffect INVISIBLE = new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, true);
 
-    private void playerEquip(Player player) {
-        player.getInventory().clear();
-        player.getInventory().setHelmet(null);
-        player.getInventory().setChestplate(null);
-        player.getInventory().setLeggings(null);
-        player.getInventory().setBoots(null);
+    void playerEquip(Player player) {
+        PlayerInfo.clearInventory(player);
         if (useColorCap) {
             if (teamAplayer.contains(player)) {
                 player.getEquipment().setHelmet(GameItems.getRedTeamCap());
@@ -520,23 +520,19 @@ public abstract class Room {
         sendAllPlayersMsg(CScraft.prefix + getPlayerFullName(player) + S.toYellow(" À¿¡À"));
         player.setHealth(player.getMaxHealth());
         playerEquip(player);
-        if (teamAplayer.contains(player))
-            PlayerInfo.teleport(player, teamA);
-        else
-            PlayerInfo.teleport(player, teamB);
         new InvincibleListener(player);
     }
 
     public void teamAWin() {
         for (Player player : teamAplayer) {
-            player.getInventory().clear();
+            PlayerInfo.clearInventory(player);
             sendReward(player);
             for (String line : getMsgList("msg.win")) {
                 player.sendMessage(getReplacedMsg(line, player, null, null));
             }
         }
         for (Player player : teamBplayer) {
-            player.getInventory().clear();
+            PlayerInfo.clearInventory(player);
             for (String line : getMsgList("msg.lose")) {
                 player.sendMessage(getReplacedMsg(line, player, null, null));
             }
@@ -546,14 +542,14 @@ public abstract class Room {
 
     public void teamBWin() {
         for (Player player : teamBplayer) {
-            player.getInventory().clear();
+            PlayerInfo.clearInventory(player);
             sendReward(player);
             for (String line : getMsgList("msg.win")) {
                 player.sendMessage(getReplacedMsg(line, player, null, null));
             }
         }
         for (Player player : teamAplayer) {
-            player.getInventory().clear();
+            PlayerInfo.clearInventory(player);
             for (String line : getMsgList("msg.lose")) {
                 player.sendMessage(getReplacedMsg(line, player, null, null));
             }
