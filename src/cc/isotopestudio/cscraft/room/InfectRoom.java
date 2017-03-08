@@ -10,6 +10,7 @@ import cc.isotopestudio.cscraft.element.RoomStatus;
 import cc.isotopestudio.cscraft.players.PlayerInfo;
 import cc.isotopestudio.cscraft.util.PluginFile;
 import cc.isotopestudio.cscraft.util.S;
+import cc.isotopestudio.cscraft.util.Util;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -246,5 +247,13 @@ public class InfectRoom extends Room {
 
     public static String name() {
         return S.toBoldDarkGreen("¸ÐÈ¾Ä£Ê½");
+    }
+
+    @Override
+    public String infoString() {
+        return super.infoString() +
+                "\nzombie=" + Util.playerToStringSet(getTeamAplayer()) +
+                "\nantigen=" + Util.playerToStringSet(getTeamAntigenPlayers()) +
+                "\nhuman=" + Util.playerToStringSet(getTeamBplayer());
     }
 }

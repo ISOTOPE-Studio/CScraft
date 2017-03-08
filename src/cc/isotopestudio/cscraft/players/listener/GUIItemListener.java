@@ -69,17 +69,17 @@ public class GUIItemListener implements Listener {
             } else if (GameItems.getHumanClassItem().equals(event.getItem())) {
                 if (room instanceof InfectRoom)
                     new ClassGUI(room, player, room.getTeamBclass()).open(player);
+            }
+        } else {
+            if (GameItems.getInfoItem().equals(event.getItem())) {
+                event.setCancelled(true);
+                new InfoGUI(room, player).open(player);
             } else if (GameItems.getAntigenClassItem().equals(event.getItem())) {
                 if (room instanceof InfectRoom)
                     new ClassGUI(room, player, ((InfectRoom) room).getTeamAntigenClass()).open(player);
             } else if (GameItems.getZombieClassItem().equals(event.getItem())) {
                 if (room instanceof InfectRoom)
                     new ClassGUI(room, player, room.getTeamAclass()).open(player);
-            }
-        } else {
-            if (GameItems.getInfoItem().equals(event.getItem())) {
-                event.setCancelled(true);
-                new InfoGUI(room, player).open(player);
             }
         }
     }
