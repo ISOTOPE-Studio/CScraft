@@ -10,6 +10,7 @@ import cc.isotopestudio.cscraft.room.InfectRoom;
 import cc.isotopestudio.cscraft.room.ProtectRoom;
 import cc.isotopestudio.cscraft.room.Room;
 import cc.isotopestudio.cscraft.room.TeamRoom;
+import cc.isotopestudio.cscraft.util.ParticleEffect;
 import cc.isotopestudio.cscraft.util.S;
 import cc.isotopestudio.cscraft.util.Util;
 import org.bukkit.Material;
@@ -33,6 +34,7 @@ public class CommandCsroom implements CommandExecutor {
                 return true;
             }
             Player player = (Player) sender;
+
             if (!player.hasPermission("cscraft.admin")) {
                 player.sendMessage(S.toPrefixRed("你没有权限"));
                 return true;

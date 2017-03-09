@@ -5,6 +5,7 @@ package cc.isotopestudio.cscraft.players.listener;
  */
 
 import cc.isotopestudio.cscraft.element.RoomStatus;
+import cc.isotopestudio.cscraft.room.InfectRoom;
 import cc.isotopestudio.cscraft.room.Room;
 import com.shampaggon.crackshot.events.WeaponDamageEntityEvent;
 import org.bukkit.entity.Player;
@@ -15,6 +16,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import static cc.isotopestudio.cscraft.players.PlayerInfo.playerRoomMap;
 
@@ -49,12 +53,18 @@ public class DamageListener implements Listener {
                         damager = (Player) ((Projectile) event1.getDamager()).getShooter();
                     }
                 }
-                if (damager != null)
-                    if ((room.getTeamAplayer().contains(player) && room.getTeamAplayer().contains(damager)) ||
-                            (room.getTeamBplayer().contains(player) && room.getTeamBplayer().contains(damager))) {
+                if (damager != null) {
+                    Set<Player> teamAplayer = new HashSet<>(room.getTeamAplayer());
+                    Set<Player> teamBplayer = new HashSet<>(room.getTeamBplayer());
+                    if (room instanceof InfectRoom) {
+                        teamAplayer.addAll(((InfectRoom) room).getTeamAntigenPlayers());
+                    }
+                    if ((teamAplayer.contains(player) && teamAplayer.contains(damager)) ||
+                            (teamBplayer.contains(player) && teamBplayer.contains(damager))) {
                         event.setCancelled(true);
                         return;
                     }
+                }
             }
             if (event.getFinalDamage() > player.getHealth()) {
                 event.setCancelled(true);

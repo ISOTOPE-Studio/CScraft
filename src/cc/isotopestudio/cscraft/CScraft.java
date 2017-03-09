@@ -11,10 +11,7 @@ import cc.isotopestudio.cscraft.element.HostileSnowman;
 import cc.isotopestudio.cscraft.players.PlayerInfo;
 import cc.isotopestudio.cscraft.players.PlayerListener;
 import cc.isotopestudio.cscraft.room.Room;
-import cc.isotopestudio.cscraft.task.CheckPlayerLocation;
-import cc.isotopestudio.cscraft.task.RoomGameUpdateTask;
-import cc.isotopestudio.cscraft.task.RoomLobbyUpdateTask;
-import cc.isotopestudio.cscraft.task.UpdateConfig;
+import cc.isotopestudio.cscraft.task.*;
 import cc.isotopestudio.cscraft.util.PluginFile;
 import cc.isotopestudio.cscraft.util.Util;
 import net.minecraft.server.v1_8_R3.EntitySnowman;
@@ -63,6 +60,7 @@ public class CScraft extends JavaPlugin {
         new CheckPlayerLocation().runTaskTimer(this, 20, 20);
         new RoomLobbyUpdateTask().runTaskTimer(this, 10, 20);
         new RoomGameUpdateTask().runTaskTimer(this, 10, 20);
+        new ParticleTask().runTaskTimer(this,11,2);
 
         GameItems.update();
 

@@ -8,12 +8,16 @@ import cc.isotopestudio.cscraft.element.CSClass;
 import cc.isotopestudio.cscraft.element.GameItems;
 import cc.isotopestudio.cscraft.element.RoomStatus;
 import cc.isotopestudio.cscraft.players.PlayerInfo;
+import cc.isotopestudio.cscraft.util.ParticleEffect;
 import cc.isotopestudio.cscraft.util.PluginFile;
 import cc.isotopestudio.cscraft.util.S;
 import cc.isotopestudio.cscraft.util.Util;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -157,7 +161,7 @@ public class InfectRoom extends Room {
         Collections.shuffle(players);
         for (int i = 0; i < antigenNum; i++) {
             Player player = players.get(i);
-            getTeamAplayer().remove(player);
+            getTeamBplayer().remove(player);
             teamAntigenPlayer.add(player);
             player.sendMessage(S.toPrefixGreen("你变成了母体, 请选择职业"));
             PlayerInfo.clearInventory(player);
