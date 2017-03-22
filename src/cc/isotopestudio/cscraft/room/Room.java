@@ -7,7 +7,6 @@ package cc.isotopestudio.cscraft.room;
 import cc.isotopestudio.cscraft.CScraft;
 import cc.isotopestudio.cscraft.element.CSClass;
 import cc.isotopestudio.cscraft.element.EffectPlace;
-import cc.isotopestudio.cscraft.element.GameItems;
 import cc.isotopestudio.cscraft.element.RoomStatus;
 import cc.isotopestudio.cscraft.players.PlayerInfo;
 import cc.isotopestudio.cscraft.util.ParticleEffect;
@@ -36,6 +35,7 @@ import org.bukkit.scoreboard.Scoreboard;
 import java.util.*;
 
 import static cc.isotopestudio.cscraft.CScraft.*;
+import static cc.isotopestudio.cscraft.element.GameItems.*;
 
 public abstract class Room {
 
@@ -315,8 +315,8 @@ public abstract class Room {
         playerData.save();
         PlayerInfo.clearInventory(player);
         PlayerInfo.teleport(player, lobby);
-        player.getInventory().setItem(0, GameItems.getClassItem());
-        player.getInventory().setItem(8, GameItems.getExitItem());
+        player.getInventory().setItem(0, addPlayerLore(getClassItem(), player));
+        player.getInventory().setItem(8, addPlayerLore(getExitItem(), player));
         players.add(player);
         PlayerInfo.playerRoomMap.put(player, this);
         sendAllPlayersMsg(S.toPrefixAqua(player.getDisplayName()) + S.toAqua(" 加入房间"));
@@ -458,19 +458,23 @@ public abstract class Room {
     private static final PotionEffect INVISIBLE = new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, true);
 
     void playerEquip(Player player) {
+        for (PotionEffect effect : player.getActivePotionEffects()) {
+            player.removePotionEffect(effect.getType());
+        }
         PlayerInfo.clearInventory(player);
         if (useColorCap) {
             if (teamAplayer.contains(player)) {
-                player.getEquipment().setHelmet(GameItems.getRedTeamCap());
+                player.getEquipment().setHelmet(addPlayerLore(getRedTeamCap(), player));
             } else {
-                player.getEquipment().setHelmet(GameItems.getBlueTeamCap());
+                player.getEquipment().setHelmet(addPlayerLore(getBlueTeamCap(), player));
             }
         }
         CSClass csclass = playerClassMap.get(player);
         csclass.equip(player);
-        player.getInventory().setItem(8, GameItems.getInfoItem());
+        player.getInventory().setItem(8, addPlayerLore(getInfoItem(), player));
         if (csclass.isInvisible()) {
             player.addPotionEffect(INVISIBLE);
+
         }
         player.setMaxHealth(csclass.getHealth());
         player.setHealth(csclass.getHealth());
@@ -558,13 +562,11 @@ public abstract class Room {
     }
 
     public void timeout() {
-        for (Player player : players) {
-            player.sendMessage(S.toPrefixRed("游戏时间超时 退出游戏"));
-        }
+        sendAllPlayersMsg(S.toPrefixRed("游戏时间超时 退出游戏"));
         resetRoom();
     }
 
-    private void sendReward(Player player) {
+    void sendReward(Player player) {
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -596,7 +598,7 @@ public abstract class Room {
 
     // INFO
 
-    private String getReplacedMsg(String msg, Player player, Player enemy, ItemStack item) {
+    String getReplacedMsg(String msg, Player player, Player enemy, ItemStack item) {
         msg = msg.replaceAll("<player>", getPlayerFullName(player))
                 .replaceAll("<kill>", String.valueOf(playerKillsMap.get(player)))
                 .replaceAll("<death>", String.valueOf(playerDeathMap.get(player)));

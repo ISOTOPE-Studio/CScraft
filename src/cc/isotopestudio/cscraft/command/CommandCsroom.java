@@ -10,7 +10,6 @@ import cc.isotopestudio.cscraft.room.InfectRoom;
 import cc.isotopestudio.cscraft.room.ProtectRoom;
 import cc.isotopestudio.cscraft.room.Room;
 import cc.isotopestudio.cscraft.room.TeamRoom;
-import cc.isotopestudio.cscraft.util.ParticleEffect;
 import cc.isotopestudio.cscraft.util.S;
 import cc.isotopestudio.cscraft.util.Util;
 import org.bukkit.Material;
@@ -352,6 +351,8 @@ public class CommandCsroom implements CommandExecutor {
                 Set<String> set = new HashSet<>();
                 if (room instanceof InfectRoom) {
                     InfectRoom infectRoom = (InfectRoom) room;
+                    player.sendMessage(S.toBoldDarkAqua("    游戏时间: ") +
+                            S.toGreen("" + infectRoom.getGameMin()));
                     player.sendMessage(S.toBoldDarkAqua("    母体数量: ") +
                             S.toGreen("" + infectRoom.getAntigenNum()));
                     CSClass teamZombieDefaultClass = infectRoom.getTeamZombieDefaultClass();
@@ -512,6 +513,31 @@ public class CommandCsroom implements CommandExecutor {
                 player.sendMessage(S.toPrefixGreen("成功设置"));
                 return true;
             }
+            if (args[0].equalsIgnoreCase("time")) {
+                if (args.length < 3) {
+                    sender.sendMessage(S.toYellow("/" + label + " time <名字> <分钟> - 设置游戏时间"));
+                    return true;
+                }
+                if (!(room instanceof InfectRoom)) {
+                    player.sendMessage(S.toPrefixRed("此房间不是") + InfectRoom.name());
+                    return true;
+                }
+                int num;
+                try {
+                    num = Integer.parseInt(args[2]);
+                    if (num < 1) throw new NumberFormatException();
+                } catch (NumberFormatException e) {
+                    player.sendMessage(S.toPrefixRed("数字不对"));
+                    return true;
+                }
+                if (num <= room.getGameTimeoutMin()) {
+                    player.sendMessage(S.toPrefixRed("时间不能比超时时间短"));
+                    return true;
+                }
+                ((InfectRoom) room).setGameMin(num);
+                player.sendMessage(S.toPrefixGreen("成功设置"));
+                return true;
+            }
             if (args[0].equalsIgnoreCase("defaultAntigen")) {
                 if (args.length < 3) {
                     sender.sendMessage(S.toYellow("/" + label + " defaultAntigen <名字> <职业名字> - 设置默认母体职业"));
@@ -639,6 +665,7 @@ public class CommandCsroom implements CommandExecutor {
     private void sendHelpPage3(String label, CommandSender sender) {
         sender.sendMessage(S.toPrefixGreen("帮助菜单 3"));
         sender.sendMessage(" - " + InfectRoom.name());
+        sender.sendMessage(S.toYellow("/" + label + " time <名字> <分钟> - 设置游戏时间"));
         sender.sendMessage(S.toYellow("/" + label + " antigenNum <名字> <数量> - 设置母体数量"));
         sender.sendMessage(S.toYellow("/" + label + " defaultAntigen <名字> <职业名字> - 设置默认母体职业"));
         sender.sendMessage(S.toYellow("/" + label + " defaultZombie <名字> <职业名字> - 设置实体僵尸职业"));

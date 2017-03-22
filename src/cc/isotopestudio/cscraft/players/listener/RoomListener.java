@@ -102,7 +102,7 @@ public class RoomListener implements Listener {
                 if (event.getMessage().contains("&w")) {
                     for (Player recipient : room.getPlayers()) {
                         String msg = event.getMessage().replaceFirst("&w", "");
-                        recipient.sendMessage(S.toBoldGold("[ȫ]") + room.getPlayerFullName(player) + ": " + msg);
+                        recipient.sendMessage(S.toBoldGold("[全]") + room.getPlayerFullName(player) + ": " + msg);
                     }
                 } else {
                     recipients = room.getTeamAplayer().contains(player) ? room.getTeamAplayer() : room.getTeamBplayer();

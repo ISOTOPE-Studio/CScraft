@@ -4,7 +4,6 @@ package cc.isotopestudio.cscraft.room;
  * Copyright ISOTOPE Studio
  */
 
-import cc.isotopestudio.cscraft.element.GameItems;
 import cc.isotopestudio.cscraft.players.PlayerInfo;
 import cc.isotopestudio.cscraft.util.PluginFile;
 import cc.isotopestudio.cscraft.util.S;
@@ -14,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 
 import static cc.isotopestudio.cscraft.CScraft.msgFiles;
 import static cc.isotopestudio.cscraft.CScraft.plugin;
+import static cc.isotopestudio.cscraft.element.GameItems.*;
 
 public class TeamRoom extends Room {
 
@@ -55,15 +55,15 @@ public class TeamRoom extends Room {
         } else {
             if (Math.random() < 0.5) {
                 getTeamBplayer().add(player);
-                player.getEquipment().setHelmet(GameItems.getBlueTeamCap());
+                player.getEquipment().setHelmet(addPlayerLore(getBlueTeamCap(), player));
             } else {
                 getTeamAplayer().add(player);
-                player.getEquipment().setHelmet(GameItems.getRedTeamCap());
+                player.getEquipment().setHelmet(addPlayerLore(getRedTeamCap(), player));
             }
         }
 
-        player.getInventory().setItem(3, GameItems.getTeam1Item());
-        player.getInventory().setItem(5, GameItems.getTeam2Item());
+        player.getInventory().setItem(3, addPlayerLore(getTeam1Item(), player));
+        player.getInventory().setItem(5, addPlayerLore(getTeam2Item(), player));
     }
 
     @Override

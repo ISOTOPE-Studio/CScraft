@@ -31,6 +31,9 @@ public class RoomGameUpdateTask extends BukkitRunnable {
                     infectRoom.sendAllPlayersMsg(S.toBoldDarkGreen("母体还有 " + infectRoom.antigenCounting + " 秒生成"));
                     infectRoom.antigenCounting--;
                 }
+                if (infectRoom.getIntervalSec() >= infectRoom.getGameMin() * 60) {
+                    infectRoom.end();
+                }
             } else {
                 if (room.getTeamAplayer().size() == 0) {
                     room.teamBWin();

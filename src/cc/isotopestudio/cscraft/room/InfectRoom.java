@@ -5,19 +5,14 @@ package cc.isotopestudio.cscraft.room;
  */
 
 import cc.isotopestudio.cscraft.element.CSClass;
-import cc.isotopestudio.cscraft.element.GameItems;
 import cc.isotopestudio.cscraft.element.RoomStatus;
 import cc.isotopestudio.cscraft.players.PlayerInfo;
-import cc.isotopestudio.cscraft.util.ParticleEffect;
 import cc.isotopestudio.cscraft.util.PluginFile;
 import cc.isotopestudio.cscraft.util.S;
 import cc.isotopestudio.cscraft.util.Util;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -30,6 +25,7 @@ import java.util.*;
 
 import static cc.isotopestudio.cscraft.CScraft.msgFiles;
 import static cc.isotopestudio.cscraft.CScraft.plugin;
+import static cc.isotopestudio.cscraft.element.GameItems.*;
 
 public class InfectRoom extends Room {
 
@@ -45,6 +41,7 @@ public class InfectRoom extends Room {
     private Set<CSClass> teamAntigenClass = new HashSet<>();
 
     private int antigenNum;
+    private int gameMin;
 
     // In-game
     private Set<Player> teamAntigenPlayer = new HashSet<>();
@@ -57,6 +54,7 @@ public class InfectRoom extends Room {
         msgFiles.add(msgData);
         msgData.setEditable(false);
         antigenNum = config.getInt("antigenNum");
+        gameMin = config.getInt("gameMin", 8);
         teamAntigenDefaultClass = CSClass.getClassByName(config.getString("teamAntigenDefaultClass"));
         teamZombieDefaultClass = CSClass.getClassByName(config.getString("teamZombieDefaultClass"));
         teamAntigenClass.clear();
@@ -70,6 +68,16 @@ public class InfectRoom extends Room {
     public void setAntigenNum(int antigenNum) {
         this.antigenNum = antigenNum;
         config.set("antigenNum", antigenNum);
+        config.save();
+    }
+
+    public int getGameMin() {
+        return gameMin;
+    }
+
+    public void setGameMin(int gameMin) {
+        this.gameMin = gameMin;
+        config.set("gameMin", gameMin);
         config.save();
     }
 
@@ -117,12 +125,25 @@ public class InfectRoom extends Room {
                 && teamAntigenClass.size() > 0 && antigenNum > 0;
     }
 
+    @Override
+    void playerEquip(Player player) {
+        super.playerEquip(player);
+        if (isUseColorCap()) {
+            if (getTeamAntigenPlayers().contains(player)) {
+                player.getInventory().setHelmet(addPlayerLore(getAntigenTeamCap(), player));
+            } else if (getTeamAplayer().contains(player)) {
+                player.getInventory().setHelmet(addPlayerLore(getZombieTeamCap(), player));
+            } else if (getTeamBplayer().contains(player)) {
+                player.getInventory().setHelmet(addPlayerLore(getBlueTeamCap(), player));
+            }
+        }
+    }
 
     @Override
     public void join(Player player) {
         super.join(player);
         getTeamBplayer().add(player);
-        player.getInventory().setItem(0, GameItems.getHumanClassItem());
+        player.getInventory().setItem(0, addPlayerLore(getHumanClassItem(), player));
     }
 
     @Override
@@ -153,6 +174,7 @@ public class InfectRoom extends Room {
     private final static PotionEffect SLOW = new PotionEffect(PotionEffectType.SLOW, 20 * 10, 10);
     private final static PotionEffect DAMAGE_RESISTANCE = new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 10, 10);
     private final static PotionEffect INVISIBILITY = new PotionEffect(PotionEffectType.INVISIBILITY, 20 * 10, 10);
+    private final static PotionEffect BLINDNESS = new PotionEffect(PotionEffectType.BLINDNESS, 20 * 8, 10);
 
     @Override
     public void start() {
@@ -165,10 +187,11 @@ public class InfectRoom extends Room {
             teamAntigenPlayer.add(player);
             player.sendMessage(S.toPrefixGreen("你变成了母体, 请选择职业"));
             PlayerInfo.clearInventory(player);
-            player.getInventory().setItem(5, GameItems.getAntigenClassItem());
+            player.getInventory().setItem(5, addPlayerLore(getAntigenClassItem(), player));
             player.addPotionEffect(SLOW);
             player.addPotionEffect(DAMAGE_RESISTANCE);
             player.addPotionEffect(INVISIBILITY);
+            player.addPotionEffect(BLINDNESS);
             new BukkitRunnable() {
                 @Override
                 public void run() {
@@ -195,10 +218,11 @@ public class InfectRoom extends Room {
             getTeamBplayer().remove(player);
             player.sendMessage(S.toPrefixGreen("你被感染了, 请选择职业"));
             sendAllPlayersMsg(getPlayerFullName(player) + "被感染了");
-            player.getInventory().setItem(5, GameItems.getZombieClassItem());
+            player.getInventory().setItem(5, addPlayerLore(getZombieClassItem(), player));
             player.addPotionEffect(SLOW);
             player.addPotionEffect(DAMAGE_RESISTANCE);
             player.addPotionEffect(INVISIBILITY);
+            player.addPotionEffect(BLINDNESS);
             new BukkitRunnable() {
                 @Override
                 public void run() {
@@ -219,12 +243,53 @@ public class InfectRoom extends Room {
     public void playerJoinClass(Player player, CSClass csclass) {
         super.playerJoinClass(player, csclass);
         if (getStatus() == RoomStatus.PROGRESS) {
-            for (PotionEffect effect : player.getActivePotionEffects()) {
-                player.removePotionEffect(effect.getType());
-            }
+//            for (PotionEffect effect : player.getActivePotionEffects()) {
+//                player.removePotionEffect(effect.getType());
+//            }
             playerEquip(player);
             hasSelectedNewClass.add(player);
         }
+    }
+
+
+    public void end() {
+        sendAllPlayersMsg(S.toPrefixYellow("时间到，游戏结束"));
+
+        Map<Player, Integer> playerKillsMap = new HashMap<>(getPlayerKillsMap());
+
+        Set<Player> winner = new HashSet<>();
+
+        int count = 0;
+        while (count < 3) {
+            int max = 0;
+            for (int i : playerKillsMap.values()) {
+                if (i > max) max = i;
+            }
+            for (Player player : playerKillsMap.keySet()) {
+                if (playerKillsMap.get(player) == max) {
+                    winner.add(player);
+                    count++;
+                    playerKillsMap.remove(player);
+                }
+            }
+        }
+
+        for (Player player : winner) {
+            sendReward(player);
+            for (String line : getMsgList("msg.win")) {
+                player.sendMessage(getReplacedMsg(line, player, null, null));
+            }
+        }
+
+        for (Player player : getPlayers()) {
+            PlayerInfo.clearInventory(player);
+            if (!winner.contains(player)) {
+                for (String line : getMsgList("msg.lose")) {
+                    player.sendMessage(getReplacedMsg(line, player, null, null));
+                }
+            }
+        }
+        resetRoom();
     }
 
     @Override

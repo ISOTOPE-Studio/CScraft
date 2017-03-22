@@ -4,6 +4,7 @@ package cc.isotopestudio.cscraft.gui;
  * Copyright ISOTOPE Studio
  */
 
+import cc.isotopestudio.cscraft.room.InfectRoom;
 import cc.isotopestudio.cscraft.room.Room;
 import cc.isotopestudio.cscraft.util.S;
 import org.bukkit.Material;
@@ -26,6 +27,9 @@ public class InfoGUI extends GUI {
         super(S.toBoldGold("Õ½¼¨") + "[" + player.getName() + "]", 6 * 9, player);
         this.room = room;
         List<Player> teamA = new ArrayList<>(room.getTeamAplayer());
+        if(room instanceof InfectRoom) {
+            teamA.addAll(((InfectRoom) room).getTeamAntigenPlayers());
+        }
         List<Player> teamB = new ArrayList<>(room.getTeamBplayer());
         for (int pos = 0; pos < 54; pos++) {
             switch (pos % 9) {

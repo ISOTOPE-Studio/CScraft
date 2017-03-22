@@ -60,7 +60,7 @@ public class CScraft extends JavaPlugin {
         new CheckPlayerLocation().runTaskTimer(this, 20, 20);
         new RoomLobbyUpdateTask().runTaskTimer(this, 10, 20);
         new RoomGameUpdateTask().runTaskTimer(this, 10, 20);
-        new ParticleTask().runTaskTimer(this,11,2);
+        new ParticleTask().runTaskTimer(this, 11, 2);
 
         GameItems.update();
 
@@ -76,6 +76,8 @@ public class CScraft extends JavaPlugin {
                     SettingsGUI.text.append(room.infoString() + "\n");
             }
         }.runTaskTimer(this, 20, 20);
+
+        new InvisibleArmorTask().runTaskLater(this, 20);
 
         getLogger().info(pluginName + "成功加载!");
         getLogger().info(pluginName + "由ISOTOPE Studio制作!");

@@ -5,7 +5,6 @@ package cc.isotopestudio.cscraft.players.listener;
  */
 
 import cc.isotopestudio.cscraft.CScraft;
-import cc.isotopestudio.cscraft.element.GameItems;
 import cc.isotopestudio.cscraft.element.RoomStatus;
 import cc.isotopestudio.cscraft.gui.ClassGUI;
 import cc.isotopestudio.cscraft.gui.InfoGUI;
@@ -17,6 +16,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 
+import static cc.isotopestudio.cscraft.element.GameItems.*;
 import static cc.isotopestudio.cscraft.players.PlayerInfo.playerRoomMap;
 
 public class GUIItemListener implements Listener {
@@ -29,10 +29,10 @@ public class GUIItemListener implements Listener {
         Room room = playerRoomMap.get(player);
         if (room.getStatus() == RoomStatus.WAITING) {
             event.setCancelled(true);
-            if (GameItems.getExitItem().equals(event.getItem())) {
+            if (itemEquals(getExitItem(), event.getItem())) {
                 room.exit(player);
                 player.sendMessage(S.toPrefixGreen("退出房间"));
-            } else if (GameItems.getTeam1Item().equals(event.getItem())) {
+            } else if (itemEquals(getTeam1Item(), event.getItem())) {
                 // switch to team A
                 if (room.getTeamAplayer().contains(player)) {
                     player.sendMessage(S.toPrefixRed("你已经在") + Room.TEAMANAME + S.toRed("了"));
@@ -44,10 +44,10 @@ public class GUIItemListener implements Listener {
                     room.getTeamBplayer().remove(player);
                     room.getTeamAplayer().add(player);
                     room.getPlayerClassMap().remove(player);
-                    player.getEquipment().setHelmet(GameItems.getRedTeamCap());
+                    player.getEquipment().setHelmet(addPlayerLore(getRedTeamCap(), player));
                     room.sendAllPlayersMsg(CScraft.prefix + player.getDisplayName() + S.toGreen(" 加入") + Room.TEAMANAME);
                 }
-            } else if (GameItems.getTeam2Item().equals(event.getItem())) {
+            } else if (itemEquals(getTeam2Item(), event.getItem())) {
                 // switch to team B
                 if (room.getTeamBplayer().contains(player)) {
                     player.sendMessage(S.toPrefixRed("你已经在") + Room.TEAMBNAME + S.toRed("了"));
@@ -59,25 +59,25 @@ public class GUIItemListener implements Listener {
                     room.getTeamAplayer().remove(player);
                     room.getTeamBplayer().add(player);
                     room.getPlayerClassMap().remove(player);
-                    player.getEquipment().setHelmet(GameItems.getBlueTeamCap());
+                    player.getEquipment().setHelmet(addPlayerLore(getBlueTeamCap(), player));
                     room.sendAllPlayersMsg(CScraft.prefix + player.getDisplayName() + S.toGreen(" 加入") + Room.TEAMBNAME);
                 }
-            } else if (GameItems.getClassItem().equals(event.getItem())) {
+            } else if (itemEquals(getClassItem(), event.getItem())) {
                 if (!(room instanceof InfectRoom)) {
                     new ClassGUI(room, player, room.getTeamAplayer().contains(player) ? room.getTeamAclass() : room.getTeamBclass()).open(player);
                 }
-            } else if (GameItems.getHumanClassItem().equals(event.getItem())) {
+            } else if (itemEquals(getHumanClassItem(), event.getItem())) {
                 if (room instanceof InfectRoom)
                     new ClassGUI(room, player, room.getTeamBclass()).open(player);
             }
         } else {
-            if (GameItems.getInfoItem().equals(event.getItem())) {
+            if (itemEquals(getInfoItem(), event.getItem())) {
                 event.setCancelled(true);
                 new InfoGUI(room, player).open(player);
-            } else if (GameItems.getAntigenClassItem().equals(event.getItem())) {
+            } else if (itemEquals(getAntigenClassItem(), event.getItem())) {
                 if (room instanceof InfectRoom)
                     new ClassGUI(room, player, ((InfectRoom) room).getTeamAntigenClass()).open(player);
-            } else if (GameItems.getZombieClassItem().equals(event.getItem())) {
+            } else if (itemEquals(getZombieClassItem(), event.getItem())) {
                 if (room instanceof InfectRoom)
                     new ClassGUI(room, player, room.getTeamAclass()).open(player);
             }

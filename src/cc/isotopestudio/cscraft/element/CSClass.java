@@ -15,6 +15,7 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.*;
 
 import static cc.isotopestudio.cscraft.CScraft.*;
+import static cc.isotopestudio.cscraft.element.GameItems.*;
 
 public class CSClass {
 
@@ -81,15 +82,15 @@ public class CSClass {
 
     public void equip(Player player) {
         if (equipment[0] != null)
-            player.getInventory().setHelmet(equipment[0]);
+            player.getInventory().setHelmet(addPlayerLore(equipment[0], player));
         if (equipment[1] != null)
-            player.getInventory().setChestplate(equipment[1]);
+            player.getInventory().setChestplate(addPlayerLore(equipment[1], player));
         if (equipment[2] != null)
-            player.getInventory().setLeggings(equipment[2]);
+            player.getInventory().setLeggings(addPlayerLore(equipment[2], player));
         if (equipment[3] != null)
-            player.getInventory().setBoots(equipment[3]);
+            player.getInventory().setBoots(addPlayerLore(equipment[3], player));
         for (int i : inventory.keySet())
-            player.getInventory().setItem(i, inventory.get(i));
+            player.getInventory().setItem(i, addPlayerLore(inventory.get(i), player));
     }
 
     public boolean isInvisible() {

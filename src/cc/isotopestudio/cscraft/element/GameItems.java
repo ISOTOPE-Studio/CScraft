@@ -8,9 +8,13 @@ import cc.isotopestudio.cscraft.room.Room;
 import cc.isotopestudio.cscraft.util.S;
 import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class GameItems {
 
@@ -32,6 +36,8 @@ public class GameItems {
     // cap
     private static ItemStack redTeamCap = new ItemStack(Material.LEATHER_HELMET);
     private static ItemStack blueTeamCap = new ItemStack(Material.LEATHER_HELMET);
+    private static ItemStack antigenTeamCap = new ItemStack(Material.LEATHER_HELMET);
+    private static ItemStack zombieTeamCap = new ItemStack(Material.LEATHER_HELMET);
 
 
     public static void update() {
@@ -85,6 +91,14 @@ public class GameItems {
         lch = (LeatherArmorMeta) blueTeamCap.getItemMeta();
         lch.setColor(Color.fromRGB(0, 0, 255));
         blueTeamCap.setItemMeta(lch);
+
+        lch = (LeatherArmorMeta) antigenTeamCap.getItemMeta();
+        lch.setColor(Color.fromRGB(0, 143, 20));
+        antigenTeamCap.setItemMeta(lch);
+
+        lch = (LeatherArmorMeta) zombieTeamCap.getItemMeta();
+        lch.setColor(Color.fromRGB(66, 255, 20));
+        zombieTeamCap.setItemMeta(lch);
     }
 
     public static ItemStack getExitItem() {
@@ -124,10 +138,34 @@ public class GameItems {
     }
 
     public static ItemStack getRedTeamCap() {
-        return redTeamCap;
+        return redTeamCap.clone();
     }
 
     public static ItemStack getBlueTeamCap() {
-        return blueTeamCap;
+        return blueTeamCap.clone();
+    }
+
+    public static ItemStack getAntigenTeamCap() {
+        return antigenTeamCap.clone();
+    }
+
+    public static ItemStack getZombieTeamCap() {
+        return zombieTeamCap;
+    }
+
+    public static ItemStack addPlayerLore(ItemStack item, Player player) {
+        item = item.clone();
+        List<String> lore = item.hasItemMeta() && item.getItemMeta().hasLore() ? item.getItemMeta().getLore() : new ArrayList<>();
+        lore.add(S.toGray("[PLAYER] " + player.getName()));
+        ItemMeta meta = item.getItemMeta();
+        meta.setLore(lore);
+        item.setItemMeta(meta);
+        return item;
+    }
+
+    public static boolean itemEquals(ItemStack itemA, ItemStack itemB) {
+        return itemA.hasItemMeta() && itemB.hasItemMeta()
+                && itemA.getItemMeta().hasDisplayName() && itemB.getItemMeta().hasDisplayName()
+                && itemA.getItemMeta().getDisplayName().equals(itemB.getItemMeta().getDisplayName());
     }
 }
