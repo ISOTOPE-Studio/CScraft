@@ -4,6 +4,7 @@ package cc.isotopestudio.cscraft.task;
  * Copyright ISOTOPE Studio
  */
 
+import cc.isotopestudio.cscraft.element.RoomStatus;
 import cc.isotopestudio.cscraft.room.Room;
 import com.comphenix.protocol.Packets;
 import com.comphenix.protocol.ProtocolLibrary;
@@ -34,6 +35,7 @@ public class InvisibleArmorTask extends BukkitRunnable {
                         }
                         Player receiver = event.getPlayer();
                         Room room = playerRoomMap.get(receiver);
+                        if(room.getStatus() == RoomStatus.WAITING) return;
                         PacketContainer packet = event.getPacket();
                         ItemStack stack = packet.getItemModifier().read(0);
                         if (stack == null) return;
@@ -54,7 +56,7 @@ public class InvisibleArmorTask extends BukkitRunnable {
                             System.out.println(" " + stack);
                             event.setPacket(packet = packet.deepClone());
                             stack = packet.getItemModifier().read(0);
-                            stack.setType(Material.RECORD_3);
+                            stack.setType(Material.GHAST_TEAR);
                         }
                     }
                 });

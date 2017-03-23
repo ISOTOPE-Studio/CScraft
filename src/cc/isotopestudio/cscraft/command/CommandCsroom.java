@@ -530,8 +530,8 @@ public class CommandCsroom implements CommandExecutor {
                     player.sendMessage(S.toPrefixRed("数字不对"));
                     return true;
                 }
-                if (num <= room.getGameTimeoutMin()) {
-                    player.sendMessage(S.toPrefixRed("时间不能比超时时间短"));
+                if (num >= room.getGameTimeoutMin()) {
+                    player.sendMessage(S.toPrefixRed("游戏时间需要比超时时间短"));
                     return true;
                 }
                 ((InfectRoom) room).setGameMin(num);

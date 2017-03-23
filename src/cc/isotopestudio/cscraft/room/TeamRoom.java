@@ -71,9 +71,11 @@ public class TeamRoom extends Room {
         super.start();
         for (Player player : getTeamAplayer()) {
             PlayerInfo.teleport(player, getTeamALocation());
+            new InvincibleListener(this, player, 5);
         }
         for (Player player : getTeamBplayer()) {
             PlayerInfo.teleport(player, getTeamBLocation());
+            new InvincibleListener(this, player, 5);
         }
         teamADeath = 0;
         teamBDeath = 0;
@@ -82,6 +84,7 @@ public class TeamRoom extends Room {
     @Override
     public void playerDeath(Player killer, Player player, ItemStack item) {
         super.playerDeath(killer, player, item);
+        new InvincibleListener(this, player, 5);
         if (getTeamAplayer().contains(player))
             PlayerInfo.teleport(player, getTeamALocation());
         else

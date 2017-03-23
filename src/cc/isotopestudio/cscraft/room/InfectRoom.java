@@ -14,8 +14,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
@@ -166,15 +164,15 @@ public class InfectRoom extends Room {
 
             scoreboards.put(player, board);
             player.setScoreboard(board);
+            board.getObjective(DisplaySlot.SIDEBAR).getScore(getPlayerTeamName(player)).setScore(0);
+            if (getPlayerClassMap().containsKey(player))
+                board.getObjective(DisplaySlot.SIDEBAR).getScore(getPlayerClassMap().get(player).getDisplayName()).setScore(0);
+            board.getObjective(DisplaySlot.SIDEBAR).getScore(S.toGold("时间")).setScore(getIntervalSec());
             board.getObjective(DisplaySlot.SIDEBAR).getScore(S.toBoldGreen("击杀")).setScore(getPlayerKillsMap().get(player));
             board.getObjective(DisplaySlot.SIDEBAR).getScore(S.toBoldRed("死亡")).setScore(getPlayerDeathMap().get(player));
+
         }
     }
-
-    private final static PotionEffect SLOW = new PotionEffect(PotionEffectType.SLOW, 20 * 10, 10);
-    private final static PotionEffect DAMAGE_RESISTANCE = new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 10, 10);
-    private final static PotionEffect INVISIBILITY = new PotionEffect(PotionEffectType.INVISIBILITY, 20 * 10, 10);
-    private final static PotionEffect BLINDNESS = new PotionEffect(PotionEffectType.BLINDNESS, 20 * 8, 10);
 
     @Override
     public void start() {
@@ -188,10 +186,10 @@ public class InfectRoom extends Room {
             player.sendMessage(S.toPrefixGreen("你变成了母体, 请选择职业"));
             PlayerInfo.clearInventory(player);
             player.getInventory().setItem(5, addPlayerLore(getAntigenClassItem(), player));
-            player.addPotionEffect(SLOW);
-            player.addPotionEffect(DAMAGE_RESISTANCE);
-            player.addPotionEffect(INVISIBILITY);
-            player.addPotionEffect(BLINDNESS);
+            player.addPotionEffect(SLOW_10S);
+            player.addPotionEffect(DAMAGE_RESISTANCE_10S);
+            player.addPotionEffect(INVISIBILITY_10S);
+            player.addPotionEffect(BLINDNESS_10S);
             new BukkitRunnable() {
                 @Override
                 public void run() {
@@ -202,6 +200,13 @@ public class InfectRoom extends Room {
                     }
                 }
             }.runTaskLater(plugin, 10 * 20);
+            new InvincibleListener(this, player, 10);
+        }
+        for (Player player : getTeamAplayer()) {
+            new InvincibleListener(this, player, 5);
+        }
+        for (Player player : getTeamBplayer()) {
+            new InvincibleListener(this, player, 5);
         }
         antigenCounting = 10;
     }
@@ -211,7 +216,7 @@ public class InfectRoom extends Room {
         super.playerDeath(killer, player, item);
         if (getTeamAplayer().contains(player)) {
             // Zombie dies
-
+            new InvincibleListener(this, player, 5);
         } else if (getTeamBplayer().contains(player)) {
             // Human dies
             getTeamAplayer().add(player);
@@ -219,10 +224,10 @@ public class InfectRoom extends Room {
             player.sendMessage(S.toPrefixGreen("你被感染了, 请选择职业"));
             sendAllPlayersMsg(getPlayerFullName(player) + "被感染了");
             player.getInventory().setItem(5, addPlayerLore(getZombieClassItem(), player));
-            player.addPotionEffect(SLOW);
-            player.addPotionEffect(DAMAGE_RESISTANCE);
-            player.addPotionEffect(INVISIBILITY);
-            player.addPotionEffect(BLINDNESS);
+            player.addPotionEffect(SLOW_10S, true);
+            player.addPotionEffect(DAMAGE_RESISTANCE_10S, true);
+            player.addPotionEffect(INVISIBILITY_10S, true);
+            player.addPotionEffect(BLINDNESS_10S, true);
             new BukkitRunnable() {
                 @Override
                 public void run() {
@@ -233,9 +238,10 @@ public class InfectRoom extends Room {
                     }
                 }
             }.runTaskLater(plugin, 10 * 20);
+            new InvincibleListener(this, player, 10);
         } else {
             // Antigen dies
-
+            new InvincibleListener(this, player, 5);
         }
     }
 
@@ -252,9 +258,11 @@ public class InfectRoom extends Room {
     }
 
 
-    public void end() {
-        sendAllPlayersMsg(S.toPrefixYellow("时间到，游戏结束"));
-
+    public void end(boolean timeout) {
+        if (timeout)
+            sendAllPlayersMsg(S.toPrefixYellow("时间到，游戏结束"));
+        else
+            sendAllPlayersMsg(S.toPrefixYellow("人类已被消灭，游戏结束"));
         Map<Player, Integer> playerKillsMap = new HashMap<>(getPlayerKillsMap());
 
         Set<Player> winner = new HashSet<>();

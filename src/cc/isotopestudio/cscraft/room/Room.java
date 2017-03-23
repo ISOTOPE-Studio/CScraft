@@ -64,6 +64,24 @@ public abstract class Room {
     public final static String TEAMANAME = S.toBoldRed("红队");
     public final static String TEAMBNAME = S.toBoldDarkAqua("蓝队");
 
+    final static PotionEffect SLOW_10S =
+            new PotionEffect(PotionEffectType.SLOW, 20 * 10, 10);
+    final static PotionEffect DAMAGE_RESISTANCE_10S =
+            new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 10, 10);
+    final static PotionEffect INVISIBILITY_10S =
+            new PotionEffect(PotionEffectType.INVISIBILITY, 20 * 10, 10);
+    final static PotionEffect BLINDNESS_10S =
+            new PotionEffect(PotionEffectType.BLINDNESS, 20 * 11, 1);
+
+    private final static PotionEffect SLOW_5S =
+            new PotionEffect(PotionEffectType.SLOW, 20 * 5, 10);
+    private final static PotionEffect DAMAGE_RESISTANCE_5S =
+            new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 20 * 5, 10);
+    private final static PotionEffect INVISIBILITY_5S =
+            new PotionEffect(PotionEffectType.INVISIBILITY, 20 * 5, 10);
+    private final static PotionEffect BLINDNESS_5S =
+            new PotionEffect(PotionEffectType.BLINDNESS, 20 * 5, 1);
+
     // In-game
     private RoomStatus status = RoomStatus.WAITING;
     private long scheduleStart = -1;
@@ -74,7 +92,6 @@ public abstract class Room {
     private Map<Player, CSClass> playerClassMap = new HashMap<>();
     private Map<Player, Integer> playerKillsMap = new HashMap<>();
     private Map<Player, Integer> playerDeathMap = new HashMap<>();
-
 
     public Room(String name) {
         this.name = name;
@@ -440,8 +457,6 @@ public abstract class Room {
         for (Player player : players) {
             playerKillsMap.put(player, 0);
             playerDeathMap.put(player, 0);
-            playerEquip(player);
-            new InvincibleListener(player);
             final Scoreboard board = Bukkit.getScoreboardManager().getNewScoreboard();
             Objective objective = board.registerNewObjective(getMsg("name"), "Scoreboard");
             objective.setDisplaySlot(DisplaySlot.SIDEBAR);
@@ -523,8 +538,11 @@ public abstract class Room {
         playerDeathMap.put(player, playerDeathMap.get(player) + 1);
         sendAllPlayersMsg(CScraft.prefix + getPlayerFullName(player) + S.toYellow(" 死了"));
         player.setHealth(player.getMaxHealth());
-        playerEquip(player);
-        new InvincibleListener(player);
+        player.addPotionEffect(SLOW_5S);
+        player.addPotionEffect(DAMAGE_RESISTANCE_5S);
+        player.addPotionEffect(INVISIBILITY_5S);
+        player.addPotionEffect(BLINDNESS_5S);
+        player.sendMessage(S.toPrefixRed("复活中..."));
     }
 
     public void teamAWin() {
@@ -611,8 +629,8 @@ public abstract class Room {
 
     public String getPlayerFullName(Player player) {
         String result = String.valueOf(ChatColor.RESET);
-        if (teamAplayer.contains(player) || teamBplayer.contains(player))
-            result += "[" + getPlayerTeamName(player) + "]";
+//        if (teamAplayer.contains(player) || teamBplayer.contains(player))
+        result += "[" + getPlayerTeamName(player) + "]";
         if (playerClassMap.containsKey(player)) {
             result += "[" + playerClassMap.get(player).getDisplayName() + "]";
         }
@@ -659,7 +677,7 @@ public abstract class Room {
     static class InvincibleListener implements Listener {
         private final Player player;
 
-        InvincibleListener(Player player) {
+        InvincibleListener(Room room, Player player, int t) {
             this.player = player;
             Bukkit.getPluginManager().registerEvents(this, plugin);
             InvincibleListener listener = this;
@@ -669,6 +687,12 @@ public abstract class Room {
                     HandlerList.unregisterAll(listener);
                 }
             }.runTaskLater(plugin, 20 * 5);
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    room.playerEquip(player);
+                }
+            }.runTaskLater(plugin, 20 * t);
         }
 
         @EventHandler(priority = EventPriority.HIGHEST)

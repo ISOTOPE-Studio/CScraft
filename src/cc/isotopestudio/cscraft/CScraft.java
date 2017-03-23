@@ -77,7 +77,7 @@ public class CScraft extends JavaPlugin {
             }
         }.runTaskTimer(this, 20, 20);
 
-        new InvisibleArmorTask().runTaskLater(this, 20);
+        new InvisibleArmorTask().runTaskLater(this, 40);
 
         getLogger().info(pluginName + "成功加载!");
         getLogger().info(pluginName + "由ISOTOPE Studio制作!");

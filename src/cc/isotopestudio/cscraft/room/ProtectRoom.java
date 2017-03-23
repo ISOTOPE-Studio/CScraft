@@ -100,6 +100,7 @@ public class ProtectRoom extends Room implements Listener {
     @Override
     public void playerDeath(Player killer, Player player, ItemStack item) {
         super.playerDeath(killer, player, item);
+        new InvincibleListener(this, player, 5);
         if (getTeamAplayer().contains(player))
             PlayerInfo.teleport(player, getTeamALocation());
         else
@@ -116,9 +117,11 @@ public class ProtectRoom extends Room implements Listener {
 
         for (Player player : getTeamAplayer()) {
             PlayerInfo.teleport(player, getTeamALocation());
+            new InvincibleListener(this, player, 5);
         }
         for (Player player : getTeamBplayer()) {
             PlayerInfo.teleport(player, getTeamBLocation());
+            new InvincibleListener(this, player, 5);
         }
 
         hostileSnowmanA = HostileSnowman.spawn(entityALocation, getTeamBplayer());

@@ -27,12 +27,18 @@ public class RoomGameUpdateTask extends BukkitRunnable {
 
             if (room instanceof InfectRoom) {
                 InfectRoom infectRoom = (InfectRoom) room;
-                if (infectRoom.antigenCounting >= 0) {
-                    infectRoom.sendAllPlayersMsg(S.toBoldDarkGreen("母体还有 " + infectRoom.antigenCounting + " 秒生成"));
+                if (infectRoom.antigenCounting > 0) {
+                    infectRoom.sendAllPlayersMsg(S.toBoldDarkGreen("    母体还有 " + infectRoom.antigenCounting + " 秒生成"));
+                    infectRoom.antigenCounting--;
+                }
+                if (infectRoom.antigenCounting == 0) {
+                    infectRoom.sendAllPlayersMsg(S.toBoldDarkGreen("    母体已生成"));
                     infectRoom.antigenCounting--;
                 }
                 if (infectRoom.getIntervalSec() >= infectRoom.getGameMin() * 60) {
-                    infectRoom.end();
+                    infectRoom.end(true);
+                } else if (infectRoom.getTeamBplayer().size() == 0) {
+                    infectRoom.end(false);
                 }
             } else {
                 if (room.getTeamAplayer().size() == 0) {
