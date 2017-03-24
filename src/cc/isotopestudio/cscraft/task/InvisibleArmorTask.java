@@ -6,6 +6,7 @@ package cc.isotopestudio.cscraft.task;
 
 import cc.isotopestudio.cscraft.element.RoomStatus;
 import cc.isotopestudio.cscraft.room.Room;
+import cc.isotopestudio.cscraft.util.Util;
 import com.comphenix.protocol.Packets;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.ConnectionSide;
@@ -35,14 +36,20 @@ public class InvisibleArmorTask extends BukkitRunnable {
                         }
                         Player receiver = event.getPlayer();
                         Room room = playerRoomMap.get(receiver);
-                        if(room.getStatus() == RoomStatus.WAITING) return;
+                        if (room.getStatus() == RoomStatus.WAITING) return;
                         PacketContainer packet = event.getPacket();
                         ItemStack stack = packet.getItemModifier().read(0);
                         if (stack == null) return;
+                        boolean armor = false;
+                        for (Material material : Util.ARMOR) {
+                            if (stack.getType() == material)
+                                armor = true;
+                        }
+                        if (!armor) return;
                         if (!stack.hasItemMeta() || !stack.getItemMeta().hasLore()) {
                             return;
                         }
-                        System.out.println(receiver.getName());
+//                        System.out.println(receiver.getName());
                         Player player = null;
                         for (String s : stack.getItemMeta().getLore()) {
                             s = ChatColor.stripColor(s);
@@ -51,9 +58,9 @@ public class InvisibleArmorTask extends BukkitRunnable {
                             }
                         }
                         if (player == null) return;
-                        System.out.println(" " + player.getName());
+//                        System.out.println(" " + player.getName());
                         if (room.getPlayerClassMap().get(player).isInvisible()) {
-                            System.out.println(" " + stack);
+//                            System.out.println(" " + stack);
                             event.setPacket(packet = packet.deepClone());
                             stack = packet.getItemModifier().read(0);
                             stack.setType(Material.GHAST_TEAR);
