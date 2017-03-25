@@ -291,6 +291,7 @@ public abstract class Room {
         config.save();
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public void remove() {
         config.getFile().delete();
         msgData.getFile().delete();
@@ -426,29 +427,28 @@ public abstract class Room {
     }
 
     public void sendAllPlayersMsg(String msg) {
-        for (Player player : players)
-            player.sendMessage(msg);
+        players.forEach(player -> player.sendMessage(msg));
     }
 
     public void prestart() {
-        for (Player player : players) {
-            if (!playerClassMap.containsKey(player)) {
-                List<CSClass> classes = new ArrayList<>();
-                if (teamAplayer.contains(player))
-                    classes.addAll(teamAclass);
-                else
-                    classes.addAll(teamBclass);
-                for (CSClass csclass : new HashSet<>(classes)) {
-                    if (csclass.getPermission() == null || player.hasPermission(csclass.getPermission())) {
-                        continue;
+        players.stream()
+                .filter(player -> !playerClassMap.containsKey(player))
+                .forEach(player -> {
+                    List<CSClass> classes = new ArrayList<>();
+                    if (teamAplayer.contains(player))
+                        classes.addAll(teamAclass);
+                    else
+                        classes.addAll(teamBclass);
+                    for (CSClass csclass : new HashSet<>(classes)) {
+                        if (csclass.getPermission() == null || player.hasPermission(csclass.getPermission())) {
+                            continue;
+                        }
+                        classes.remove(csclass);
                     }
-                    classes.remove(csclass);
-                }
-                Collections.shuffle(classes);
-                playerClassMap.put(player, classes.get(0));
-                player.sendMessage(S.toPrefixRed("已超时, 随机选择职业"));
-            }
-        }
+                    Collections.shuffle(classes);
+                    playerClassMap.put(player, classes.get(0));
+                    player.sendMessage(S.toPrefixRed("已超时, 随机选择职业"));
+                });
         start();
     }
 
@@ -464,18 +464,20 @@ public abstract class Room {
             scoreboards.put(player, board);
             player.setScoreboard(board);
         }
-        for (EffectPlace effectPlace : effects) {
-            effectPlace.spawn();
-        }
+        effects.forEach(EffectPlace::spawn);
+//        for (EffectPlace effectPlace : effects) {
+//            effectPlace.spawn();
+//        }
         sendAllPlayersMsg(S.toPrefixYellow("游戏开始"));
     }
 
     private static final PotionEffect INVISIBLE = new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 1, true);
 
     void playerEquip(Player player) {
-        for (PotionEffect effect : player.getActivePotionEffects()) {
-            player.removePotionEffect(effect.getType());
-        }
+        player.getActivePotionEffects().forEach(effect -> player.removePotionEffect(effect.getType()));
+//        for (PotionEffect effect : player.getActivePotionEffects()) {
+//            player.removePotionEffect(effect.getType());
+//        }
         PlayerInfo.clearInventory(player);
         if (useColorCap) {
             if (teamAplayer.contains(player)) {
